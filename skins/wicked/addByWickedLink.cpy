@@ -20,8 +20,8 @@ from Products.wicked.config import BACKLINK_RELATIONSHIP
 newcontentid = titleToNormalizedId(Title)
 # XXX this is ambiguous as to where content will end up depending
 #     on whether 'context' is folderish
-newcontentid = context.invokeFactory(type_name, id=newcontentid,
-                                     title=Title)
+context.invokeFactory(type_name, id=newcontentid,
+                      title=Title)
 newcontent = getattr(context, newcontentid)
 
 # if new content is referenceable
