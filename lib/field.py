@@ -66,7 +66,11 @@ class WikiField(fapi.FilterField):
         fapi.FilterField.set(self, instance, value, **kwargs)        
 
         # parse wiki text, set backlinks
-        new_links = linkregex.findall(value)
+        if value.__class__ == atapi.BaseUnit:
+            value_str = value.getRaw()
+        else:
+            value_str = value
+        new_links = linkregex.findall(value_str)
         old_links = instance.getBRefs(relationship=config.BACKLINK_RELATIONSHIP)
 
         new_links = map(normalize, new_links)
@@ -84,11 +88,11 @@ class WikiField(fapi.FilterField):
                                    relationship=config.BACKLINK_RELATIONSHIP,
                                    referenceClass=Backlink) \
               for brain in brains ]
-            
+
         new_links = [ (link, True) for link in new_links ]
         unlink = [ obj for obj in old_links \
                      if not dict(new_links).has_key(obj.id) ]
-  
+
         [ obj.deleteReference(instance, relationship=config.BACKLINK_RELATIONSHIP)
           for obj in unlink ]
 

@@ -41,16 +41,31 @@ class WickedTestCase(ArcheSiteTestCase):
     def afterSetUp(self):
         ArcheSiteTestCase.afterSetUp(self)
         installWicked(self.portal)
-        
         # Because we add skins this needs to be called. Um... ick.
         self._refreshSkinData()
 
         # add some pages
         self.page1 = makeContent(self.folder,
                                  titleToNormalizedId(TITLE1),
-                                 'IronicWiki', title=TITLE1)
+                                 self.wicked_type, title=TITLE1)
         self.page2 = makeContent(self.folder,
                                  titleToNormalizedId(TITLE2),
-                                 'IronicWiki',title=TITLE2)
+                                 self.wicked_type, title=TITLE2)
+
+
+    def getRenderedWickedField(self, doc):
+        field = self.wicked_field
+        return doc.Schema()[field].getAccessor(doc)()
+
+    def hasAddLink(self, doc):
+        """ does wicked field text contain a wicked-generated add link? """
+        # XXX make test stronger, support looking for specific links
+        return doc.absolute_url() in self.getRenderedWickedField(doc)
+
+    def hasWickedLink(self, doc, dest):
+        """ does wicked field text contain a resolved wicked link to
+        the specified dest object?  """
+        # XXX make test stronger
+        return dest.absolute_url() in self.getRenderedWickedField(doc)
 
 setup.PortalSetup(products=['Archetypes', 'wicked'])

@@ -5,7 +5,7 @@ wicked
 $Id: $
 """
 
-__authors__ = 'Whit Morriss <whit@kalistra.com>'
+__authors__ = 'Whit Morriss <whit@kalistra.com>, Rob Miller <ra@burningman.com>'
 __docformat__ = 'restructuredtext'
 
 

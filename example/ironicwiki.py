@@ -15,7 +15,6 @@ from Products.Archetypes import public as atapi
 from Products.wicked import config as config
 from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.utils import getToolByName
-from ZODB.POSException import ConflictError
 
 from Products.filter import api as fapi
 from Products.wicked import api as wapi
