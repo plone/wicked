@@ -40,6 +40,21 @@ def configureWysiwyg(portal, out):
         editors = ['Kupu',] + editors
         portal.portal_properties.site_properties._updateProperty('available_editors', editors)
 
+def installExtendedPathIndex(portal, out):
+    """ change the path index to an ExtendedPathIndex """
+    cat = getToolByName(portal, 'portal_catalog')
+    index_types = [index['name'] for index in cat.Indexes.filtered_meta_types()]
+    if not 'ExtendedPathIndex' in index_types:
+        print >> out, '-> WARNING! ExtendedPathIndex NOT installed!'
+        return
+    path_index_type = dict(cat.enumerateIndexes())['path']
+    if path_index_type == 'ExtendedPathIndex':
+        print >> out, '-> ExtendedPathIndex already installed'
+    else:
+        cat.delIndex('path')
+        cat.addIndex('path', 'ExtendedPathIndex')
+        cat.manage_reindexIndex(['path'])
+        print >> out, '-> ExtendedPathIndex installed'
 
 def install(self):
     out = StringIO()
@@ -49,6 +64,8 @@ def install(self):
     install_subskin(self, out, config.GLOBALS)
 
     installTypes(self, out, listTypes(config.PROJECTNAME), config.PROJECTNAME)
+
+    installExtendedPathIndex(self, out)
 
     configureReferenceCatalog(self, out)
     configureWysiwyg(self, out)

@@ -1,7 +1,7 @@
 import sre
 from Products.CMFCore.utils import getToolByName
 from Products.filter import api as fapi
-from Products.AdvancedQuery import Eq
+from Products.AdvancedQuery import Eq, Generic
 
 from normalize import titleToNormalizedId
 
@@ -21,21 +21,29 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
         path = path.split('/')
         return '/'.join(path[len(portal_path):])
 
-    def _getBrainAttrMatch(self, attr, value, brains,
-                           case_sensitive=True):
+    def _getBrainIdMatch(self, value, brains):
         """
-        Return first brain from the sequence w/ specified attribute
-        matching the specified value, or None if no match
+        Return first brain from the sequence w/ id matching specified
+        value, or None if no match
         """
-        if not case_sensitive:
-            value = value.lower()
         for brain in brains:
-            b_value = getattr(brain, attr)
-            if not case_sensitive:
-                b_value = b_value.lower()
-            if getattr(brain, attr) == value:
+            if brain.id == value:
                 return brain
         
+    def _getBrainTitleMatch(self, value, brains):
+        """
+        Return first brain from the sequence w/ title matching specified
+        value (case insensitive), or None if no match
+
+        Currently just matching on length, since the index lookup was for
+        an exact phrase, equal length implies equal value
+
+        XXX do we want to be more forgiving w/ extra whitespace?
+        """
+        for brain in brains:
+            if len(brain.Title) == len(value):
+                return brain
+
     def _filterCore(self, instance, chunk, **kwargs):
         """
         Use the portal catalog to find a list of possible links.
@@ -43,8 +51,10 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
         """
         catalog = getToolByName(instance, 'portal_catalog')
         path = instance.aq_inner.aq_parent.absolute_url_path()
-        query = Eq('path', path) & (Eq('id', chunk) | Eq('Title', chunk))
-        #import pdb; pdb.set_trace()
+        id = chunk
+        title = '"%s"' % chunk
+        query = Generic('path', {'query': path, 'depth': 1}) \
+                & (Eq('id', id) | Eq('Title', title))
         brains = catalog.evalAdvancedQuery(query, (('created', 'desc'),))
         link_brain = None
         
@@ -52,24 +62,25 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
             if len(brains) == 1:
                 link_brain = brains[0]
             else:
-                link_brain = self._getBrainAttrMatch('id', chunk, brains)
+                link_brain = self._getBrainIdMatch(chunk, brains)
         else:
             # XXX check for kwargs[scope] and modify path expression in
             #     the following query appropriately
-            query = Eq('id', chunk) | Eq('Title', chunk)
+            query = Eq('id', id) | Eq('Title', title)
             brains = catalog.evalAdvancedQuery(query, (('created', 'desc'),))
             if brains:
                 if len(brains) == 1:
                     link_brain = brains[0]
                 else:
-                    link_brain = self._getBrainAttrMatch('id', chunk, brains)
+                    link_brain = self._getBrainIdMatch(chunk, brains)
 
         if brains and not link_brain:
             # there was no id match, get the earliest created Title match
-            link_brain = self._getBrainAttrMatch('Title', chunk, brains,
-                                                 case_sensitive=False)
+            link_brain = self._getBrainTitleMatch(chunk, brains)
 
         if link_brain:
+            # XXX do we need to support 'links' as a sequence or should
+            #     we change to a single 'link'
             kwargs['links'] = [ {'path': link_brain.getPath(),
                                  'icon': link_brain.getIcon,
                                  'rel_path': self.getPathRelToPortal(link_brain.getPath(),
