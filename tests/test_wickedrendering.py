@@ -28,7 +28,7 @@ class TestWickedRendering(WickedTestCase):
     wicked_field = 'body'
     
     def test_stxRendering(self):
-        self.page1.update(body=stx_body)
+        self.page1.setBody(stx_body, mimetype='text/structured')
         self.failUnless('<ul>' in self.page1.getBody())
 
 
