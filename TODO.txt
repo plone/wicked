@@ -1,0 +1,27 @@
+----------
+:: TODO ::
+----------
+
+
+
+Proposed User Interface:
+-----------------------
+
+
+- link / resolution menu
+
+
+- addmenu
+
+
+- backlink menu
+
+
+
+Link Creation:
+--------------
+
+
+- fix behavior of addByWickedLink
+
+

@@ -1,0 +1,21 @@
+Installation Notes:
+
+Unpack this Product into your Zope/Plone Products directory. This
+product has a number of dependencies.
+
+Product                         Version    URL
+-----                           --------   -----------------------------------
+Plone                           2.0.4+     http://svn.plone.org/plone/CMFPlone/trunk/
+Archetypes                      1.3+       http://svn.plone.org/archetypes/Archetypes/branches/release-1_3-branch/
+ATReferenceBrowserWidget        N/A        http://svn.plone.org/archetypes/ATReferenceBrowserWidget/trunk/
+kupu                            1.1+       http://codespeak.net/svn/kupu/trunk/kupu
+
+Make sure these are all installed and then on a *nix system from the
+wicked directory you should be able to type
+
+# make
+
+
+if you wish to run the tests without using make (which is fine)
+
+# python tests/runalltests.py

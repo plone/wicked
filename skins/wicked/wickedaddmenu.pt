@@ -1,0 +1,40 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
+      i18n:domain="plone">
+
+<body>
+<div metal:define-macro="addmenu">
+<div class="">
+    <div class="WickedMenuPosition">
+      <a href="#"
+	title="Add new items to this folder"
+	onclick="return buttonClick(event, 'wickedObjectMenu');"
+	onmouseover="buttonMouseover(event, 'wickedObjectMenu');"
+	i18n:attributes="title">
+	<span i18n:translate="label_add_new_item">+</span>
+      </a>
+      <ul class="actionMenu" id="wickeObjectMenu"
+	onmouseover="menuMouseover(event)">
+	<metal:block tal:repeat="ctype contentTypes"> 
+	  <li tal:define="Title ctype/Title;Id ctype/getId">
+	    <a href="#" 
+	      onMouseUp="if (activeButton != null) resetButton(activeButton);"
+	      tal:define="folder python:test(getattr(here.aq_explicit, 'isPrincipiaFolderish', 0), here, here.getParentNode())"
+	      i18n:attributes="title"
+	      tal:attributes="href python:folder.absolute_url()+'/addByWickedLink?type_name=%s&Title=%s&refid=%s' %(Id, Title, here.id);
+	      title Title">
+	      <img src="folder.gif" 
+		alt="" 
+		width="16" 
+		height="16" 
+		tal:attributes="src string:$portal_url/${ctype/getIcon}" />
+		<tal:title i18n:translate=""
+		  tal:content="Title">Title</tal:title>
+	    </a>
+	  </li>
+	</metal:block>
+      </ul>
+    </div>
+</div>
+</div>
+</body>	
+</html>

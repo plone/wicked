@@ -1,0 +1,49 @@
+<html>
+<body>
+    <pre>
+    Behaviors:
+    
+    - link resolved without ambiguity: display slug linked
+
+    - link resolved with ambiguity: display slug w/ link menu
+
+    - link unresolved: display slug w/ add icon and/or add menu
+    </pre>
+    <div metal:define-macro="wicked_link">
+      <span tal:define="howmany python:len(links)" 
+	tal:condition="howmany" tal:omit-tag="">
+	<span tal:condition="python:howmany > 1" tal:omit-tag="">  
+	  <span tal:define="link python:link[0]" tal:omit-tag=""> 
+	    <span metal:use-macro="here/wicked_link/macros/linkmenu"> 
+	      the first link
+	    </span>
+	  </span>
+	</span>
+	<span tal:condition="python:howmany == 1" tal:omit-tag=''> 
+	  <span tal:define="link python:link[0]" tal:omit-tag=''>
+	    <span class='wikilink_resolved'>
+	      <a tal:define="url python:link[1]; title python:link[0]" 
+		tal:content='python: link[0]' tal:attributes='href string:$portal_url/${url}' />
+	    </span>
+	  </span>
+	</span>
+      </span>
+      <span tal:condition="python:not len(links)" tal:omit-tag=''>
+	<span class="wickedparens">((</span>
+	<span tal:content="chunk" class='wikilink_unresolved'>a chunk</span>
+	&nbsp;<a class="wickedadd" tal:attributes="href string:$here_url/addFromLink?Title=${chunk}" tal:content="string:+" tal:define="here_url here/absolute_url">+</a>&nbsp;
+	<span class="wickedparens">))</span>
+      </span>
+    </div>
+
+    <div metal:define-macro="linkmenu">
+
+    </div>
+    <div metal:define-macro="addmenu">
+      
+    </div>
+    <div metal:define-macro="resolve">
+      
+    </div>
+</body>
+</html>
