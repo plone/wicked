@@ -21,28 +21,37 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
         path = path.split('/')
         return '/'.join(path[len(portal_path):])
 
-    def _getBrainIdMatch(self, value, brains):
+    def _getMatchFromQueryResults(self, chunk, brains):
         """
-        Return first brain from the sequence w/ id matching specified
-        value, or None if no match
-        """
-        for brain in brains:
-            if brain.id == value:
-                return brain
-        
-    def _getBrainTitleMatch(self, value, brains):
-        """
-        Return first brain from the sequence w/ title matching specified
-        value (case insensitive), or None if no match
+        Given a set of query results and the wicked link text, return
+        the brain that represents the correct object to link to, or
+        None
 
-        Currently just matching on length, since the index lookup was for
-        an exact phrase, equal length implies equal value
+        Assumes that brains are already ordered oldest to newest, so
+        the first absolute match is the one returned.  Matches on id
+        take priority over matches on title
 
-        XXX do we want to be more forgiving w/ extra whitespace?
+        Currently title matches comparisons are just testing for equal
+        length; since the index lookup was for an exact phrase, equal
+        length implies equal value
+
+        XXX do we want to be more forgiving w/ extra whitespace in the
+        title?
         """
-        for brain in brains:
-            if len(brain.Title) == len(value):
-                return brain
+        link_brain = None
+        if len(brains) == 1:
+            if brains[0].id == chunk or len(brains[0].Title) == len(chunk):
+                link_brain = brains[0]
+        else:
+            for brain in brains:
+                if brain.id == chunk:
+                    link_brain = brain
+            if not link_brain:
+                # there was no id match, get the earliest created Title match
+                for brain in brains:
+                    if len(brain.Title) == len(chunk):
+                        link_brain = brain
+        return link_brain
 
     def _filterCore(self, instance, chunk, **kwargs):
         """
@@ -53,30 +62,22 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
         path = instance.aq_inner.aq_parent.absolute_url_path()
         id = chunk
         title = '"%s"' % chunk
+
         query = Generic('path', {'query': path, 'depth': 1}) \
                 & (Eq('id', id) | Eq('Title', title))
-        brains = catalog.evalAdvancedQuery(query, (('created', 'desc'),))
+        brains = catalog.evalAdvancedQuery(query, ('created',))
+
         link_brain = None
-        
         if brains:
-            if len(brains) == 1:
-                link_brain = brains[0]
-            else:
-                link_brain = self._getBrainIdMatch(chunk, brains)
-        else:
+            link_brain = self._getMatchFromQueryResults(chunk, brains)
+
+        if not link_brain:
             # XXX check for kwargs[scope] and modify path expression in
             #     the following query appropriately
             query = Eq('id', id) | Eq('Title', title)
-            brains = catalog.evalAdvancedQuery(query, (('created', 'desc'),))
+            brains = catalog.evalAdvancedQuery(query, ('created',))
             if brains:
-                if len(brains) == 1:
-                    link_brain = brains[0]
-                else:
-                    link_brain = self._getBrainIdMatch(chunk, brains)
-
-        if brains and not link_brain:
-            # there was no id match, get the earliest created Title match
-            link_brain = self._getBrainTitleMatch(chunk, brains)
+                link_brain = self._getMatchFromQueryResults(chunk, brains)
 
         if link_brain:
             # XXX do we need to support 'links' as a sequence or should

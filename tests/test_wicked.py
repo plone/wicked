@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, time
 import unittest
 from sets import Set
 import traceback
@@ -7,7 +7,7 @@ if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
 
 from Testing import ZopeTestCase
-from wickedtestcase import WickedTestCase, test_content
+from wickedtestcase import WickedTestCase, makeContent
 from Products.wicked.lib.normalize import titleToNormalizedId
 from Products.wicked.config import BACKLINK_RELATIONSHIP
 
@@ -27,6 +27,15 @@ class TestWikiLinking(WickedTestCase):
         # XXX make test stronger
         return dest.absolute_url() in doc.getBody()
 
+    def replaceCreatedWithFieldIndex(self):
+        """ replace the 'created' index w/ a field index b/c we need
+        better than 1 minute resolution for our testing """
+        cat = self.portal.portal_catalog
+        cat.delIndex('created')
+        cat.manage_addIndex('created', 'FieldIndex',
+                            extras={indexed_attrs:'created'})
+        cat.manage_reindexIndex(ids=['created'])
+
     def test_backlink(self):
         assert self.page1 in self.page2.getRefs(relationship=BACKLINK_RELATIONSHIP)
 
@@ -38,51 +47,126 @@ class TestWikiLinking(WickedTestCase):
         self.failUnless(self.hasAddLink(self.page1))
         self.failUnless(self.hasWickedLink(self.page1, self.page2))
 
-    def testLinkPriorities(self):
-        self.createRichTestContent()
+    def testLocalIdBeatsLocalTitle(self):
+        w1 = makeContent(self.folder, 'IdTitleClash',
+                         'IronicWiki', title='Some Title')
+        w2 = makeContent(self.folder, 'some_other_id',
+                         'IronicWiki', title='IdTitleClash')
+        self.page1.setBody("((%s))" % w1.id) # matches w2 title
+        self.failUnless(self.hasWickedLink(self.page1, w1))
+        self.failIf(self.hasWickedLink(self.page1, w2))
 
-        wf1 = self.folder.wf1
-        wf2 = self.folder.wf2
-        wf3 = self.folder.wf3
+    def testLocalIdBeatsRemoteId(self):
+        f2 = makeContent(self.folder, 'f2', 'Folder')
+        w1 = makeContent(f2, self.page1.id, 'IronicWiki',
+                         title='W1 Title')
+        w2 = makeContent(f2, 'w2_id', 'IronicWiki',
+                         title='W2 Title')
+        w2.setBody("((%s))" % self.page1.id)
+        self.failUnless(self.hasWickedLink(w2, w1))
+        self.failIf(self.hasWickedLink(w2, self.page1))
+
+    def testLocalTitleBeatsRemoteId(self):
+        f2 = makeContent(self.folder, 'f2', 'Folder')
+        w1 = makeContent(f2, 'w1_id', 'IronicWiki',
+                         title=self.page1.id)
+        w2 = makeContent(f2, 'w2_id', 'IronicWiki',
+                         title='W2 Title')
+        w2.setBody("((%s))" % self.page1.id)
+        self.failUnless(self.hasWickedLink(w2, w1))
+        self.failIf(self.hasWickedLink(w2, self.page1))
         
-        wf1_wicked1 = getattr(wf1, 'wicked-one')
-        wf1_wicked2 = getattr(wf1, 'wicked-two')
-        wf1_wicked3 = getattr(wf1, 'wicked-three')
+    def testInexactTitleNotMatch(self):
+        w1 = makeContent(self.folder, 'w1', 'IronicWiki',
+                         title='W1 Title With Extra')
+        self.page1.setBody("((W1 Title))")
+        self.failIf(self.hasWickedLink(self.page1, w1))
+        self.failUnless(self.hasAddLink(self.page1))
 
-        wf2_wicked1 = getattr(wf2, 'wicked-one')
-        wf2_wicked2_diffid = getattr(wf2, 'wicked-two-diff-id')
-        wf2_wicked3_difftitle = getattr(wf2, 'wicked-three')
+    def testInexactTitleNotBlockLocalId(self):
+        w1 = makeContent(self.folder, 'w1', 'IronicWiki',
+                         title='W1 Title')
+        w2 = makeContent(self.folder, 'w2', 'IronicWiki',
+                         title='%s With Extra' % w1.id)
+        self.page1.setBody("((%s))" % w1.id)
+        self.failUnless(self.hasWickedLink(self.page1, w1))
+        self.failIf(self.hasWickedLink(self.page1, w2))
 
-        wf3_wicked1 = getattr(wf3, 'wicked-one')
-        wf3_wicked2 = getattr(wf3, 'wicked-two')
+    def testInexactLocalTitleNotBlockLocalTitle(self):
+        w1 = makeContent(self.folder, 'w1', 'IronicWiki',
+                         title='W1 Title')
+        w2 = makeContent(self.folder, 'w2', 'IronicWiki',
+                         title='%s With Extra' % w1.Title())
+        self.page1.setBody("((%s))" % w1.Title())
+        self.failUnless(self.hasWickedLink(self.page1, w1))
+        self.failIf(self.hasWickedLink(self.page1, w2))
 
-        wf1_wicked1.setBody("((%s)) ((%s))" % (wf1_wicked2.id, wf1_wicked3.id))
-        self.failUnless(self.hasWickedLink(wf1_wicked1, wf1_wicked2))
-        self.failUnless(self.hasWickedLink(wf1_wicked1, wf1_wicked3))
+    def testInexactLocalTitleNotBlockRemoteId(self):
+        f2 = makeContent(self.folder, 'f2', 'Folder')
+        w1 = makeContent(self.folder, 'w1', 'IronicWiki',
+                         title='W1 Title')
+        w2 = makeContent(f2, 'w2', 'IronicWiki',
+                         title='%s With Extra' % w1.id)
+        w3 = makeContent(f2, 'w3', 'IronicWiki',
+                         title='W3 Title')
+        w3.setBody("((%s))" % w1.id)
+        self.failUnless(self.hasWickedLink(w3, w1))
+        self.failIf(self.hasWickedLink(w3, w2))
 
-        wf1_wicked1.setBody("((%s)) ((%s))" % (wf1_wicked2.Title(),
-                                               wf1_wicked3.Title()))
-        self.failUnless(self.hasWickedLink(wf1_wicked1, wf1_wicked2))
-        self.failUnless(self.hasWickedLink(wf1_wicked1, wf1_wicked3))
+    def testInexactRemoteTitleNotBlockRemoteId(self):
+        f2 = makeContent(self.folder, 'f2', 'Folder')
+        w1 = makeContent(self.folder, 'w1', 'IronicWiki',
+                         title='W1 Title')
+        w2 = makeContent(self.folder, 'w2', 'IronicWiki',
+                         title='%s With Extra' % w1.id)
+        w3 = makeContent(f2, 'w3', 'IronicWiki',
+                         title='W3 Title')
+        w3.setBody("((%s))" % w1.id)
+        self.failUnless(self.hasWickedLink(w3, w1))
+        self.failIf(self.hasWickedLink(w3, w2))
 
-        wf1_wicked2.setBody("((%s))" % wf1_wicked1.id)
-        self.failUnless(self.hasWickedLink(wf1_wicked2, wf1_wicked1))
+    def testInexactLocalTitleNotBlockRemoteTitle(self):
+        f2 = makeContent(self.folder, 'f2', 'Folder')
+        w1 = makeContent(self.folder, 'w1', 'IronicWiki',
+                         title='W1 Title')
+        w2 = makeContent(f2, 'w2', 'IronicWiki',
+                         title='%s With Extra' % w1.Title())
+        w3 = makeContent(f2, 'w3', 'IronicWiki',
+                         title='W3 Title')
+        w3.setBody("((%s))" % w1.Title())
+        self.failUnless(self.hasWickedLink(w3, w1))
+        self.failIf(self.hasWickedLink(w3, w2))
 
-        wf1_wicked2.setBody("((%s))" % wf1_wicked1.Title())
-        self.failUnless(self.hasWickedLink(wf1_wicked2, wf1_wicked1))
+    def testInexactRemoteTitleNotBlockRemoteTitle(self):
+        f2 = makeContent(self.folder, 'f2', 'Folder')
+        w1 = makeContent(self.folder, 'w1', 'IronicWiki',
+                         title='W1 Title')
+        w2 = makeContent(self.folder, 'w2', 'IronicWiki',
+                         title='%s With Extra' % w1.Title())
+        w3 = makeContent(f2, 'w3', 'IronicWiki',
+                         title='W3 Title')
+        w3.setBody("((%s))" % w1.Title())
+        self.failUnless(self.hasWickedLink(w3, w1))
+        self.failIf(self.hasWickedLink(w3, w2))
 
-        wf2_wicked2_diffid.setBody("((%s))" % wf2_wicked1.id)
-        self.failUnless(self.hasWickedLink(wf2_wicked2_diffid,
-                                           wf2_wicked1))
+    def testDuplicateLocalTitleMatchesOldest(self):
+        title = 'Duplicate Title'
+        w1 = makeContent(self.folder, 'w1', 'IronicWiki',
+                         title=title)
+        w2 = makeContent(self.folder, 'w2', 'IronicWiki',
+                         title=title)
+        w3 = makeContent(self.folder, 'w3', 'IronicWiki',
+                         title=title)
+        self.page1.setBody("((%s))" % title)
+        self.failUnless(self.hasWickedLink(self.page1, w1))
+        self.failIf(self.hasWickedLink(self.page1, w2))
+        self.failIf(self.hasWickedLink(self.page1, w3))
 
-        wf2_wicked2_diffid.setBody("((%s))" % wf2_wicked1.Title())
-        self.failUnless(self.hasWickedLink(wf2_wicked2_diffid,
-                                           wf2_wicked1))
-
-        wf1_wicked1.setBody("((%s))" % wf2_wicked2_diffid.id)
-        self.failUnless(self.hasWickedLink(wf1_wicked1, wf2_wicked2_diffid))
-
+        self.folder.manage_delObjects(ids=[w1.id])
+        self.failUnless(self.hasWickedLink(self.page1, w2))
+        self.failIf(self.hasWickedLink(self.page1, w3))
         
+
 class TestDocCreation(WickedTestCase):
     def afterSetUp(self):
         WickedTestCase.afterSetUp(self)

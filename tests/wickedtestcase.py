@@ -34,43 +34,6 @@ def makeContent(container, id, portal_type, **kw):
 TITLE1 = "Cop Shop"
 TITLE2 = 'DMV Computer has died'
 
-wf1_contents = {
-    'wicked-one': {'Type': 'IronicWiki',
-                   'title': 'Wicked One'},
-    'wicked-two': {'Type': 'IronicWiki',
-                   'title': 'Wicked Two'},
-    'wicked-three': {'Type': 'IronicWiki',
-                     'title': 'Wicked Three'},
-    }
-
-wf2_contents = {
-    'wicked-one': {'Type': 'IronicWiki',
-                   'title': 'Wicked One'},
-    'wicked-two-diff-id': {'Type': 'IronicWiki',
-                           'title': 'Wicked Two'},
-    'wicked-three': {'Type': 'IronicWiki',
-                     'title': 'Wicked Three Different Title'},
-    }
-
-wf3_contents = {
-    'wicked-one': {'Type': 'IronicWiki',
-                   'title': 'Wicked One'},
-    'wicked-two': {'Type': 'IronicWiki',
-                   'title': 'Wicked Two'},
-    }    
-
-test_content = {
-    'wf1': {'Type': 'Folder',
-            'title': 'WickedFolder1',
-            'contents': wf1_contents},
-    'wf2': {'Type': 'Folder',
-            'title': 'WickedFolder2',
-            'contents': wf2_contents},
-    'wf3': {'Type': 'Folder',
-            'title': 'WickedFolder3',
-            'contents': wf3_contents},
-    }
-
 # This is the test case. You will have to add test_<methods> to your
 # class in order to assert things about your Product.
 class WickedTestCase(ArcheSiteTestCase):
@@ -89,15 +52,5 @@ class WickedTestCase(ArcheSiteTestCase):
         self.page2 = makeContent(self.folder,
                                  titleToNormalizedId(TITLE2),
                                  'IronicWiki',title=TITLE2)
-
-    def createRichTestContent(self):
-        for f_id, f_desc in test_content.items():
-            folder = makeContent(self.folder, f_id, f_desc['Type'],
-                                 title=f_desc['title'])
-            setattr(self, f_id, folder)
-            for ob_id in f_desc['contents'].keys():
-                ob_desc = f_desc['contents'][ob_id]
-                makeContent(folder, ob_id, ob_desc['Type'],
-                            title=ob_desc['title'])
 
 setup.PortalSetup(products=['Archetypes', 'wicked'])
