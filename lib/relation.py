@@ -1,12 +1,23 @@
+##########################################################
+#
+# Licensed under the terms of the GNU Public License
+# (see docs/LICENSE.GPL)
+#
+# Copyright (c) 2005:
+#   - The Open Planning Project (http://www.openplans.org/)
+#   - Whit Morriss <whit@kalistra.com>
+#   - and contributors
+#
+##########################################################
+
 """
-SmartLink
-~~~~~~~~~~
+BackLink
+~~~~~~~~
 
 A type of reference that can be used/extened to provide smarter
 inter-document linking. With the support of an editor this can be
 quite useful.
 
-$Id: $
 """
 
 __authors__ = 'Whit Morriss <whit@kalistra.com>'

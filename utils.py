@@ -54,4 +54,3 @@ def installDepends(portal):
              'optional' : optional_handler,
              })
 
-

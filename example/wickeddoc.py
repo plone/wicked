@@ -1,3 +1,14 @@
+##########################################################
+#
+# Licensed under the terms of the GNU Public License
+# (see docs/LICENSE.GPL)
+#
+# Copyright (c) 2005:
+#   - The Open Planning Project (http://www.openplans.org/)
+#   - Rob Miller <rob@kalistra.com> (RaFromBRC)
+#   - and contributors
+#
+##########################################################
 """
 WickedDoc
 ~~~~~~~~~~

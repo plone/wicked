@@ -1,4 +1,13 @@
 #!/usr/bin/python
+##########################################################
+#
+# Licensed under the terms of the GNU Public License
+# (see docs/LICENSE.GPL)
+#
+# Copyright (c) 2005:
+#   - The Plone Foundation (http://plone.org/foundation/)
+#
+##########################################################
 
 import re
 

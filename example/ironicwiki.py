@@ -1,9 +1,21 @@
+##########################################################
+#
+# Licensed under the terms of the GNU Public License
+# (see docs/LICENSE.GPL)
+#
+# Copyright (c) 2005:
+#   - The Open Planning Project (http://www.openplans.org/)
+#   - Whit Morriss <whit@kalistra.com>
+#   - and contributors
+#
+##########################################################
+
 """
 IronicWiki
 ~~~~~~~~~~
 
 a demonstration of wicked's capabilities confined to the content type
-wicked aspire to make obsolete
+wicked aspires to make obsolete
 
 """
 
