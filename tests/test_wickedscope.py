@@ -10,7 +10,7 @@ from Testing import ZopeTestCase
 
 from Products.wicked.lib.normalize import titleToNormalizedId
 from Products.wicked.config import BACKLINK_RELATIONSHIP
-from Products.wicked.example import WickedDoc
+from Products.wicked.example import IronicWiki
 from wickedtestcase import WickedTestCase, makeContent
 
 
@@ -27,32 +27,32 @@ def scopeTester(self):
     return path
 
 class TestWickedScope(WickedTestCase):
-    wicked_type = 'WickedDoc'
-    wicked_field = 'text'
+    wicked_type = 'IronicWiki'
+    wicked_field = 'body'
 
     def afterSetUp(self):
-        WickedDoc.scopeTester = scopeTester
-        WickedDoc.schema['text'].scope = 'scopeTester'
+        IronicWiki.scopeTester = scopeTester
+        IronicWiki.schema['body'].scope = 'scopeTester'
         WickedTestCase.afterSetUp(self)
 
     def beforeTearDown(self):
-        del WickedDoc.scopeTester
-        WickedDoc.schema['text'].scope = ''
+        del IronicWiki.scopeTester
+        IronicWiki.schema['body'].scope = ''
 
     def test_insideScope(self):
         f2 = makeContent(self.folder, 'f2', 'Folder')
-        wd1 = makeContent(f2, 'wd1', 'WickedDoc',
-                          title='WD1 Title')
-        wd1.setText("((%s))" % self.page1.Title())
-        self.failUnless(self.hasWickedLink(wd1, self.page1))
+        w1 = makeContent(f2, 'w1', 'IronicWiki',
+                          title='W1 Title')
+        w1.setBody("((%s))" % self.page1.Title())
+        self.failUnless(self.hasWickedLink(w1, self.page1))
 
     def test_outsideScope(self):
         f2 = makeContent(self.folder, 'f2', 'Folder')
         f3 = makeContent(f2, 'f3', 'Folder')
-        wd1 = makeContent(f3, 'wd1', 'WickedDoc',
-                          title='WD1 Title')
-        wd1.setText("((%s))" % self.page1.Title())
-        self.failIf(self.hasWickedLink(wd1, self.page1))
+        w1 = makeContent(f3, 'w1', 'IronicWiki',
+                          title='W1 Title')
+        w1.setBody("((%s))" % self.page1.Title())
+        self.failIf(self.hasWickedLink(w1, self.page1))
         
 
 def test_suite():

@@ -14,12 +14,15 @@ from AccessControl import ClassSecurityInfo
 from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.utils import getToolByName
 from Products.Archetypes import public as atapi
-from Products.ATContentTypes.atct import ATDocument
 try:
-    from Products.ATContentTypes.config import ATDOCUMENT_CONTENT_TYPE
-except ImportError:
+    from Products.ATContentTypes.atct import ATDocument
+except ImportError: # ATCT 0.2
+    from Products.ATContentTypes.types.ATDocument import ATDocument
+try:
     from Products.ATContentTypes.config import zconf
     ATDOCUMENT_CONTENT_TYPE = zconf.ATDocument.default_content_type
+except ImportError: # ATCT 0.2
+    from Products.ATContentTypes.config import ATDOCUMENT_CONTENT_TYPE
 
 from Products.filter import api as fapi
 

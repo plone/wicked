@@ -44,8 +44,7 @@ schema = atapi.BaseSchema.copy() + atapi.Schema((
 class IronicWiki(atapi.BaseContent):
     """ Ironic wiki Portal Content """
 
-    archetype_name='Wiki'
-    portal_type= meta_type ='IronicWiki'
+    archetype_name = portal_type = meta_type = 'IronicWiki'
     schema=schema
     global_allow=True
 

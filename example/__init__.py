@@ -2,4 +2,7 @@
 Import example types to allow for initialization
 """
 from ironicwiki import IronicWiki
-from wickeddoc import WickedDoc
+try:
+    from wickeddoc import WickedDoc
+except ImportError: # no ATCT
+    pass

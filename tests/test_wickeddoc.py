@@ -11,6 +11,12 @@ from wickedtestcase import WickedTestCase, makeContent
 from Products.wicked.lib.normalize import titleToNormalizedId
 from Products.wicked.config import BACKLINK_RELATIONSHIP
 
+has_atct = True
+try:
+    from Products.wicked.example import WickedDoc
+except ImportError:
+    print "WARNING: ATContentTypes not installed, WickedDoc tests not running"
+    has_atct = False
 
 class TestWickedDoc(WickedTestCase):
     wicked_type = 'WickedDoc'
@@ -27,8 +33,9 @@ class TestWickedDoc(WickedTestCase):
 
 def test_suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestWickedDoc))
+    if has_atct:
+        suite.addTest(unittest.makeSuite(TestWickedDoc))
     return suite
 
-if __name__ == '__main__':
+if __name__ == '__main__' and has_atct:
     framework()
