@@ -38,8 +38,8 @@ class TestWikiLinking(WickedTestCase):
         self.failUnless(self.hasAddLink(self.page1))
         self.failUnless(self.hasWickedLink(self.page1, self.page2))
 
-    def testLinkScopes(self):
-        self.createTestContent()
+    def testLinkPriorities(self):
+        self.createRichTestContent()
 
         wf1 = self.folder.wf1
         wf2 = self.folder.wf2

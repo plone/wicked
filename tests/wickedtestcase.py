@@ -90,7 +90,7 @@ class WickedTestCase(ArcheSiteTestCase):
                                  titleToNormalizedId(TITLE2),
                                  'IronicWiki',title=TITLE2)
 
-    def createTestContent(self):
+    def createRichTestContent(self):
         for f_id, f_desc in test_content.items():
             folder = makeContent(self.folder, f_id, f_desc['Type'],
                                  title=f_desc['title'])
