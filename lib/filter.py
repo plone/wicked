@@ -35,7 +35,7 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
             brains = catalog(**scope)
             if not brains:
                 del scope['id']
-                scope.update['Title'] = '"%s"' % chunk
+                scope.update({'Title': '"%s"' % chunk})
                 brains = catalog(**scope)
 
         kwargs['links'] = [ {'path': brain.getPath(),
