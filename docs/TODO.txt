@@ -7,6 +7,11 @@ Proposed User Interface:
 
 - link / resolution menu
 
+  currently if a wicked link resolves to the "wrong" piece of content,
+  there's no way to override this.  we'd like to have a way to "peg" a
+  link to a specific piece of content, but without losing the
+  simplicity of the default case
+
 - addmenu
 
 - backlink menu
@@ -14,4 +19,19 @@ Proposed User Interface:
 Misc:
 ----
 
-- migration from ZWiki to STX format WickedDoc
+- migration from ZWiki
+
+  we'd like to provide a migration for folks that may want to use
+  wicked instead of ZWiki.  ideally this would provide a means to
+  allow site managers to specify the destination content type, so wiki
+  pages can be replaced by any arbitrary wicked-aware type
+
+- filter support w/o field replacement
+
+  currently in order for filters to be applied to a field, the field
+  needs to inherit from the FilterField base class.  ideally, this
+  would not be necessary, since this makes it considerably harder to
+  retrofit existing content types w/ wicked-aware fields.  ben saller
+  has ideas about how to handle this using 'eventually' to register
+  event channels on field accessors that would trigger the filters
+  being called... more coming soon
