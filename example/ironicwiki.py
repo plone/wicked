@@ -2,9 +2,9 @@
 IronicWiki
 ~~~~~~~~~~
 
-a demonstration of wicked's capabilities confined to the content type wicked aspire to make obsolete
+a demonstration of wicked's capabilities confined to the content type
+wicked aspire to make obsolete
 
-$Id: $
 """
 
 __authors__ = 'Whit Morriss <whit@kalistra.com>'

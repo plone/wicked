@@ -54,7 +54,8 @@ class WikiField(fapi.FilterField):
         kwargs['scope'] = self.scope
         kwargs['template'] = self.template
         kwargs['wicked_macro'] = self.wicked_macro
-        return fapi.FilterField.get(self, instance, mimetype=mimetype, raw=raw, **kwargs)
+        return fapi.FilterField.get(self, instance, mimetype=mimetype,
+                                    raw=raw, **kwargs)
         
     def set(self, instance, value, **kwargs):
         """

@@ -48,7 +48,11 @@ class WickedTestCase(ArcheSiteTestCase):
         self._refreshSkinData()
 
         # add some pages
-        self.page1 = makeContent(self.folder, titleToNormalizedId(TITLE1), 'IronicWiki', TITLE1)
-        self.page2 = makeContent(self.folder, titleToNormalizedId(TITLE2), 'IronicWiki',TITLE2)
+        self.page1 = makeContent(self.folder,
+                                 titleToNormalizedId(TITLE1),
+                                 'IronicWiki', TITLE1)
+        self.page2 = makeContent(self.folder,
+                                 titleToNormalizedId(TITLE2),
+                                 'IronicWiki',TITLE2)
 
 setup.PortalSetup(products=['Archetypes', 'wicked'])

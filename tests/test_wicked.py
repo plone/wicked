@@ -35,16 +35,18 @@ class TestDocCreation(WickedTestCase):
 
     def demoCreate(self):
         self.login('test_user_1_')
-        self.page1.addByWickedLink(Title=self.title, type_name='Document')
+        self.page1.addByWickedLink(Title=self.title)
         
     def testDocAdded(self):
         self.demoCreate()
-        self.failUnless(getattr(self.folder, titleToNormalizedId(self.title), None))
+        self.failUnless(getattr(self.folder,
+                                titleToNormalizedId(self.title), None))
 
     def testBacklinks(self):
         self.demoCreate()
         newdoc = getattr(self.folder, titleToNormalizedId(self.title))
-        self.failUnless(self.page1 in newdoc.getRefs(relationship=BACKLINK_RELATIONSHIP))
+        backlinks = newdoc.getRefs(relationship=BACKLINK_RELATIONSHIP)
+        self.failUnless(self.page1 in backlinks)
 
 def test_suite():
     suite = unittest.TestSuite()

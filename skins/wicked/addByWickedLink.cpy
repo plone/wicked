@@ -4,25 +4,32 @@
 ##bind namespace=
 ##bind script=script
 ##bind subpath=traverse_subpath
-##parameters=type_name, Title
+##parameters=type_name="", Title=""
 ##title=used to add content by wiki link
 ##
-if type_name is None:
-    raise Exception, 'Type name not specified'
-
-if Title is None:
+if not Title:
     raise Exception, 'Title not specified'
+
+if not type_name:
+    type_name = context.meta_type
+    #raise Exception, 'Type name not specified'
 
 from Products.wicked.lib.normalize import titleToNormalizedId
 from Products.wicked.config import BACKLINK_RELATIONSHIP
 
-newcontentid=titleToNormalizedId(Title)
-newcontentid = container.invokeFactory(type_name, id=newcontentid)
-newcontent = getattr(container, newcontentid)
+newcontentid = titleToNormalizedId(Title)
+# XXX this is ambiguous as to where content will end up depending
+#     on whether 'context' is folderish
+newcontentid = context.invokeFactory(type_name, id=newcontentid,
+                                     title=Title)
+newcontent = getattr(context, newcontentid)
 
 # if new content is referenceable
-if container.portal_interface.objectImplements\
+if context.portal_interface.objectImplements\
    (newcontent,
-    'from Products.Archetypes.interfaces.referenceable.IReferenceable'):
+    'Products.Archetypes.interfaces.referenceable.IReferenceable'):
     newcontent.addReference(context, relationship=BACKLINK_RELATIONSHIP)
-    
+
+state.set(status='success', context=newcontent,
+          portal_status_message='"%s" has been created' % Title)
+return state
