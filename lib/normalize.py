@@ -9,6 +9,9 @@
 #
 ##########################################################
 
+__authors__ = 'Anders Pearson <anders@columbia.edu>'
+__docformat__ = 'restructuredtext'
+
 import re
 
 mapping = {138: 's', 140: 'OE', 142: 'z', 154: 's', 156: 'oe', 158: 'z', 159: 'Y', 
