@@ -73,7 +73,6 @@ class WikiField(fapi.FilterField):
         
         # add appropriate backlinks, remove stale ones
         if new_links:
-            #import pdb; pdb.set_trace()
             catalog = getToolByName(instance, UID_MANAGER)
             brains = filter(None, catalog(id=new_links))
 
@@ -90,7 +89,7 @@ class WikiField(fapi.FilterField):
         unlink = [ obj for obj in old_links \
                      if not dict(new_links).has_key(obj.id) ]
   
-        [ obj.deleteReference(instance, relationship=config.BACKLINK_RELATIONSHIP) \
+        [ obj.deleteReference(instance, relationship=config.BACKLINK_RELATIONSHIP)
           for obj in unlink ]
 
 registerField(WikiField,

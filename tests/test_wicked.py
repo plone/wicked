@@ -16,15 +16,27 @@ class TestWikiLinking(WickedTestCase):
         WickedTestCase.afterSetUp(self)
         self.page1.setBody('((DMV Computer has died))')
 
+    def hasAddLink(self, doc):
+        """ does doc body contain a wicked-generated add link? """
+        # XXX make test stronger, support looking for specifc links
+        return doc.absolute_url() in doc.getBody()
+
+    def hasWickedLink(self, doc, dest):
+        """ does doc body contain a resolved wicked link to the specified
+        dest object? """
+        # XXX make test stronger
+        return dest.absolute_url() in doc.getBody()
+
     def test_backlink(self):
         assert self.page1 in self.page2.getRefs(relationship=BACKLINK_RELATIONSHIP)
 
     def testforlink(self):
-        assert self.page1.absolute_url() in self.page1.getBody()
+        self.failUnless(self.hasWickedLink(self.page1, self.page2))
 
     def testformultiplelinks(self):
         self.page1.setBody('((DMV Computer has died))  ((Make another link))')
-        assert self.page1.absolute_url() in self.page1.getBody()
+        self.failUnless(self.hasAddLink(self.page1))
+        self.failUnless(self.hasWickedLink(self.page1, self.page2))
 
 class TestDocCreation(WickedTestCase):
     def afterSetUp(self):

@@ -37,7 +37,7 @@ TITLE1 = "Cop Shop"
 TITLE2 = 'DMV Computer has died'
 
 # This is the test case. You will have to add test_<methods> to your
-# class inorder to assert things about your Product.
+# class in order to assert things about your Product.
 class WickedTestCase(ArcheSiteTestCase):
     
     def afterSetUp(self):

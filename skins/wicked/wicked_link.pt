@@ -9,22 +9,26 @@
 
     - link unresolved: display slug w/ add icon and/or add menu
     </pre>
-    <div metal:define-macro="wicked_link">
+    <metal:block metal:define-macro="wicked_link">
       <span tal:define="howmany python:len(links)" 
 	    tal:condition="howmany" tal:omit-tag="">
 	<span tal:condition="python:howmany > 1" tal:omit-tag="">  
-	  <span tal:define="link python:link[0]" tal:omit-tag=""> 
+	  <span tal:define="link python:links[0]" tal:omit-tag=""> 
 	    <span metal:use-macro="here/wicked_link/macros/linkmenu"> 
 	      the first link
 	    </span>
 	  </span>
 	</span>
 	<span tal:condition="python:howmany == 1" tal:omit-tag=''> 
-	  <span tal:define="link python:link[0]" tal:omit-tag=''>
+	  <span tal:define="link python:links[0]" tal:omit-tag=''>
 	    <span class='wikilink_resolved'>
-	      <a tal:define="url python:link[1]; title python:link[0]" 
-		 tal:content='python: link[0]'
-                 tal:attributes='href string:$portal_url/${url}' />
+	      <a tal:define="path python:link['path'];
+                             icon python:link['icon'];
+                             rel_path python:link['rel_path']" 
+                 tal:attributes="href string:${here/portal_url}/${rel_path}">
+                <img tal:condition="icon"
+                     tal:attributes="src icon"/><span tal:replace="chunk" />
+              </a>
 	    </span>
 	  </span>
 	</span>
@@ -38,7 +42,7 @@
            tal:define="here_url here/absolute_url">+</a>
 	<span class="wickedparens">))</span>
       </span>
-    </div>
+    </metal:block>
 
     <div metal:define-macro="linkmenu">
 
