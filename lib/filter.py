@@ -11,8 +11,8 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
     Filter for creating core wiki behavior 
     """
 
-    name='Wicked Filter'
-    pattern=pattern
+    name = 'Wicked Filter'
+    pattern = pattern
 
     def getPathRelToPortal(self, path, instance):
         portal_path = getToolByName(instance,
@@ -27,13 +27,22 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
         catalog = getToolByName(instance, 'portal_catalog')
         
         scope = kwargs['scope'].copy() # could be replaced with a tals eval or full object
-        scope['id'] = titleToNormalizedId(chunk)
+        scope.update({'id': chunk,
+                     'path': instance.aq_inner.aq_parent.absolute_url_path()})
+        brains = catalog(**scope)
+        if not brains:
+            scope.update({'id': titleToNormalizedId(chunk)})
+            brains = catalog(**scope)
+            if not brains:
+                del scope['id']
+                scope.update['Title'] = '"%s"' % chunk
+                brains = catalog(**scope)
 
         kwargs['links'] = [ {'path': brain.getPath(),
                              'icon': brain.getIcon,
                              'rel_path': self.getPathRelToPortal(brain.getPath(),
                                                                  instance)}
-                            for brain in catalog(**scope) ]
+                            for brain in brains ]
         kwargs['chunk'] = chunk
         macro = kwargs['wicked_macro']; del kwargs['wicked_macro']
         return self._macro_renderer(instance, macro, **kwargs)
