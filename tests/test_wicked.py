@@ -27,13 +27,13 @@ class TestWikiLinking(WickedTestCase):
         # XXX make test stronger
         return dest.absolute_url() in doc.getBody()
 
-    def replaceCreatedWithFieldIndex(self):
+    def replaceCreatedIndex(self):
         """ replace the 'created' index w/ a field index b/c we need
         better than 1 minute resolution for our testing """
         cat = self.portal.portal_catalog
         cat.delIndex('created')
         cat.manage_addIndex('created', 'FieldIndex',
-                            extras={indexed_attrs:'created'})
+                            extra={'indexed_attrs':'created'})
         cat.manage_reindexIndex(ids=['created'])
 
     def test_backlink(self):
@@ -149,7 +149,8 @@ class TestWikiLinking(WickedTestCase):
         self.failUnless(self.hasWickedLink(w3, w1))
         self.failIf(self.hasWickedLink(w3, w2))
 
-    def testDuplicateLocalTitleMatchesOldest(self):
+    def testDupLocalTitleMatchesOldest(self):
+        self.replaceCreatedIndex()
         title = 'Duplicate Title'
         w1 = makeContent(self.folder, 'w1', 'IronicWiki',
                          title=title)
@@ -165,7 +166,51 @@ class TestWikiLinking(WickedTestCase):
         self.folder.manage_delObjects(ids=[w1.id])
         self.failUnless(self.hasWickedLink(self.page1, w2))
         self.failIf(self.hasWickedLink(self.page1, w3))
-        
+
+    def testDupRemoteIdMatchesOldest(self):
+        self.replaceCreatedIndex()
+        id = 'duplicate_id'
+        f2 = makeContent(self.folder, 'f2', 'Folder')
+        f3 = makeContent(self.folder, 'f3', 'Folder')
+        f4 = makeContent(self.folder, 'f4', 'Folder')
+        w1 = makeContent(f2, id, 'IronicWiki',
+                         title='W1 Title')
+        # mix up the order, just to make sure
+        w3 = makeContent(f4, id, 'IronicWiki',
+                         title='W3 Title')
+        w2 = makeContent(f3, id, 'IronicWiki',
+                         title='W2 Title')
+        self.page1.setBody("((%s))" % id)
+        self.failUnless(self.hasWickedLink(self.page1, w1))
+        self.failIf(self.hasWickedLink(self.page1, w2))
+        self.failIf(self.hasWickedLink(self.page1, w3))
+
+        f2.manage_delObjects(ids=[w1.id])
+        self.failUnless(self.hasWickedLink(self.page1, w3))
+        self.failIf(self.hasWickedLink(self.page1, w2))
+
+    def testDupRemoteTitleMatchesOldest(self):
+        self.replaceCreatedIndex()
+        title = 'Duplicate Title'
+        f2 = makeContent(self.folder, 'f2', 'Folder')
+        f3 = makeContent(self.folder, 'f3', 'Folder')
+        f4 = makeContent(self.folder, 'f4', 'Folder')
+        w1 = makeContent(f2, 'w1', 'IronicWiki',
+                         title=title)
+        # mix up the order, just to make sure
+        w3 = makeContent(f4, 'w3', 'IronicWiki',
+                         title=title)
+        w2 = makeContent(f3, 'w2', 'IronicWiki',
+                         title=title)
+        self.page1.setBody("((%s))" % title)
+        self.failUnless(self.hasWickedLink(self.page1, w1))
+        self.failIf(self.hasWickedLink(self.page1, w2))
+        self.failIf(self.hasWickedLink(self.page1, w3))
+
+        f2.manage_delObjects(ids=[w1.id])
+        self.failUnless(self.hasWickedLink(self.page1, w3))
+        self.failIf(self.hasWickedLink(self.page1, w2))
+    
 
 class TestDocCreation(WickedTestCase):
     def afterSetUp(self):

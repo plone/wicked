@@ -46,11 +46,13 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
             for brain in brains:
                 if brain.id == chunk:
                     link_brain = brain
+                    break
             if not link_brain:
                 # there was no id match, get the earliest created Title match
                 for brain in brains:
                     if len(brain.Title) == len(chunk):
                         link_brain = brain
+                        break
         return link_brain
 
     def _filterCore(self, instance, chunk, **kwargs):
