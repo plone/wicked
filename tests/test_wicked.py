@@ -55,7 +55,7 @@ class TestWikiLinking(WickedTestCase):
 
         wf3_wicked1 = getattr(wf3, 'wicked-one')
         wf3_wicked2 = getattr(wf3, 'wicked-two')
-        
+
         wf1_wicked1.setBody("((%s)) ((%s))" % (wf1_wicked2.id, wf1_wicked3.id))
         self.failUnless(self.hasWickedLink(wf1_wicked1, wf1_wicked2))
         self.failUnless(self.hasWickedLink(wf1_wicked1, wf1_wicked3))

@@ -8,6 +8,7 @@ Product                         Version    URL
 Plone                           2.0.4+     http://svn.plone.org/plone/CMFPlone/trunk/
 Archetypes                      1.3+       http://svn.plone.org/archetypes/Archetypes/branches/release-1_3-branch/
 ATReferenceBrowserWidget        N/A        http://svn.plone.org/archetypes/ATReferenceBrowserWidget/trunk/
+AdvancedQuery                   0.6        http://www.dieter.handshake.de/pyprojects/zope/AdvancedQuery.tgz
 kupu                            1.1+       http://codespeak.net/svn/kupu/trunk/kupu
 
 Make sure these are all installed and then on a *nix system from the
