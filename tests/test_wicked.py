@@ -7,7 +7,7 @@ if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
 
 from Testing import ZopeTestCase
-from wickedtestcase import WickedTestCase
+from wickedtestcase import WickedTestCase, test_content
 from Products.wicked.lib.normalize import titleToNormalizedId
 from Products.wicked.config import BACKLINK_RELATIONSHIP
 
@@ -38,6 +38,51 @@ class TestWikiLinking(WickedTestCase):
         self.failUnless(self.hasAddLink(self.page1))
         self.failUnless(self.hasWickedLink(self.page1, self.page2))
 
+    def testLinkScopes(self):
+        self.createTestContent()
+
+        wf1 = self.folder.wf1
+        wf2 = self.folder.wf2
+        wf3 = self.folder.wf3
+        
+        wf1_wicked1 = getattr(wf1, 'wicked-one')
+        wf1_wicked2 = getattr(wf1, 'wicked-two')
+        wf1_wicked3 = getattr(wf1, 'wicked-three')
+
+        wf2_wicked1 = getattr(wf2, 'wicked-one')
+        wf2_wicked2_diffid = getattr(wf2, 'wicked-two-diff-id')
+        wf2_wicked3_difftitle = getattr(wf2, 'wicked-three')
+
+        wf3_wicked1 = getattr(wf3, 'wicked-one')
+        wf3_wicked2 = getattr(wf3, 'wicked-two')
+        
+        wf1_wicked1.setBody("((%s)) ((%s))" % (wf1_wicked2.id, wf1_wicked3.id))
+        self.failUnless(self.hasWickedLink(wf1_wicked1, wf1_wicked2))
+        self.failUnless(self.hasWickedLink(wf1_wicked1, wf1_wicked3))
+
+        wf1_wicked1.setBody("((%s)) ((%s))" % (wf1_wicked2.Title(),
+                                               wf1_wicked3.Title()))
+        self.failUnless(self.hasWickedLink(wf1_wicked1, wf1_wicked2))
+        self.failUnless(self.hasWickedLink(wf1_wicked1, wf1_wicked3))
+
+        wf1_wicked2.setBody("((%s))" % wf1_wicked1.id)
+        self.failUnless(self.hasWickedLink(wf1_wicked2, wf1_wicked1))
+
+        wf1_wicked2.setBody("((%s))" % wf1_wicked1.Title())
+        self.failUnless(self.hasWickedLink(wf1_wicked2, wf1_wicked1))
+
+        wf2_wicked2_diffid.setBody("((%s))" % wf2_wicked1.id)
+        self.failUnless(self.hasWickedLink(wf2_wicked2_diffid,
+                                           wf2_wicked1))
+
+        wf2_wicked2_diffid.setBody("((%s))" % wf2_wicked1.Title())
+        self.failUnless(self.hasWickedLink(wf2_wicked2_diffid,
+                                           wf2_wicked1))
+
+        wf1_wicked1.setBody("((%s))" % wf2_wicked2_diffid.id)
+        self.failUnless(self.hasWickedLink(wf1_wicked1, wf2_wicked2_diffid))
+
+        
 class TestDocCreation(WickedTestCase):
     def afterSetUp(self):
         WickedTestCase.afterSetUp(self)
