@@ -25,6 +25,7 @@ schema = atapi.BaseSchema.copy() + atapi.Schema((
                     primary=True,
                     filters=('Wicked Filter',),
                     default_content_type='text/structured',
+                    default_output_type='text/html',
                     allowable_content_types = ('text/structured',
                                                'text/restructured',
                                                'text/html',
