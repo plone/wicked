@@ -2,26 +2,16 @@
 :: TODO ::
 ----------
 
-
-
 Proposed User Interface:
 -----------------------
 
-
 - link / resolution menu
-
 
 - addmenu
 
-
 - backlink menu
 
+Misc:
+----
 
-
-Link Creation:
---------------
-
-
-- fix behavior of addByWickedLink
-
-
+- migration from ZWiki to STX format WickedDoc

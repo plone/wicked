@@ -31,7 +31,7 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
         the first absolute match is the one returned.  Matches on id
         take priority over matches on title
 
-        Currently title matches comparisons are just testing for equal
+        Currently title match comparisons are just testing for equal
         length; since the index lookup was for an exact phrase, equal
         length implies equal value
 
@@ -74,9 +74,14 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
             link_brain = self._getMatchFromQueryResults(chunk, brains)
 
         if not link_brain:
-            # XXX check for kwargs[scope] and modify path expression in
-            #     the following query appropriately
-            query = Eq('id', id) | Eq('Title', title)
+            if kwargs['scope']:
+                scope = getattr(instance, kwargs['scope'])
+                if callable(scope):
+                    scope = scope()
+                query = Generic('path', scope) \
+                        & (Eq('id', id) | Eq('Title', title))
+            else:
+                query = Eq('id', id) | Eq('Title', title)
             brains = catalog.evalAdvancedQuery(query, ('created',))
             if brains:
                 link_brain = self._getMatchFromQueryResults(chunk, brains)

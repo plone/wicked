@@ -24,6 +24,9 @@ Here is some structured text data:
 """
 
 class TestWickedRendering(WickedTestCase):
+    wicked_type = 'IronicWiki'
+    wicked_field = 'body'
+    
     def test_stxRendering(self):
         self.page1.update(body=stx_body)
         self.failUnless('<ul>' in self.page1.getBody())
