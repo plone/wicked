@@ -18,7 +18,7 @@ from Products.ATContentTypes.atct import ATDocument
 try:
     from Products.ATContentTypes.config import ATDOCUMENT_CONTENT_TYPE
 except ImportError:
-    from Product.ATContentTypes.config import zconf
+    from Products.ATContentTypes.config import zconf
     ATDOCUMENT_CONTENT_TYPE = zconf.ATDocument.default_content_type
 
 from Products.filter import api as fapi
