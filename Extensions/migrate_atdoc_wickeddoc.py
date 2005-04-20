@@ -2,7 +2,7 @@ from Products.ATContentTypes.migration.walker import CatalogWalker
 from Products.wicked.migration.migrator import WickedDocMigrator
 from Products.CMFCore.utils import getToolByName
 
-def wickeddoc_migration(self):
+def migrate_atdoc_wickeddoc(self):
     catalog = getToolByName(self, 'portal_catalog')
     migrators = (WickedDocMigrator,)
     out = []

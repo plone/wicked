@@ -15,4 +15,7 @@ if CMFItemMigrator != None:
         dst_portal_type = 'WickedDoc'
         dst_meta_type = 'WickedDoc'
 
+        def custom(self):
+            self.new.setContentType(self.old.getContentType())
+
     registerMigrator(WickedDocMigrator)
