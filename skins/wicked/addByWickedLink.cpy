@@ -11,7 +11,7 @@ if not Title:
     raise Exception, 'Title not specified'
 
 if not type_name:
-    type_name = context.meta_type
+    type_name = context.Type()
     #raise Exception, 'Type name not specified'
 
 from Products.wicked.lib.normalize import titleToNormalizedId

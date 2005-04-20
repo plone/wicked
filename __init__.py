@@ -18,6 +18,7 @@ import sys
 from AccessControl import ModuleSecurityInfo
 from AccessControl import allow_module, allow_class, allow_type
 
+import Products.wicked.migration
 # Register Global Tools/Services/Config
 # (Skins)
 registerDirectory(config.SKINS_DIR, config.GLOBALS)

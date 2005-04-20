@@ -9,8 +9,7 @@ for atype in  types:
     permissions[atype['portal_type']] = permission
 
     # Assign default roles
-    setDefaultRoles(permission, ('Member',
-                                 'Reviewer',
-                                 'Manager',
+    setDefaultRoles(permission, ('Manager',
+                                 'Owner'
                                  )
                     )
