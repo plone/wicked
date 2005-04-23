@@ -21,9 +21,11 @@ def migrate_atdoc_wickeddoc(self):
         out.append('Portal catalog updated.')
 
         atct_tool = getToolByName(self, 'portal_atct')
+        get_transaction().commit(1)
         atct_tool._changePortalTypeName('Document', 'ATDocument',
                                         global_allow=0,
                                         title='AT Document')
+        get_transaction().commit(1)
         atct_tool._changePortalTypeName('WickedDoc', 'Document',
                                         global_allow=1,
                                         title='Document')
