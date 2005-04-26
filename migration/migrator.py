@@ -8,7 +8,7 @@ except ImportError:
 if CMFItemMigrator != None:
     class WickedDocMigrator(CMFItemMigrator):
         walker = CatalogWalker
-        map = {'text': 'setText'}
+        map = {'getText': 'setText'}
         
         src_portal_type = 'Document'
         src_meta_type = 'ATDocument'
