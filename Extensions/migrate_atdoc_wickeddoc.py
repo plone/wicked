@@ -28,7 +28,7 @@ def migrate_atdoc_wickeddoc(self):
         get_transaction().commit(1)
         atct_tool._changePortalTypeName('WickedDoc', 'Document',
                                         global_allow=1,
-                                        title='Document')
+                                        title='Page')
         out.append('Document types switched')
 
         return '\n'.join(out)
