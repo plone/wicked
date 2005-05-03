@@ -34,13 +34,10 @@
 	</span>
       </span>
       <span tal:condition="python:not len(links)" tal:omit-tag=''>
-	<span class="wickedparens">((</span>
-	<span tal:content="chunk" class='wikilink_unresolved'>a chunk</span>
-	<a class="wickedadd"
+	<span class="wickedparens">((</span><span tal:content="chunk" class='wikilink_unresolved'>a chunk</span><span class="wickedparens">))</span><a class="wickedadd"
            tal:attributes="href string:$here_url/addByWickedLink?Title=${chunk}"
            tal:content="string:+"
            tal:define="here_url here/absolute_url">+</a>
-	<span class="wickedparens">))</span>
       </span>
     </metal:block>
 
