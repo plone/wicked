@@ -67,7 +67,7 @@ schema = ATDocument.schema.copy() + atapi.Schema((
      
 
 class WickedDoc(ATDocument):
-    """ ATDocument with wicked linking """
+    """ A page in the portal; supports wiki linking. """
 
     archetype_name='Wicked Doc'
     portal_type= meta_type ='WickedDoc'
