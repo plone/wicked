@@ -11,6 +11,9 @@
 #
 ##########################################################
 
+from AccessControl import ClassSecurityInfo
+from ZPublisher.HTTPRequest import FileUpload
+
 from relation import Backlink
 from normalize import titleToNormalizedId
 from Products.wicked import config
@@ -22,8 +25,6 @@ from Products.Archetypes.Registry import registerField
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.Expression import createExprContext
-
-from AccessControl import ClassSecurityInfo
 
 try:
     # When Reference are in CMFCore
@@ -81,8 +82,12 @@ class WikiField(fapi.FilterField):
         # parse wiki text, set backlinks
         if value.__class__ == atapi.BaseUnit:
             value_str = value.getRaw()
+        elif value.__class__ == FileUpload:
+            # a file was uploaded, get the (possibly transformed) value
+            value_str = self.get(instance, skip_filters=True)
         else:
             value_str = value
+
         new_links = linkregex.findall(value_str)
         old_links = instance.getBRefs(relationship=config.BACKLINK_RELATIONSHIP)
 
