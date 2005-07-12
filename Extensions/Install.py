@@ -47,7 +47,8 @@ def installExtendedPathIndex(portal, out):
     if not 'ExtendedPathIndex' in index_types:
         print >> out, '-> WARNING! ExtendedPathIndex NOT installed!'
         return
-    path_index_type = dict(cat.enumerateIndexes())['path']
+    index_dict = dict([i[:2] for i in cat.enumerateIndexes()])
+    path_index_type = index_dict['path']
     if path_index_type == 'ExtendedPathIndex':
         print >> out, '-> ExtendedPathIndex already installed'
     else:

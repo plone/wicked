@@ -4,14 +4,22 @@ from Products.CMFCore.utils import getToolByName
 
 def migrate_atdoc_wickeddoc(self):
     catalog = getToolByName(self, 'portal_catalog')
+    portal = getToolByName(self, 'portal_url').getPortalObject()
     migrators = (WickedDocMigrator,)
     out = []
 
     for migrator in migrators:
         out.append('*** Migrating %s to %s ***\n' % (migrator.src_portal_type,
                                                      migrator.dst_portal_type))
-        w = CatalogWalker(migrator, catalog)
-        out.append(w.go())
+        try:
+            w = CatalogWalker(migrator, portal) # ATCT-0.2
+        except AttributeError:
+            w = CatalogWalker(portal, migrator) # ATCT-1.0
+        w_result = w.go()
+        if type(w_result) == type(''):
+            out.append(w_result) # ATCT-0.2
+        else:
+            out.append('%s Migrated\n' % migrator.src_portal_type)
 
         wf = getToolByName(self, 'portal_workflow')
         count = wf.updateRoleMappings()
