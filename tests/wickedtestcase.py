@@ -1,6 +1,6 @@
 from Testing                 import ZopeTestCase
 from Products.CMFCore.utils  import getToolByName
-from Products.PloneTestCase import setup
+from Products.PloneTestCase.setup import setupPloneSite
 
 from Products.Archetypes.tests.ArchetypesTestCase import ArcheSiteTestCase
 from Products.wicked.Extensions.Install import install as installWicked
@@ -68,4 +68,4 @@ class WickedTestCase(ArcheSiteTestCase):
         # XXX make test stronger
         return dest.absolute_url() in self.getRenderedWickedField(doc)
 
-setup.PortalSetup(products=['Archetypes', 'wicked'])
+setupPloneSite(products=['Archetypes', 'wicked'])
