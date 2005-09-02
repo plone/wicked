@@ -43,9 +43,9 @@ schema = atapi.BaseSchema.copy() + atapi.Schema((
                                                'text/plain',
                                                'text/plain-pre'),
                     
-                    widget=atapi.RichWidget( description = "The body text of the document.",
+                    widget=atapi.RichWidget( description = "Link away!",
                                              description_msgid = "help_body_text",
-                                             label = "Body text",
+                                             label = "The wiki",
                                              label_msgid = "label_body_text",
                                              rows = 25,
                                              i18n_domain = "plone")),
