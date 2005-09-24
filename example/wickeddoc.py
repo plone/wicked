@@ -47,6 +47,7 @@ schema = ATDocument.schema.copy() + atapi.Schema((
                    primary=True,
                    filters=('Wicked Filter',),
                    validators = ('isTidyHtmlWithCleanup',),
+                   #validators = ('isTidyHtml',),
                    default_content_type = ATDOCUMENT_CONTENT_TYPE,
                    default_output_type = 'text/html',
                    allowable_content_types = ('text/structured',

@@ -16,7 +16,7 @@ class TestWikiLinking(WickedTestCase):
     wicked_field = 'body'
     
     def afterSetUp(self):
-        super(TestWikiLinking, self).afterSetUp()
+        WickedTestCase.afterSetUp(self)
         self.page1.setBody('((DMV Computer has died))')
 
     def replaceCreatedIndex(self):

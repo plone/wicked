@@ -16,8 +16,6 @@ Proposed User Interface:
 
 - backlink menu
 
-- zmori adapter for backlinks
-
 - determine whether or not user has the ability to add content in the
   current folder, decide whether or not to render the add links based
   on this

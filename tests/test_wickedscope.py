@@ -33,7 +33,7 @@ class TestWickedScope(WickedTestCase):
     def afterSetUp(self):
         IronicWiki.scopeTester = scopeTester
         IronicWiki.schema['body'].scope = 'scopeTester'
-        super(TestWickedScope, self).afterSetUp()
+        WickedTestCase.afterSetUp(self)
 
     def beforeTearDown(self):
         del IronicWiki.scopeTester
