@@ -16,6 +16,7 @@ from ZPublisher.HTTPRequest import FileUpload
 
 from relation import Backlink
 from normalize import titleToNormalizedId
+from filter import WickedFilter
 from Products.wicked import config
 from Products.filter import api as fapi
 
@@ -51,7 +52,7 @@ class WikiField(fapi.FilterField):
     __implements__ = fapi.FilterField.__implements__
     _properties = fapi.FilterField._properties.copy()
     _properties.update({
-        'filter':'Wicked Filter',
+        'filter':WickedFilter.name,
 
         # scope, template, and wicked_macro would work nicely as TALS
         
@@ -73,8 +74,8 @@ class WikiField(fapi.FilterField):
         
     def set(self, instance, value, **kwargs):
         """
-        do a normal text field set, then parse to set backlink references,
-        and to remove stale backlinks
+        do a normal text field set, set backlink references, remove stale
+        backlinks, cache resolved forward links
         """
         
         fapi.FilterField.set(self, instance, value, **kwargs)        
@@ -95,24 +96,29 @@ class WikiField(fapi.FilterField):
         
         # add appropriate backlinks, remove stale ones
         if new_links:
-            catalog = getToolByName(instance, UID_MANAGER)
-            brains = filter(None, catalog(id=new_links))
+            kwargs['scope'] = self.scope
+            wkd_filter = fapi.getFilter(WickedFilter.name)
+            getLTB = wkd_filter.getLinkTargetBrain
+            brains = [getLTB(instance, new_link, **kwargs) \
+                      for new_link in new_links]
+            brains = filter(None, brains)
 
             refcat = getToolByName(instance, REFERENCE_MANAGER)
 
             # replace with generator expression
-            [ refcat.addReference( brain.getObject(),
-                                   instance,
-                                   relationship=config.BACKLINK_RELATIONSHIP,
-                                   referenceClass=Backlink) \
-              for brain in brains ]
+            for brain in brains:
+                refcat.addReference(brain.getObject(),
+                                    instance,
+                                    relationship=config.BACKLINK_RELATIONSHIP,
+                                    referenceClass=Backlink)
 
-        new_links = [ (link, True) for link in new_links ]
-        unlink = [ obj for obj in old_links \
-                     if not dict(new_links).has_key(obj.id) ]
+        new_links = dict([(link, True) for link in new_links])
+        unlink = [obj for obj in old_links \
+                  if not new_links.has_key(obj.id)]
 
-        [ obj.deleteReference(instance, relationship=config.BACKLINK_RELATIONSHIP)
-          for obj in unlink ]
+        for obj in unlink:
+            obj.deleteReference(instance,
+                                relationship=config.BACKLINK_RELATIONSHIP)
 
 registerField(WikiField,
               title='Wiki',

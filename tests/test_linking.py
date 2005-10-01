@@ -7,7 +7,7 @@ if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
 
 from Testing import ZopeTestCase
-from wickedtestcase import WickedTestCase, makeContent
+from wickedtestcase import WickedTestCase, makeContent, TITLE2
 from Products.wicked.lib.normalize import titleToNormalizedId
 from Products.wicked.config import BACKLINK_RELATIONSHIP
 
@@ -17,7 +17,7 @@ class TestWikiLinking(WickedTestCase):
     
     def afterSetUp(self):
         WickedTestCase.afterSetUp(self)
-        self.page1.setBody('((DMV Computer has died))')
+        self.page1.setBody('((%s))' % TITLE2)
 
     def replaceCreatedIndex(self):
         """ replace the 'created' index w/ a field index b/c we need

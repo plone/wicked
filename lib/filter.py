@@ -68,7 +68,7 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
                         break
         return link_brain
 
-    def _filterCore(self, instance, chunk, **kwargs):
+    def _filterCore(self, instance, chunk, return_brain=False, **kwargs):
         """
         Use the portal catalog to find a list of possible links.
         fiter by path, present by macro
@@ -99,6 +99,9 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
             if brains:
                 link_brain = self._getMatchFromQueryResults(chunk, brains)
 
+        if return_brain:
+            return link_brain
+        
         if link_brain:
             # XXX do we need to support 'links' as a sequence or should
             #     we change to a single 'link'
@@ -111,5 +114,13 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
         kwargs['chunk'] = chunk
         macro = kwargs['wicked_macro']; del kwargs['wicked_macro']
         return self._macro_renderer(instance, macro, **kwargs)
+
+    def getLinkTargetBrain(self, instance, link_text, **kwargs):
+        """
+        returns a brain of the object that would be the link target
+        for the 'link_text' parameter
+        """
+        return self._filterCore(instance, link_text, return_brain=True,
+                                **kwargs)
     
 fapi.registerFilter(WickedFilter())
