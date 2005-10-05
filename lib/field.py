@@ -60,6 +60,7 @@ class WikiField(fapi.FilterField):
         'wicked_macro':'wicked_link'
         })
     
+
     security  = ClassSecurityInfo()
     def get(self, instance, mimetype=None, raw=False, **kwargs):
         """
@@ -68,7 +69,8 @@ class WikiField(fapi.FilterField):
         kwargs['scope'] = self.scope
         kwargs['template'] = self.template
         kwargs['wicked_macro'] = self.wicked_macro
-        kwargs['cached_links'] = getattr(self, '_cached_links', {})
+        link_store = getattr(instance.aq_base, '_wicked_cache', {})
+        kwargs['cached_links'] = link_store.get(self.getName(), {})
         return fapi.FilterField.get(self, instance, mimetype=mimetype,
                                     raw=raw, **kwargs)
         
@@ -119,7 +121,9 @@ class WikiField(fapi.FilterField):
                                                              brain)
                     new_links[link] = rendered
 
-        self._cached_links = new_links
+        link_store = getattr(instance.aq_base, '_wicked_cache', {})
+        link_store[self.getName()] = new_links
+        instance._wicked_cache = link_store
                     
         unlink = [obj for obj in old_links \
                   if not new_links.has_key(obj.id)]
@@ -129,7 +133,11 @@ class WikiField(fapi.FilterField):
                                 relationship=config.BACKLINK_RELATIONSHIP)
 
     def removeLinkFromCache(self, link, instance):
-        cached_links = getattr(self, '_cached_links', {})
+        """
+        clears a link from the wicked cache on the 'instance' object
+        """
+        link_store = getattr(instance.aq_base, '_wicked_cache', {})
+        cached_links = link_store.get(self.getName(), {})
         if cached_links.has_key(link):
             cached_links.pop(link)
             instance._p_changed = True

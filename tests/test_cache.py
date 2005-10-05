@@ -16,7 +16,7 @@ from wickedtestcase import WickedTestCase
 
 MARKER = 'marker'
 
-class TestWickedField(WickedTestCase):
+class TestLinkCache(WickedTestCase):
     wicked_type = 'IronicWiki'
     wicked_field = 'body'
 
@@ -32,8 +32,8 @@ class TestWickedField(WickedTestCase):
 
     def test_linkGetsCached(self):
         field = self.field
-        self.failUnless(shasattr(field, '_cached_links'))
-        cached_links = field._cached_links
+        wicked_cache = self.page1._wicked_cache
+        cached_links = wicked_cache[field.getName()]
         pg2_id = self.page2.getId()
         self.failUnless(cached_links.has_key(pg2_id))
 
@@ -48,7 +48,8 @@ class TestWickedField(WickedTestCase):
 
     def test_cacheIsUsed(self):
         field = self.field
-        cached_links = field._cached_links
+        wicked_cache = self.page1._wicked_cache
+        cached_links = wicked_cache[field.getName()]
         pg2_id = self.page2.getId()
         cached_links[pg2_id] = MARKER
         value = self.getRenderedWickedField(self.page1)
@@ -58,7 +59,7 @@ class TestWickedField(WickedTestCase):
 
 def test_suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestWickedField))
+    suite.addTest(unittest.makeSuite(TestLinkCache))
     return suite
 
 if __name__ == '__main__':
