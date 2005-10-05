@@ -15,7 +15,7 @@ from AccessControl import ClassSecurityInfo
 from ZPublisher.HTTPRequest import FileUpload
 
 from relation import Backlink
-from normalize import titleToNormalizedId
+from filter import WickedFilter
 from Products.wicked import config
 from Products.filter import api as fapi
 
@@ -40,10 +40,10 @@ except ImportError:
 
 from filter import pattern as linkregex 
 
-def normalize(wikilink, remove_parens=False):
+def removeParens(wikilink):
     wikilink.replace('((', '')
     wikilink.replace('))', '')
-    return titleToNormalizedId(wikilink)
+    return wikilink
 
 class WikiField(fapi.FilterField):
     """ drop-in wiki """
@@ -51,7 +51,7 @@ class WikiField(fapi.FilterField):
     __implements__ = fapi.FilterField.__implements__
     _properties = fapi.FilterField._properties.copy()
     _properties.update({
-        'filter':'Wicked Filter',
+        'filter':WickedFilter.name,
 
         # scope, template, and wicked_macro would work nicely as TALS
         
@@ -60,6 +60,7 @@ class WikiField(fapi.FilterField):
         'wicked_macro':'wicked_link'
         })
     
+
     security  = ClassSecurityInfo()
     def get(self, instance, mimetype=None, raw=False, **kwargs):
         """
@@ -68,13 +69,15 @@ class WikiField(fapi.FilterField):
         kwargs['scope'] = self.scope
         kwargs['template'] = self.template
         kwargs['wicked_macro'] = self.wicked_macro
+        link_store = getattr(instance.aq_base, '_wicked_cache', {})
+        kwargs['cached_links'] = link_store.get(self.getName(), {})
         return fapi.FilterField.get(self, instance, mimetype=mimetype,
                                     raw=raw, **kwargs)
         
     def set(self, instance, value, **kwargs):
         """
-        do a normal text field set, then parse to set backlink references,
-        and to remove stale backlinks
+        do a normal text field set, set backlink references, remove stale
+        backlinks, cache resolved forward links
         """
         
         fapi.FilterField.set(self, instance, value, **kwargs)        
@@ -91,28 +94,53 @@ class WikiField(fapi.FilterField):
         new_links = linkregex.findall(value_str)
         old_links = instance.getBRefs(relationship=config.BACKLINK_RELATIONSHIP)
 
-        new_links = map(normalize, new_links)
-        
+        new_links = map(removeParens, new_links)
+        new_links = dict([(link, False) for link in new_links])
+
         # add appropriate backlinks, remove stale ones
         if new_links:
-            catalog = getToolByName(instance, UID_MANAGER)
-            brains = filter(None, catalog(id=new_links))
-
+            kwargs['scope'] = self.scope
+            wkd_filter = fapi.getFilter(WickedFilter.name)
+            getLTB = wkd_filter.getLinkTargetBrain
             refcat = getToolByName(instance, REFERENCE_MANAGER)
+            for link in new_links.keys():
+                brain = getLTB(instance, link, **kwargs)
+                if brain is None:
+                    new_links.pop(link)
+                else:
+                    refcat.addReference(brain.getObject(),
+                                        instance,
+                                        relationship=config.BACKLINK_RELATIONSHIP,
+                                        referenceClass=Backlink,
+                                        link_text=link,
+                                        fieldname=self.getName())
+                    rendered = wkd_filter.renderLinkForBrain(self.template,
+                                                             self.wicked_macro,
+                                                             link,
+                                                             instance,
+                                                             brain)
+                    new_links[link] = rendered
 
-            # replace with generator expression
-            [ refcat.addReference( brain.getObject(),
-                                   instance,
-                                   relationship=config.BACKLINK_RELATIONSHIP,
-                                   referenceClass=Backlink) \
-              for brain in brains ]
+        link_store = getattr(instance.aq_base, '_wicked_cache', {})
+        link_store[self.getName()] = new_links
+        instance._wicked_cache = link_store
+                    
+        unlink = [obj for obj in old_links \
+                  if not new_links.has_key(obj.id)]
 
-        new_links = [ (link, True) for link in new_links ]
-        unlink = [ obj for obj in old_links \
-                     if not dict(new_links).has_key(obj.id) ]
+        for obj in unlink:
+            obj.deleteReference(instance,
+                                relationship=config.BACKLINK_RELATIONSHIP)
 
-        [ obj.deleteReference(instance, relationship=config.BACKLINK_RELATIONSHIP)
-          for obj in unlink ]
+    def removeLinkFromCache(self, link, instance):
+        """
+        clears a link from the wicked cache on the 'instance' object
+        """
+        link_store = getattr(instance.aq_base, '_wicked_cache', {})
+        cached_links = link_store.get(self.getName(), {})
+        if cached_links.has_key(link):
+            cached_links.pop(link)
+            instance._p_changed = True
 
 registerField(WikiField,
               title='Wiki',

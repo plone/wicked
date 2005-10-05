@@ -1,6 +1,6 @@
 from Testing                 import ZopeTestCase
 from Products.CMFCore.utils  import getToolByName
-from Products.PloneTestCase import setup
+from Products.PloneTestCase import ptc
 
 from Products.Archetypes.tests.ArchetypesTestCase import ArcheSiteTestCase
 from Products.wicked.Extensions.Install import install as installWicked
@@ -40,9 +40,6 @@ class WickedTestCase(ArcheSiteTestCase):
     
     def afterSetUp(self):
         ArcheSiteTestCase.afterSetUp(self)
-        installWicked(self.portal)
-        # Because we add skins this needs to be called. Um... ick.
-        self._refreshSkinData()
 
         # add some pages
         self.page1 = makeContent(self.folder,
@@ -54,8 +51,8 @@ class WickedTestCase(ArcheSiteTestCase):
 
 
     def getRenderedWickedField(self, doc):
-        field = self.wicked_field
-        return doc.Schema()[field].getAccessor(doc)()
+        fieldname = self.wicked_field
+        return doc.getField(fieldname).getAccessor(doc)()
 
     def hasAddLink(self, doc):
         """ does wicked field text contain a wicked-generated add link? """
@@ -68,4 +65,4 @@ class WickedTestCase(ArcheSiteTestCase):
         # XXX make test stronger
         return dest.absolute_url() in self.getRenderedWickedField(doc)
 
-setup.PortalSetup(products=['Archetypes', 'wicked'])
+ptc.setupPloneSite(products=['Archetypes', 'wicked'])
