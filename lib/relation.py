@@ -14,7 +14,7 @@
 BackLink
 ~~~~~~~~
 
-A type of reference that can be used/extened to provide smarter
+A type of reference that can be used/extended to provide smarter
 inter-document linking. With the support of an editor this can be
 quite useful.
 
@@ -24,9 +24,9 @@ __authors__ = 'Whit Morriss <whit@kalistra.com>'
 __docformat__ = 'restructuredtext'
 
 from Products.Archetypes import public as atapi
-from Products.wicked import config as config
 from Products.Archetypes.references import Reference
 from Products.filter.api import getFilter
+from Products.wicked import config as config
 
 class Backlink(Reference):
     """
@@ -34,6 +34,11 @@ class Backlink(Reference):
     wiki-link
     """
     relationship = config.BACKLINK_RELATIONSHIP
+
+    def __init__(self, rID, sID, tID, relationship, **kwargs):
+        Reference.__init__(self, rID, sID, tID, relationship, **kwargs)
+        self.link_text = kwargs['link_text']
+        self.fieldname = kwargs['fieldname']
 
     def targetURL(self):
         """
@@ -44,5 +49,9 @@ class Backlink(Reference):
             return target.absolute_url()
         return '#'
 
-    
-
+    def delHook(self, tool, sourceObject=None, targetObject=None):
+        """
+        invalidate ourselves from the targetObject's link cache
+        """
+        field = targetObject.getField(self.fieldname)
+        field.removeLinkFromCache(self.link_text, targetObject)

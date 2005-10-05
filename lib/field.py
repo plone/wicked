@@ -15,7 +15,6 @@ from AccessControl import ClassSecurityInfo
 from ZPublisher.HTTPRequest import FileUpload
 
 from relation import Backlink
-from normalize import titleToNormalizedId
 from filter import WickedFilter
 from Products.wicked import config
 from Products.filter import api as fapi
@@ -41,10 +40,10 @@ except ImportError:
 
 from filter import pattern as linkregex 
 
-def normalize(wikilink, remove_parens=False):
+def removeParens(wikilink):
     wikilink.replace('((', '')
     wikilink.replace('))', '')
-    return titleToNormalizedId(wikilink)
+    return wikilink
 
 class WikiField(fapi.FilterField):
     """ drop-in wiki """
@@ -69,6 +68,7 @@ class WikiField(fapi.FilterField):
         kwargs['scope'] = self.scope
         kwargs['template'] = self.template
         kwargs['wicked_macro'] = self.wicked_macro
+        kwargs['cached_links'] = getattr(self, '_cached_links', {})
         return fapi.FilterField.get(self, instance, mimetype=mimetype,
                                     raw=raw, **kwargs)
         
@@ -92,33 +92,47 @@ class WikiField(fapi.FilterField):
         new_links = linkregex.findall(value_str)
         old_links = instance.getBRefs(relationship=config.BACKLINK_RELATIONSHIP)
 
-        new_links = map(normalize, new_links)
-        
+        new_links = map(removeParens, new_links)
+        new_links = dict([(link, False) for link in new_links])
+
         # add appropriate backlinks, remove stale ones
         if new_links:
             kwargs['scope'] = self.scope
             wkd_filter = fapi.getFilter(WickedFilter.name)
             getLTB = wkd_filter.getLinkTargetBrain
-            brains = [getLTB(instance, new_link, **kwargs) \
-                      for new_link in new_links]
-            brains = filter(None, brains)
-
             refcat = getToolByName(instance, REFERENCE_MANAGER)
+            for link in new_links.keys():
+                brain = getLTB(instance, link, **kwargs)
+                if brain is None:
+                    new_links.pop(link)
+                else:
+                    refcat.addReference(brain.getObject(),
+                                        instance,
+                                        relationship=config.BACKLINK_RELATIONSHIP,
+                                        referenceClass=Backlink,
+                                        link_text=link,
+                                        fieldname=self.getName())
+                    rendered = wkd_filter.renderLinkForBrain(self.template,
+                                                             self.wicked_macro,
+                                                             link,
+                                                             instance,
+                                                             brain)
+                    new_links[link] = rendered
 
-            # replace with generator expression
-            for brain in brains:
-                refcat.addReference(brain.getObject(),
-                                    instance,
-                                    relationship=config.BACKLINK_RELATIONSHIP,
-                                    referenceClass=Backlink)
-
-        new_links = dict([(link, True) for link in new_links])
+        self._cached_links = new_links
+                    
         unlink = [obj for obj in old_links \
                   if not new_links.has_key(obj.id)]
 
         for obj in unlink:
             obj.deleteReference(instance,
                                 relationship=config.BACKLINK_RELATIONSHIP)
+
+    def removeLinkFromCache(self, link, instance):
+        cached_links = getattr(self, '_cached_links', {})
+        if cached_links.has_key(link):
+            cached_links.pop(link)
+            instance._p_changed = True
 
 registerField(WikiField,
               title='Wiki',

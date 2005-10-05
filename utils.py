@@ -54,3 +54,8 @@ def installDepends(portal):
              'optional' : optional_handler,
              })
 
+def getPathRelToPortal(path, instance):
+    portal_path = getToolByName(instance,
+                                'portal_url').getPortalPath().split('/')
+    path = path.split('/')
+    return '/'.join(path[len(portal_path):])

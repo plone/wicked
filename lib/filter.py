@@ -14,7 +14,10 @@
 import sre
 from Products.CMFCore.utils import getToolByName
 from Products.filter import api as fapi
+from Products.filter.utils import createContext, macro_render
 from Products.AdvancedQuery import Eq, Generic
+
+from Products.wicked.utils import getPathRelToPortal
 
 from normalize import titleToNormalizedId
 
@@ -27,12 +30,6 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
 
     name = 'Wicked Filter'
     pattern = pattern
-
-    def getPathRelToPortal(self, path, instance):
-        portal_path = getToolByName(instance,
-                                    'portal_url').getPortalPath().split('/')
-        path = path.split('/')
-        return '/'.join(path[len(portal_path):])
 
     def _getMatchFromQueryResults(self, chunk, brains):
         """
@@ -70,9 +67,15 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
 
     def _filterCore(self, instance, chunk, return_brain=False, **kwargs):
         """
-        Use the portal catalog to find a list of possible links.
-        fiter by path, present by macro
+        First check the link cache.  If the link is not in the cache,
+        use the portal catalog to find a list of possible links.
+
+        Filter by path, present by macro.
         """
+        cached_links = kwargs.get('cached_links', {})
+        if cached_links.has_key(chunk) and not return_brain:
+            return cached_links[chunk]
+
         catalog = getToolByName(instance, 'portal_catalog')
         path = instance.aq_inner.aq_parent.absolute_url_path()
         id = chunk
@@ -105,10 +108,10 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
         if link_brain:
             # XXX do we need to support 'links' as a sequence or should
             #     we change to a single 'link'
-            kwargs['links'] = [ {'path': link_brain.getPath(),
-                                 'icon': link_brain.getIcon,
-                                 'rel_path': self.getPathRelToPortal(link_brain.getPath(),
-                                                                     instance)} ]
+            kwargs['links'] = [{'path': link_brain.getPath(),
+                                'icon': link_brain.getIcon,
+                                'rel_path': getPathRelToPortal(link_brain.getPath(),
+                                                               instance)}]
         else:
             kwargs['links'] = []
         kwargs['chunk'] = chunk
@@ -118,9 +121,35 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
     def getLinkTargetBrain(self, instance, link_text, **kwargs):
         """
         returns a brain of the object that would be the link target
-        for the 'link_text' parameter
+        for the 'link_text' parameter in the context of the 'instance'
+        object
         """
         return self._filterCore(instance, link_text, return_brain=True,
                                 **kwargs)
-    
+
+    def renderLinkForBrain(self, template, macro, text, instance, brain, **kw):
+        """
+        returns rendered wicked link that would resolve to the object related
+        to the specified brain
+
+        - template: template containing the wicked link macro
+
+        - macro: name of the wicked link macro
+
+        - text: text that is the content of the wicked link
+
+        - instance: object on which the link is being rendered
+
+        - brain: object to which the link should resolve
+        """
+        kw['links'] = [{'path': brain.getPath(),
+                        'icon': brain.getIcon,
+                        'rel_path': getPathRelToPortal(brain.getPath(),
+                                                       instance)}]
+        kw['chunk'] = text
+        context = createContext(instance, **kw)
+        template = instance.restrictedTraverse(path=template)
+        macro = template.macros[macro]
+        return macro_render(macro, instance, context, **kw)
+
 fapi.registerFilter(WickedFilter())

@@ -51,8 +51,8 @@ class WickedTestCase(ArcheSiteTestCase):
 
 
     def getRenderedWickedField(self, doc):
-        field = self.wicked_field
-        return doc.Schema()[field].getAccessor(doc)()
+        fieldname = self.wicked_field
+        return doc.getField(fieldname).getAccessor(doc)()
 
     def hasAddLink(self, doc):
         """ does wicked field text contain a wicked-generated add link? """
