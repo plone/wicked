@@ -54,5 +54,3 @@ Credits
 
 wicked uses ObjectRealms' Bricolite product as a model and borrows heavily
 from it.
-
-  
