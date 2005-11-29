@@ -39,3 +39,11 @@ Misc:
   has ideas about how to handle this using 'eventually' to register
   event channels on field accessors that would trigger the filters
   being called... more coming soon
+
+- improve link caching
+
+  links are currently cached as rendered html.  this is fast, but when
+  folks might be visiting the same page via more than one virtual host
+  (or even via both http and https) then these cached links may be
+  incorrect.  it would be better to cache the path to the object and
+  then to figure out the appropriate URL at render time.
