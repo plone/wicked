@@ -77,7 +77,7 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
             return cached_links[chunk]
 
         catalog = getToolByName(instance, 'portal_catalog')
-        path = instance.aq_inner.aq_parent.absolute_url_path()
+        path = '/'.join(instance.aq_inner.aq_parent.getPhysicalPath())
         id = chunk
         title = '"%s"' % chunk
 
