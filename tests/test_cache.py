@@ -11,6 +11,7 @@ from Testing import ZopeTestCase
 from Products.CMFCore.utils import getToolByName
 from Products.Archetypes.utils import shasattr
 from Products.filter import api as fapi
+from Products.wicked import utils
 from Products.wicked.lib.filter import WickedFilter
 from wickedtestcase import WickedTestCase
 
@@ -28,7 +29,7 @@ class TestLinkCache(WickedTestCase):
         field = self.page1.getField(self.wicked_field)
         field.getMutator(self.page1)("((%s))" % self.page2.getId())
         self.field = field
-        self.filter = fapi.getFilter(WickedFilter.name)
+        self.filter = utils.getFilter(self.page1)
 
     def test_linkGetsCached(self):
         field = self.field
@@ -42,7 +43,6 @@ class TestLinkCache(WickedTestCase):
         rendered = self.filter.renderLinkForBrain(field.template,
                                                   field.wicked_macro,
                                                   pg2_id,
-                                                  self.page1,
                                                   brain)
         self.failUnless(cached_links[pg2_id] == rendered)
 

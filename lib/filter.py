@@ -13,22 +13,21 @@
 
 import sre
 from Products.CMFCore.utils import getToolByName
-from Products.filter import api as fapi
 from Products.filter.utils import createContext, macro_render
 from Products.AdvancedQuery import Eq, Generic
 
-from Products.wicked.utils import getPathRelToPortal
-
+from Products.wicked import utils, config
+from Products.filter import filter as filters
 from normalize import titleToNormalizedId
 
 pattern = sre.compile('\(\(([\w\W]+?)\)\)') # matches ((Some Text To link 123))
 
-class WickedFilter(fapi.MacroSubstitutionFilter):
+class WickedFilter(filters.MacroSubstitutionFilter):
     """
     Filter for creating core wiki behavior 
     """
 
-    name = 'Wicked Filter'
+    name = config.FILTER_NAME
     pattern = pattern
 
     def _getMatchFromQueryResults(self, chunk, brains):
@@ -65,24 +64,25 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
                         break
         return link_brain
 
-    def _filterCore(self, instance, chunk, return_brain=False, **kwargs):
+    def _filterCore(self, chunk, return_brain=False, **kwargs):
         """
         First check the link cache.  If the link is not in the cache,
         use the portal catalog to find a list of possible links.
 
         Filter by path, present by macro.
         """
+        normalled = titleToNormalizedId(chunk)
         cached_links = kwargs.get('cached_links', {})
         if cached_links.has_key(chunk) and not return_brain:
             return cached_links[chunk]
 
-        catalog = getToolByName(instance, 'portal_catalog')
-        path = '/'.join(instance.aq_inner.aq_parent.getPhysicalPath())
-        id = chunk
+        catalog = getToolByName(self.context, 'portal_catalog')
+        path = '/'.join(self.context.aq_inner.aq_parent.getPhysicalPath())
+        getId = chunk
         title = '"%s"' % chunk
 
         query = Generic('path', {'query': path, 'depth': 1}) \
-                & (Eq('id', id) | Eq('Title', title))
+                & (Eq('getId', getId) | Eq('Title', title))
         brains = catalog.evalAdvancedQuery(query, ('created',))
 
         link_brain = None
@@ -91,13 +91,13 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
 
         if not link_brain:
             if kwargs['scope']:
-                scope = getattr(instance, kwargs['scope'])
+                scope = getattr(self.context, kwargs['scope'])
                 if callable(scope):
                     scope = scope()
                 query = Generic('path', scope) \
-                        & (Eq('id', id) | Eq('Title', title))
+                        & (Eq('getId', getId) | Eq('Title', title))
             else:
-                query = Eq('id', id) | Eq('Title', title)
+                query = Eq('getId', getId) | Eq('Title', title)
             brains = catalog.evalAdvancedQuery(query, ('created',))
             if brains:
                 link_brain = self._getMatchFromQueryResults(chunk, brains)
@@ -110,24 +110,24 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
             #     we change to a single 'link'
             kwargs['links'] = [{'path': link_brain.getPath(),
                                 'icon': link_brain.getIcon,
-                                'rel_path': getPathRelToPortal(link_brain.getPath(),
-                                                               instance)}]
+                                'rel_path': utils.getPathRelToPortal(link_brain.getPath(),
+                                                                     self.context)}]
         else:
             kwargs['links'] = []
         kwargs['chunk'] = chunk
         macro = kwargs['wicked_macro']; del kwargs['wicked_macro']
-        return self._macro_renderer(instance, macro, **kwargs)
+        return self._macro_renderer(macro, **kwargs)
 
-    def getLinkTargetBrain(self, instance, link_text, **kwargs):
+    def getLinkTargetBrain(self, link_text, **kwargs):
         """
         returns a brain of the object that would be the link target
-        for the 'link_text' parameter in the context of the 'instance'
+        for the 'link_text' parameter in the context of the 'self.context'
         object
         """
-        return self._filterCore(instance, link_text, return_brain=True,
+        return self._filterCore(link_text, return_brain=True,
                                 **kwargs)
 
-    def renderLinkForBrain(self, template, macro, text, instance, brain, **kw):
+    def renderLinkForBrain(self, template, macro, text, brain, **kw):
         """
         returns rendered wicked link that would resolve to the object related
         to the specified brain
@@ -138,18 +138,16 @@ class WickedFilter(fapi.MacroSubstitutionFilter):
 
         - text: text that is the content of the wicked link
 
-        - instance: object on which the link is being rendered
+        - self.context: object on which the link is being rendered
 
         - brain: object to which the link should resolve
         """
         kw['links'] = [{'path': brain.getPath(),
                         'icon': brain.getIcon,
-                        'rel_path': getPathRelToPortal(brain.getPath(),
-                                                       instance)}]
+                        'rel_path': utils.getPathRelToPortal(brain.getPath(),
+                                                       self.context)}]
         kw['chunk'] = text
-        context = createContext(instance, **kw)
-        template = instance.restrictedTraverse(path=template)
+        econtext = createContext(self.context, **kw)
+        template = self.context.restrictedTraverse(path=template)
         macro = template.macros[macro]
-        return macro_render(macro, instance, context, **kw)
-
-fapi.registerFilter(WickedFilter())
+        return macro_render(macro, self.context, econtext, **kw)

@@ -18,6 +18,8 @@ a demonstration of wicked's capabilities confined to the content type
 wicked aspires to make obsolete
 
 """
+from zope.interface import implements
+from Products.wicked.interface import IAmWicked
 
 __authors__ = 'Whit Morriss <whit@kalistra.com>'
 __docformat__ = 'restructuredtext'
@@ -55,6 +57,7 @@ schema = atapi.BaseSchema.copy() + atapi.Schema((
 
 class IronicWiki(atapi.BaseContent):
     """ Ironic wiki Portal Content """
+    implements(IAmWicked)
 
     archetype_name = portal_type = meta_type = 'IronicWiki'
     schema=schema

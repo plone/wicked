@@ -16,7 +16,7 @@ from ZPublisher.HTTPRequest import FileUpload
 
 from relation import Backlink
 from filter import WickedFilter
-from Products.wicked import config
+from Products.wicked import config, utils
 from Products.filter import api as fapi
 
 from Products.Archetypes import public as atapi
@@ -79,58 +79,66 @@ class WikiField(fapi.FilterField):
         do a normal text field set, set backlink references, remove stale
         backlinks, cache resolved forward links
         """
-        
-        fapi.FilterField.set(self, instance, value, **kwargs)        
+        super(WikiField, self).set(instance, value, **kwargs)        
 
         # parse wiki text, set backlinks
+        
+        value_str = value
         if value.__class__ == atapi.BaseUnit:
             value_str = value.getRaw()
         elif value.__class__ == FileUpload:
             # a file was uploaded, get the (possibly transformed) value
             value_str = self.get(instance, skip_filters=True)
-        else:
-            value_str = value
 
-        new_links = linkregex.findall(value_str)
+        new_links = dict()
+        found = linkregex.findall(value_str)
         old_links = instance.getBRefs(relationship=config.BACKLINK_RELATIONSHIP)
 
-        new_links = map(removeParens, new_links)
-        new_links = dict([(link, False) for link in new_links])
+        if len(found):
+            new_links = found
+            new_links = map(removeParens, new_links)
+            new_links = dict([(link, False) for link in new_links])
+
+        unlink = [obj.deleteReference for obj in old_links \
+                  if not new_links.has_key(obj.getId())]
+        
+        [delRef(instance,
+                relationship=config.BACKLINK_RELATIONSHIP) \
+         for delRef in unlink]
+        
+        if not len(new_links):
+            return
 
         # add appropriate backlinks, remove stale ones
-        if new_links:
-            kwargs['scope'] = self.scope
-            wkd_filter = fapi.getFilter(WickedFilter.name)
-            getLTB = wkd_filter.getLinkTargetBrain
-            refcat = getToolByName(instance, REFERENCE_MANAGER)
-            for link in new_links.keys():
-                brain = getLTB(instance, link, **kwargs)
-                if brain is None:
-                    new_links.pop(link)
-                else:
-                    refcat.addReference(brain.getObject(),
-                                        instance,
-                                        relationship=config.BACKLINK_RELATIONSHIP,
-                                        referenceClass=Backlink,
-                                        link_text=link,
-                                        fieldname=self.getName())
-                    rendered = wkd_filter.renderLinkForBrain(self.template,
-                                                             self.wicked_macro,
-                                                             link,
-                                                             instance,
-                                                             brain)
-                    new_links[link] = rendered
+        kwargs['scope'] = self.scope 
+        wicked = utils.getFilter(instance)
 
+        renderLink, getBrain = (wicked.renderLinkForBrain,
+                                wicked.getLinkTargetBrain)
+        
+        refcat = getToolByName(instance, REFERENCE_MANAGER)
+        for link in new_links.keys():
+            brain = getBrain(link, **kwargs)
+            if brain is None:
+                new_links.pop(link)
+            else:
+                refcat.addReference(brain.getObject(),
+                                    instance,
+                                    relationship=config.BACKLINK_RELATIONSHIP,
+                                    referenceClass=Backlink,
+                                    link_text=link,
+                                    fieldname=self.getName())
+                
+                rendered = renderLink(self.template, self.wicked_macro,
+                                      link, brain)
+                new_links[link] = rendered
+
+        # move to getter?
         link_store = getattr(instance.aq_base, '_wicked_cache', {})
         link_store[self.getName()] = new_links
         instance._wicked_cache = link_store
-                    
-        unlink = [obj for obj in old_links \
-                  if not new_links.has_key(obj.id)]
+        
 
-        for obj in unlink:
-            obj.deleteReference(instance,
-                                relationship=config.BACKLINK_RELATIONSHIP)
 
     def removeLinkFromCache(self, link, instance):
         """

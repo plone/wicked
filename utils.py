@@ -1,3 +1,4 @@
+from zope.app import zapi
 from Products.CMFCore.utils import getToolByName
 from StringIO import StringIO
 
@@ -5,6 +6,11 @@ from ZODB.POSException import ConflictError
 from os.path import join, abspath, dirname, basename
 import ZConfig
 import os.path
+from Products.wicked.config import FILTER_NAME
+from Products.filter import api as fapi
+
+def getFilter(obj):
+    return zapi.getAdapter(obj, fapi.IFieldFilter, FILTER_NAME)
 
 ## Configuration utilities
 DIR_PATH = abspath(dirname(__file__))
@@ -16,8 +22,9 @@ def doc_file(file):
     return join(DIR_PATH, 'docs', file)
 
 def register(portal, pkg):
-    install = portal.portal_quickinstaller.installProduct
-    install(pkg)
+    qi = getToolByName(portal, 'portal_quickinstaller')
+    if not qi.isProductInstalled(pkg):
+        install = qi.installProduct(pkg)
 
 def requires(portal, pkg):
     """Make sure that we can load and install the package into the

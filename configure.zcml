@@ -1,0 +1,10 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+	   xmlns:five="http://namespaces.zope.org/five">
+  <adapter
+     name = "Wicked Filter"
+     for="Products.wicked.interface.IAmWicked"
+     factory="Products.wicked.lib.filter.WickedFilter"
+     provides="Products.filter.interface.IFieldFilter"
+     permission="zope2.Public"
+     />
+</configure>

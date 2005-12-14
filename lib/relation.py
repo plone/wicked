@@ -25,8 +25,7 @@ __docformat__ = 'restructuredtext'
 
 from Products.Archetypes import public as atapi
 from Products.Archetypes.references import Reference
-from Products.filter.api import getFilter
-from Products.wicked import config as config
+from Products.wicked import config
 
 class Backlink(Reference):
     """

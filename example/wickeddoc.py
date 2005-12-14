@@ -21,6 +21,9 @@ linking in the primary text field.
 __authors__ = 'Rob Miller <ra@burningman.com>'
 __docformat__ = 'restructuredtext'
 
+from zope.interface import implements
+from Products.wicked.interface import IAmWicked
+
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.utils import getToolByName
@@ -65,10 +68,9 @@ schema = ATDocument.schema.copy() + atapi.Schema((
                         i18n_domain = "plone")),
     ))
      
-
 class WickedDoc(ATDocument):
     """ A page in the portal; supports wiki linking. """
-
+    implements(IAmWicked)
     archetype_name='Wicked Doc'
     portal_type= meta_type ='WickedDoc'
     schema=schema

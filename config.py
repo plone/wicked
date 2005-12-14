@@ -12,6 +12,7 @@ PROJECTNAME            = "wicked"
 SKINS_DIR              = 'skins'
 GLOBALS                = globals()
 BACKLINK_RELATIONSHIP  = 'Backlink->Source Doc'
+FILTER_NAME = 'Wicked Filter'
 
 try:
     # When Reference are in CMFCore
@@ -24,3 +25,5 @@ except ImportError:
     from Products.Archetypes.Referenceable import Referenceable
     from Products.Archetypes.config import REFERENCE_CATALOG as REFERENCE_MANAGER
     from Products.Archetypes.config import UID_CATALOG as UID_MANAGER
+
+

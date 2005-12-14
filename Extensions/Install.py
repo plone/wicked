@@ -9,6 +9,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.ZCatalog.ZCatalog import manage_addZCatalog
 from OFS.ObjectManager import BadRequestException
 
+from Products.filter.Extensions.Install import configureWysiwyg
 from Products.wicked.utils import installDepends
 from Products.wicked import config
 
@@ -31,15 +32,6 @@ def configureReferenceCatalog(portal, out):
         catalog.manage_reindexIndex(indexName)
 
 
-def configureWysiwyg(portal, out):
-    editors = portal.portal_properties.site_properties.getProperty('available_editors')
-    if "Kupu" in editors:
-        # move it up in the list
-        editors = list(editors)
-        editors.remove('Kupu')
-        editors = ['Kupu',] + editors
-        portal.portal_properties.site_properties._updateProperty('available_editors', editors)
-
 def installExtendedPathIndex(portal, out):
     """ change the path index to an ExtendedPathIndex """
     cat = getToolByName(portal, 'portal_catalog')
@@ -59,7 +51,6 @@ def installExtendedPathIndex(portal, out):
 
 def install(self):
     out = StringIO()
-
     installDepends(self)
 
     install_subskin(self, out, config.GLOBALS)

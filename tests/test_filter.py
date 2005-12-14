@@ -10,6 +10,7 @@ from Testing import ZopeTestCase
 
 from Products.CMFCore.utils import getToolByName
 from Products.filter import api as fapi
+from Products.wicked import utils
 from Products.wicked.lib.filter import WickedFilter
 from wickedtestcase import WickedTestCase
 
@@ -24,11 +25,10 @@ class TestWickedFilter(WickedTestCase):
         WickedTestCase.afterSetUp(self)
         field = self.page1.getField(self.wicked_field)
         field.getMutator(self.page1)("((%s))" % self.page2.getId())
-        self.wkd_filter = fapi.getFilter(WickedFilter.name)
+        self.filter = utils.getFilter(self.page1)
 
     def test_getLinkTargetBrain(self):
-        brain = self.wkd_filter.getLinkTargetBrain(self.page1,
-                                                   self.page2.getId())
+        brain = self.filter.getLinkTargetBrain(self.page2.getId())
         self.failUnless(brain.getObject()) == self.page2
 
     def test_renderLinkForBrain(self):
@@ -36,10 +36,9 @@ class TestWickedFilter(WickedTestCase):
         brain = cat(id=self.page2.getId())[0]
         field = self.page1.getField(self.wicked_field)
 
-        rendered = self.wkd_filter.renderLinkForBrain(field.template,
+        rendered = self.filter.renderLinkForBrain(field.template,
                                                       field.wicked_macro,
                                                       brain.id,
-                                                      self.page1,
                                                       brain)
         self.failUnless(rendered in field.getAccessor(self.page1)())
 

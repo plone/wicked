@@ -25,9 +25,13 @@ context.invokeFactory(type_name, id=newcontentid,
 newcontent = getattr(context, newcontentid)
 
 # if new content is referenceable
-if context.portal_interface.objectImplements\
-   (newcontent,
-    'Products.Archetypes.interfaces.referenceable.IReferenceable'):
+# XXX this is the right way, but plone specific
+# 
+#if hasattr(context, 'portal_interface') and context.portal_interface.objectImplements\
+#   (newcontent,
+#    'Products.Archetypes.interfaces.referenceable.IReferenceable'):
+
+if hasattr(newcontent, 'addReference'):
     newcontent.addReference(context, relationship=BACKLINK_RELATIONSHIP)
 
 state.set(status='success', context=newcontent,

@@ -10,19 +10,28 @@ from Testing import ZopeTestCase
 from wickedtestcase import WickedTestCase, makeContent, TITLE2
 from Products.wicked.lib.normalize import titleToNormalizedId
 from Products.wicked.config import BACKLINK_RELATIONSHIP
+from Products.CMFCore.utils import getToolByName
 
-class TestWikiLinking(WickedTestCase):
+class Base(WickedTestCase):
+    wicked_type = 'IronicWiki'
+    wicked_field = 'body'
+    
+    def demoCreate(self, **kw):
+        self.login('test_user_1_')
+        self.page1.addByWickedLink(Title=kw.get('Title', self.title))
+
+class TestWikiLinking(Base):
     wicked_type = 'IronicWiki'
     wicked_field = 'body'
     
     def afterSetUp(self):
-        WickedTestCase.afterSetUp(self)
+        super(TestWikiLinking, self).afterSetUp()
         self.page1.setBody('((%s))' % TITLE2)
 
     def replaceCreatedIndex(self):
         """ replace the 'created' index w/ a field index b/c we need
         better than 1 minute resolution for our testing """
-        cat = self.portal.portal_catalog
+        cat = getToolByName(self.portal, 'portal_catalog')
         cat.delIndex('created')
         cat.manage_addIndex('created', 'FieldIndex',
                             extra={'indexed_attrs':'created'})
@@ -202,21 +211,14 @@ class TestWikiLinking(WickedTestCase):
         f2.manage_delObjects(ids=[w1.id])
         self.failUnless(self.hasWickedLink(self.page1, w3))
         self.failIf(self.hasWickedLink(self.page1, w2))
-    
 
-class TestDocCreation(WickedTestCase):
-    wicked_type = 'IronicWiki'
-    wicked_field = 'body'
+class TestDocCreation(Base):
     
     def afterSetUp(self):
         WickedTestCase.afterSetUp(self)
         self.title = 'Create a New Document'
         self.page1.setBody('((%s))' %self.title)
         self._refreshSkinData()
-
-    def demoCreate(self):
-        self.login('test_user_1_')
-        self.page1.addByWickedLink(Title=self.title)
         
     def testDocAdded(self):
         self.demoCreate()
@@ -229,10 +231,41 @@ class TestDocCreation(WickedTestCase):
         backlinks = newdoc.getRefs(relationship=BACKLINK_RELATIONSHIP)
         self.failUnless(self.page1 in backlinks)
 
+## from Products.PloneTestCase import setup
+## import inspect
+## class MetaBaseTestRemover(setup.MetaPlaceless):
+##     def __init__(klass, name, bases, kdict):
+##         super(MetaBaseTestRemover, klass).__init__(name, bases, kdict)
+##         import pdb; pdb.set_trace()
+##         methods = ((delattr(subclass, method_name) for method_name, v in inspect.getmembers(subclass, inspect.ismethod)) for subclass in klass.__subclasses__())
+        
+class TestLinkNormalization(Base):
+    
+    def test_normalizeid_matchesfirst(self):
+        # add content from link
+        # test link
+        # change title
+        # test link
+
+        title1 = self.title = 'the monkey flies at dawn'
+        self.demoCreate()
+
+        self.newpage = getattr(self.folder, titleToNormalizedId(title1))
+
+        gettext = lambda :self.getRenderedWickedField(self.page1)
+        # if this fail, wicked is not working period
+        
+        self.assertNotEqual(gettext().find(self.newpage.absolute_url()), -1)
+
+        self.newpage.update(dict(title='I changed my mind'))
+        text = self.getRenderedWickedField(self.page1)
+        self.assertNotEqual(gettext().find(self.newpage.absolute_url()), -1)
+
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestDocCreation))
     suite.addTest(unittest.makeSuite(TestWikiLinking))
+    suite.addTest(unittest.makeSuite(TestLinkNormalization))
     return suite
 
 if __name__ == '__main__':
