@@ -1,4 +1,4 @@
-from Products.filter.interface import IFilterable
+from Products.filter.interfaces import IFilterable
 
 class IAmWicked(IFilterable):
     """
