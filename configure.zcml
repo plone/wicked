@@ -2,9 +2,9 @@
 	   xmlns:five="http://namespaces.zope.org/five">
   <adapter
      name = "Wicked Filter"
-     for="Products.wicked.interface.IAmWicked"
+     for="Products.wicked.interfaces.IAmWicked"
      factory="Products.wicked.lib.filter.WickedFilter"
-     provides="Products.filter.interface.IFieldFilter"
+     provides="Products.filter.interfaces.IFieldFilter"
      permission="zope2.Public"
      />
 </configure>

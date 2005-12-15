@@ -22,7 +22,7 @@ __authors__ = 'Rob Miller <ra@burningman.com>'
 __docformat__ = 'restructuredtext'
 
 from zope.interface import implements
-from Products.wicked.interface import IAmWicked
+from Products.wicked.interfaces import IAmWicked
 
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore import CMFCorePermissions

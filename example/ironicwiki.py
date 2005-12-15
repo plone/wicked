@@ -19,7 +19,7 @@ wicked aspires to make obsolete
 
 """
 from zope.interface import implements
-from Products.wicked.interface import IAmWicked
+from Products.wicked.interfaces import IAmWicked
 
 __authors__ = 'Whit Morriss <whit@kalistra.com>'
 __docformat__ = 'restructuredtext'
