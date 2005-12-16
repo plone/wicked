@@ -310,8 +310,8 @@ class TestRemoteLinking(Base):
 
 def test_suite():
     suite = unittest.TestSuite()
-##     suite.addTest(unittest.makeSuite(TestDocCreation))
-##     suite.addTest(unittest.makeSuite(TestWikiLinking))
+    suite.addTest(unittest.makeSuite(TestDocCreation))
+    suite.addTest(unittest.makeSuite(TestWikiLinking))
     suite.addTest(unittest.makeSuite(TestLinkNormalization))
     suite.addTest(unittest.makeSuite(TestRemoteLinking))
     return suite
