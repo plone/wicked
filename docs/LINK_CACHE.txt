@@ -1,0 +1,42 @@
+----------------
+:: Link Cache ::
+----------------
+
+In order to be correct in real-time, wicked performs link resolution
+at render time.  This may, however, become expensive when there are
+thousands of pages and thousands of wicked links on a busy site.
+To help with this wicked uses a very simple link caching mechanism.
+
+Whenever a wicked field is saved, all links are resolved and the
+output of the resolved wicked macro is pre-rendered.  This information
+is stored in a dictionary, with the keys being the wicked link text
+that is ((between parentheses)), and the values being the rendered
+output for each link.
+
+This dictionary is then stored on the AT object instance in an
+attribute called '_wicked_cache'.  _wicked_cache is another
+dictionary, where the keys are the names of any wicked fields that
+exist on the object, and the values are the link caches for those
+fields.
+
+Also during the save process, the backlink references are created.
+The reference constructor is passed keyword arguments specifying the
+wicked link text and the name of the wicked field in which the link
+exists.  The backlink reference's 'delHook' is then used to remove the
+link from the original object's link cache if the target object is
+deleted.
+
+As an example, imagine object 'foo' had a wicked field named 'body' in
+its schema, and that in this field was the text 'Here is ((a link))',
+which resolved to an object named 'a-link'.  When the value was saved
+to the field, then the following would hold true:
+
+>>> foo._wicked_cache
+{'body': {'a link': '<RENDERED WICKED MACRO>'}}
+
+where '<RENDERED WICKED MACRO>' would actually be the wicked link
+macro's html output.
+
+When the wicked field is rendered, of course, this link cache is
+checked and any links that can be are retrieved from the cache instead
+of looked up in the catalog.

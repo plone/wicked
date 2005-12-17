@@ -1,0 +1,7 @@
+Installation Notes:
+
+Unpack this Product into your Zope/Plone Products directory, then use
+portal_quickinstaller within your Plone site to install the types and
+skins into your site.  Please see REQUIREMENTS.txt for all required
+products and versions.
+

@@ -1,0 +1,1 @@
+import wicked.migration.migrator

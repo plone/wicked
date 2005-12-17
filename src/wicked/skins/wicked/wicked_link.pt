@@ -1,0 +1,83 @@
+<html>
+<body>
+    <pre>
+    Behaviors:
+    
+    - link resolved without ambiguity: display slug linked
+
+    - link resolved with ambiguity: display slug w/ link menu
+
+    - link unresolved: display slug w/ add icon and/or add menu
+    </pre>
+    <metal:block metal:define-macro="wicked_link">
+      <span tal:define="howmany python:len(links)" 
+	    tal:condition="howmany" tal:omit-tag="">
+	<span tal:condition="python:howmany > 1" tal:omit-tag="">  
+	  <span tal:define="link python:links[0]" tal:omit-tag=""> 
+	    <span metal:use-macro="here/wicked_link/macros/linkmenu"> 
+	      the first link
+	    </span>
+	  </span>
+	</span>
+	<span tal:condition="python:howmany == 1" tal:omit-tag=''> 
+	  <span tal:define="link python:links[0]" tal:omit-tag=''>
+	    <span class='wikilink_resolved'>
+	      <a tal:define="path python:link['path'];
+                             icon python:link['icon'];
+                             rel_path python:link['rel_path']" 
+                 tal:attributes="href string:${here/portal_url}/${rel_path}">
+                <img tal:condition="icon"
+                     tal:attributes="src icon"/><span tal:replace="chunk" />
+              </a>
+	    </span>
+	  </span>
+	</span>
+      </span>
+      <span tal:condition="python:not len(links)" tal:omit-tag=''>
+	<span tal:content="chunk" class='wikilink_unresolved'>A CHUNK</span><a class="wickedadd"
+           tal:attributes="href string:$here_url/addByWickedLink?Title=${chunk}"
+           tal:define="here_url here/absolute_url">+</a>
+      </span>
+    </metal:block>
+
+    <div metal:define-macro="linkmenu">
+
+    </div>
+    <div metal:define-macro="addmenu">
+      
+    </div>
+    <div metal:define-macro="resolve">
+      
+    </div>
+
+    <metal:block metal:define-macro="wicked_test">
+      <tal:block define="howmany python:len(links)" 
+		 condition="howmany" tal:omit-tag="">
+	<tal:block condition="python:howmany > 1" omit-tag="">  
+	  <tal:block define="link python:links[0]" omit-tag=""> 
+	    <tal:block metal:use-macro="here/wicked_link/macros/linkmenu"> 
+	      the first link
+	    </tal:block>
+	  </tal:block>
+	</tal:block>
+	<tal:block condition="python:howmany == 1" omit-tag=''> 
+	  <tal:block define="link python:links[0]" omit-tag=''>
+	    <a tal:define="path python:link['path'];
+			   icon python:link['icon'];
+			   rel_path python:link['rel_path']" 
+               tal:attributes="href string:${here/portal_url}/${rel_path}">
+              <img tal:condition="icon"
+		   tal:attributes="src icon"/><tal:block tal:replace="chunk" />
+            </a>
+	  </tal:block>
+	</tal:block>
+      </tal:block>
+      <tal:block condition="python:not len(links)" omit-tag=''>
+	<span tal:content="chunk">A CHUNK</span>
+	<a class="wickedadd"
+	   tal:attributes="href string:$here_url/addByWickedLink?Title=${chunk}"
+       tal:define="here_url here/absolute_url">+</a>
+      </tal:block>
+    </metal:block>
+</body>
+</html>
