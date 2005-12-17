@@ -25,6 +25,7 @@ from Products.Archetypes.Registry import registerField
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.Expression import createExprContext
+from interfaces import IMacroCacheManager
 
 try:
     # When Reference are in CMFCore
@@ -39,6 +40,7 @@ except ImportError:
     from Products.Archetypes.config import UID_CATALOG as UID_MANAGER
 
 from filter import pattern as linkregex 
+from normalize import titleToNormalizedId
 
 def removeParens(wikilink):
     wikilink.replace('((', '')
@@ -66,13 +68,13 @@ class WikiField(fapi.FilterField):
         """
         Pass in a scope, template and macro, then let filter field do it's magic
         """
+        # configuration
         kwargs['scope'] = self.scope
         kwargs['template'] = self.template
         kwargs['wicked_macro'] = self.wicked_macro
-        link_store = getattr(instance.aq_base, '_wicked_cache', {})
-        kwargs['cached_links'] = link_store.get(self.getName(), {})
-        return fapi.FilterField.get(self, instance, mimetype=mimetype,
-                                    raw=raw, **kwargs)
+        kwargs['fieldname'] = self.getName()
+        return super(WikiField, self).get(instance, mimetype=mimetype,
+                                        raw=raw, **kwargs)
         
     def set(self, instance, value, **kwargs):
         """
@@ -92,18 +94,25 @@ class WikiField(fapi.FilterField):
 
         new_links = dict()
         found = linkregex.findall(value_str)
+
+        # use straight catalog
         old_links = instance.getBRefs(relationship=config.BACKLINK_RELATIONSHIP)
 
         if len(found):
             new_links = found
             new_links = map(removeParens, new_links)
-            new_links = dict([(link, False) for link in new_links])
+            new_links = dict([(titleToNormalizedId(link), False) for link in new_links])
 
+        wicked = utils.getFilter(instance)
+        wicked.fieldname = fieldname = self.getName() 
+        cache = IMacroCacheManager(wicked)
+
+        # unravel this
         unlink = [obj.deleteReference for obj in old_links \
                   if not new_links.has_key(obj.getId())]
-        
+
         [delRef(instance,
-                relationship=config.BACKLINK_RELATIONSHIP) \
+                     relationship=config.BACKLINK_RELATIONSHIP) \
          for delRef in unlink]
         
         if not len(new_links):
@@ -111,12 +120,12 @@ class WikiField(fapi.FilterField):
 
         # add appropriate backlinks, remove stale ones
         kwargs['scope'] = self.scope 
-        wicked = utils.getFilter(instance)
 
         renderLink, getBrain = (wicked.renderLinkForBrain,
                                 wicked.getLinkTargetBrain)
         
         refcat = getToolByName(instance, REFERENCE_MANAGER)
+
         for link in new_links.keys():
             brain = getBrain(link, **kwargs)
             if brain is None:
@@ -127,18 +136,11 @@ class WikiField(fapi.FilterField):
                                     relationship=config.BACKLINK_RELATIONSHIP,
                                     referenceClass=Backlink,
                                     link_text=link,
-                                    fieldname=self.getName())
+                                    fieldname=fieldname)
                 
                 rendered = renderLink(self.template, self.wicked_macro,
                                       link, brain)
-                new_links[link] = rendered
-
-        # move to getter?
-        link_store = getattr(instance.aq_base, '_wicked_cache', {})
-        link_store[self.getName()] = new_links
-        instance._wicked_cache = link_store
-        
-
+                cache.set(intern(link), rendered)  
 
     def removeLinkFromCache(self, link, instance):
         """

@@ -14,109 +14,60 @@
 import sre
 from Products.CMFCore.utils import getToolByName
 from Products.filter.utils import createContext, macro_render
-from Products.AdvancedQuery import Eq, Generic
 
 from Products.wicked import utils, config
 from Products.filter import filter as filters
 from normalize import titleToNormalizedId
+from zope.interface import implements
+from interfaces import IWickedFilter, IWickedQuery
 
-pattern = sre.compile('\(\(([\w\W]+?)\)\)') # matches ((Some Text To link 123))
+_marker = object()
+
+pattern = sre.compile(r'\(\(([\w\W]+?)\)\)') # matches ((Some Text To link 123))
+
+from utils import getMatch, delsetif, cache, query
 
 class WickedFilter(filters.MacroSubstitutionFilter):
     """
     Filter for creating core wiki behavior 
     """
+    implements(IWickedFilter)
 
     name = config.FILTER_NAME
     pattern = pattern
+    getMatch = getMatch
+    delkw = staticmethod(delsetif)
 
-    def _getMatchFromQueryResults(self, chunk, brains):
+    wicked_macro = _marker
+    template = _marker
+    fieldname = None
+
+    @cache
+    @query
+    def _filterCore(self, chunk, return_brain=False, normalized=None, **kwargs):
         """
-        Given a set of query results and the wicked link text, return
-        the brain that represents the correct object to link to, or
-        None
-
-        Assumes that brains are already ordered oldest to newest, so
-        the first absolute match is the one returned.  Matches on id
-        take priority over matches on title
-
-        Currently title match comparisons are just testing for equal
-        length; since the index lookup was for an exact phrase, equal
-        length implies equal value
-
-        XXX do we want to be more forgiving w/ extra whitespace in the
-        title?
+        see utils.py for complete details on how wicked modifies
+        the standard macro filter
         """
-        link_brain = None
-        if len(brains) == 1:
-            if brains[0].id == chunk or len(brains[0].Title) == len(chunk):
-                link_brain = brains[0]
-        else:
-            for brain in brains:
-                if brain.id == chunk:
-                    link_brain = brain
-                    break
-            if not link_brain:
-                # there was no id match, get the earliest created Title match
-                for brain in brains:
-                    if len(brain.Title) == len(chunk):
-                        link_brain = brain
-                        break
-        return link_brain
 
-    def _filterCore(self, chunk, return_brain=False, **kwargs):
-        """
-        First check the link cache.  If the link is not in the cache,
-        use the portal catalog to find a list of possible links.
+        # these allow filter core to run without the decorator
+        # but are redundant
+        # if not normalized:
+        #    normalized = titleToNormalizedId(chunk)
 
-        Filter by path, present by macro.
-        """
-        normalled = titleToNormalizedId(chunk)
-        cached_links = kwargs.get('cached_links', {})
-        if cached_links.has_key(chunk) and not return_brain:
-            return cached_links[chunk]
-
-        catalog = getToolByName(self.context, 'portal_catalog')
-        path = '/'.join(self.context.aq_inner.aq_parent.getPhysicalPath())
-        getId = chunk
-        title = '"%s"' % chunk
-
-        query = Generic('path', {'query': path, 'depth': 1}) \
-                & (Eq('getId', getId) | Eq('Title', title))
-        brains = catalog.evalAdvancedQuery(query, ('created',))
-
-        link_brain = None
-        if brains:
-            link_brain = self._getMatchFromQueryResults(chunk, brains)
-
-        if not link_brain:
-            if kwargs['scope']:
-                scope = getattr(self.context, kwargs['scope'])
-                if callable(scope):
-                    scope = scope()
-                query = Generic('path', scope) \
-                        & (Eq('getId', getId) | Eq('Title', title))
-            else:
-                query = Eq('getId', getId) | Eq('Title', title)
-            brains = catalog.evalAdvancedQuery(query, ('created',))
-            if brains:
-                link_brain = self._getMatchFromQueryResults(chunk, brains)
-
-        if return_brain:
-            return link_brain
+        # these should not change 
+        # for the life of the instance
         
-        if link_brain:
-            # XXX do we need to support 'links' as a sequence or should
-            #     we change to a single 'link'
-            kwargs['links'] = [{'path': link_brain.getPath(),
-                                'icon': link_brain.getIcon,
-                                'rel_path': utils.getPathRelToPortal(link_brain.getPath(),
-                                                                     self.context)}]
-        else:
-            kwargs['links'] = []
+        fattrs = 'wicked_macro', 'template',
+        [self.delkw(self, attr, kwargs, _marker) \
+         for attr in fattrs]
+
+        # these must remain more dynamic
         kwargs['chunk'] = chunk
-        macro = kwargs['wicked_macro']; del kwargs['wicked_macro']
-        return self._macro_renderer(macro, **kwargs)
+        
+        return super(WickedFilter,
+                     self)._filterCore(self.wicked_macro,
+                                       template=self.template, **kwargs)
 
     def getLinkTargetBrain(self, link_text, **kwargs):
         """
