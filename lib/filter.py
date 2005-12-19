@@ -82,7 +82,7 @@ class WickedFilter(filters.MacroSubstitutionFilter):
         title = '"%s"' % chunk
 
         query = Generic('path', {'query': path, 'depth': 1}) \
-                & (Eq('getId', getId) | Eq('Title', title))
+                & (Eq('getId', getId) | Eq('Title', title) | Eq('getId', normalled)) 
         brains = catalog.evalAdvancedQuery(query, ('created',))
 
         link_brain = None
