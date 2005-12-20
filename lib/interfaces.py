@@ -6,6 +6,57 @@ class IWickedFilter(IMacroFilter):
     Wicked field filter
     """
 
+class IBacklinkManager(Interface):
+    """
+    this might become the wicked storage manager...
+    """
+    def manageLinks():
+        """
+        removes old links adds new
+        """
+
+    def addLinks(links, scope, dups=[]):
+        """
+        retrieves brains, and sets backlinks for a colletion
+        wicked links.  will filter against identifiers(UIDs)
+        in dups (this allow chaining with removelinks, which
+        returns duplicate links)
+        """
+        
+    def getLinks():
+        """
+        returns all current backlinks
+        """
+        
+    def set(brain, link):
+        """
+        creates a backlink(a smart pointer pointing for the links target)
+        and caches link
+        """
+        
+    def remove(brain):
+        """
+        does the actual backlink removal and cache unsetting
+        """
+
+    def removeLinks(exclude=tuple()):
+        """
+        iterates over a list of brain representing existing backlink
+        and executes backlink deletion if not included in exclude
+        
+        @exclude: list of strings 'links' not to erase
+        """
+
+class IATBacklinkManager(IBacklinkManager):
+    """
+    A manager for Archetypes reference (aka smart pointer) based backlinka 
+    """
+    relation = Attribute( """
+    Name of Archetype relationship. Used to retrieve
+    backlinks from reference engine
+    """)
+
+
 class IMacroCacheManager(Interface):
 
     def get(key, default, **kwargs):
@@ -50,4 +101,5 @@ class IWickedQuery(Interface):
     dataobjects for wicked prep
     for the macro parser
     """
+
 

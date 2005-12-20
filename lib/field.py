@@ -41,11 +41,14 @@ except ImportError:
 
 from filter import pattern as linkregex 
 from normalize import titleToNormalizedId
+from factories import ATBacklinkManager as BacklinkManager 
 
 def removeParens(wikilink):
     wikilink.replace('((', '')
     wikilink.replace('))', '')
     return wikilink
+
+
 
 class WikiField(fapi.FilterField):
     """ drop-in wiki """
@@ -62,7 +65,6 @@ class WikiField(fapi.FilterField):
         'wicked_macro':'wicked_link'
         })
     
-
     security  = ClassSecurityInfo()
     def get(self, instance, mimetype=None, raw=False, **kwargs):
         """
@@ -92,65 +94,19 @@ class WikiField(fapi.FilterField):
             # a file was uploaded, get the (possibly transformed) value
             value_str = self.get(instance, skip_filters=True)
 
-        new_links = dict()
+        new_links = []
         found = linkregex.findall(value_str)
-
-        # use straight catalog
-        old_links = instance.getBRefs(relationship=config.BACKLINK_RELATIONSHIP)
 
         if len(found):
             new_links = found
             new_links = map(removeParens, new_links)
-            new_links = dict([(titleToNormalizedId(link), False) for link in new_links])
 
         wicked = utils.getFilter(instance)
-        wicked.fieldname = fieldname = self.getName() 
-        cache = IMacroCacheManager(wicked)
+        wicked.configure(**dict(fieldname=self.getName(),
+                              wicked_macro=self.wicked_macro,
+                              template=self.template))
 
-        # unravel this
-        unlink = [obj.deleteReference for obj in old_links \
-                  if not new_links.has_key(obj.getId())]
-
-        [delRef(instance,
-                     relationship=config.BACKLINK_RELATIONSHIP) \
-         for delRef in unlink]
-        
-        if not len(new_links):
-            return
-
-        # add appropriate backlinks, remove stale ones
-        kwargs['scope'] = self.scope 
-
-        renderLink, getBrain = (wicked.renderLinkForBrain,
-                                wicked.getLinkTargetBrain)
-        
-        refcat = getToolByName(instance, REFERENCE_MANAGER)
-
-        for link in new_links.keys():
-            brain = getBrain(link, **kwargs)
-            if brain is None:
-                new_links.pop(link)
-            else:
-                refcat.addReference(brain.getObject(),
-                                    instance,
-                                    relationship=config.BACKLINK_RELATIONSHIP,
-                                    referenceClass=Backlink,
-                                    link_text=link,
-                                    fieldname=fieldname)
-                
-                rendered = renderLink(self.template, self.wicked_macro,
-                                      link, brain)
-                cache.set(intern(link), rendered)  
-
-    def removeLinkFromCache(self, link, instance):
-        """
-        clears a link from the wicked cache on the 'instance' object
-        """
-        link_store = getattr(instance.aq_base, '_wicked_cache', {})
-        cached_links = link_store.get(self.getName(), {})
-        if cached_links.has_key(link):
-            cached_links.pop(link)
-            instance._p_changed = True
+        BacklinkManager(wicked).manageLinks(new_links, self.scope)
 
 registerField(WikiField,
               title='Wiki',

@@ -1,0 +1,60 @@
+basic manager for quick and dirty caching links
+on a content object.
+
+First, fake some AT content and a filter
+
+    >>> from Products.wicked.lib.testing.cache import cachetestsetup, Filter, dummy
+    >>> content, ccm = cachetestsetup()
+    >>> fil = Filter(content)
+    >>> fil.fieldname = 'body'
+    >>> from Products.wicked.lib.factories import ContentCacheManager
+    >>> ccm=ContentCacheManager(fil)
+
+Check and make sure the __init__ does the right thing
+
+    >>> ccm.context == fil
+    True
+    >>> ccm.content == content
+    True
+
+Lets manage that hot content cache!
+The cache manager takes a tuple: ('string', UID)  and some
+text to cache
+
+    >>> bob = dummy(dict(getId='bob', UID='bobid', text='some text'))
+    >>> dog = dummy(dict(getId='dog', UID='dogid', text='some dog text'))
+    >>> ccm.get(bob.getId)
+
+    >>> ccm.set((dog.getId, dog.UID),  dog.text)
+    'some dog text'
+    
+    >>> ccm.set((bob.getId, bob.UID), bob.text)
+    'some text'
+    
+    >>> getattr(content, ccm.cache_attr)[0]
+    CacheStore '/you/are/here' {'body': Cache '/you/are/here' {'bob': 'bobid', 'dog': 'dogid'}} :: [('bobid', 'some text'), ('dogid', 'some dog text')]
+
+    >>> store = getattr(content, ccm.cache_attr)[0]
+    >>> store._cache['dogid']
+    'some dog text'
+    >>> store._cache['bobid']
+    'some text'
+     
+    >>> ccm.get('bob')
+    'some text'
+
+    >>> ccm.unset('bob')
+    'some text'
+
+    >>> _marker = object()
+    >>> ccm.get('bob', _marker) is _marker
+    True
+    >>> ccm.get('dog')
+    'some dog text'
+    >>> ccm.get('billybob')
+
+    Finally, make sure uid unsetting works
+    >>> ccm.unset('dogid', use_uid=True)
+    'some dog text'
+
+    >>> ccm.unset('bogusid', use_uid=True)

@@ -23,8 +23,9 @@ def setupCA():
     setUp()
     fivezcml.loadmeta()
     fivezcml.load('permissions.zcml')
-    fivezcml.zcml.load_config('configure.zcml', Products.wicked)
-
+    #fivezcml.zcml.load_config('configure.zcml', Products.wicked)
+    fivezcml.zcml.load_config('configure.zcml', Products.wicked.lib)
+    
     # once we have a filter directive
     #filterzcml.loadmeta()
     fivezcml.clear()

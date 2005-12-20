@@ -29,15 +29,13 @@ from Products.wicked import config
 
 class Backlink(Reference):
     """
-    A backlink is a reference set on an object when it is reference by a definite
+    A backlink is a reference set on an object when it is referenced by a definite
     wiki-link
     """
     relationship = config.BACKLINK_RELATIONSHIP
 
     def __init__(self, rID, sID, tID, relationship, **kwargs):
-        Reference.__init__(self, rID, sID, tID, relationship, **kwargs)
-        self.link_text = kwargs['link_text']
-        self.fieldname = kwargs['fieldname']
+        super(Backlink, self).__init__(rID, sID, tID, relationship, **kwargs)
 
     def targetURL(self):
         """
@@ -48,9 +46,5 @@ class Backlink(Reference):
             return target.absolute_url()
         return '#'
 
-    def delHook(self, tool, sourceObject=None, targetObject=None):
-        """
-        invalidate ourselves from the targetObject's link cache
-        """
-        field = targetObject.getField(self.fieldname)
-        field.removeLinkFromCache(self.link_text, targetObject)
+
+

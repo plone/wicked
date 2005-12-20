@@ -25,7 +25,7 @@
 	      <a tal:define="path python:link['path'];
                              icon python:link['icon'];
                              rel_path python:link['rel_path']" 
-                 tal:attributes="href string:${here/portal_url}/${rel_path}">
+                 tal:attributes="href string:&&portal_url&&/${rel_path}">
                 <img tal:condition="icon"
                      tal:attributes="src icon"/><span tal:replace="chunk" />
               </a>
@@ -65,7 +65,7 @@
 	    <a tal:define="path python:link['path'];
 			   icon python:link['icon'];
 			   rel_path python:link['rel_path']" 
-               tal:attributes="href string:${here/portal_url}/${rel_path}">
+               tal:attributes="href string:&&base_url&&/${rel_path}">
               <img tal:condition="icon"
 		   tal:attributes="src icon"/><tal:block tal:replace="chunk" />
             </a>

@@ -9,16 +9,22 @@
      />
 
   <adapter
-     for=".interfaces.IWickedFilter"
+     for="Products.wicked.lib.interfaces.IWickedFilter"
      factory=".factories.ContentCacheManager"
      provides=".interfaces.IMacroCacheManager"
      permission="zope2.Public"
      />
 
   <adapter
-     for=".interfaces.IWickedFilter"
+     for="Products.wicked.lib.interfaces.IWickedFilter"
      factory=".factories.WickedCatalogInquisitor"
      provides=".interfaces.IWickedQuery"
+     permission="zope2.Public"
+     />
+  <adapter
+     for="Products.wicked.lib.interfaces.IWickedFilter"
+     factory=".factories.ATBacklinkManager"
+     provides=".interfaces.IBacklinkManager"
      permission="zope2.Public"
      />
 

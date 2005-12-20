@@ -31,9 +31,9 @@ class TestWickedScope(WickedTestCase):
     wicked_field = 'body'
 
     def afterSetUp(self):
+        WickedTestCase.afterSetUp(self)
         IronicWiki.scopeTester = scopeTester
         IronicWiki.schema['body'].scope = 'scopeTester'
-        WickedTestCase.afterSetUp(self)
 
     def beforeTearDown(self):
         del IronicWiki.scopeTester
@@ -44,7 +44,7 @@ class TestWickedScope(WickedTestCase):
         w1 = makeContent(f2, 'w1', 'IronicWiki',
                           title='W1 Title')
         w1.setBody("((%s))" % self.page1.Title())
-        self.failUnless(self.hasWickedLink(w1, self.page1))
+        self.failUnlessWickedLink(w1, self.page1)
 
     def test_outsideScope(self):
         f2 = makeContent(self.folder, 'f2', 'Folder')
@@ -52,7 +52,7 @@ class TestWickedScope(WickedTestCase):
         w1 = makeContent(f3, 'w1', 'IronicWiki',
                           title='W1 Title')
         w1.setBody("((%s))" % self.page1.Title())
-        self.failIf(self.hasWickedLink(w1, self.page1))
+        self.failIfWickedLink(w1, self.page1)
         
 
 def test_suite():

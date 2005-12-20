@@ -11,75 +11,123 @@
 #
 ##########################################################
 
-import sre
-from Products.CMFCore.utils import getToolByName
-from Products.filter.utils import createContext, macro_render
 
-from Products.wicked import utils, config
+from Products.CMFCore.utils import getToolByName
 from Products.filter import filter as filters
+from Products.filter.utils import createContext, macro_render
+from Products.wicked import utils, config
+from interfaces import IWickedFilter, IWickedQuery, IMacroCacheManager
 from normalize import titleToNormalizedId
 from zope.interface import implements
-from interfaces import IWickedFilter, IWickedQuery
+import sre
 
 _marker = object()
 
 pattern = sre.compile(r'\(\(([\w\W]+?)\)\)') # matches ((Some Text To link 123))
 
-from utils import getMatch, delsetif, cache, query
+from filtercore import getMatch, setup, cache, \
+     query, match, packBrain, onlybrain, \
+     prstack
+from utils import delsetif
+
+
+
+
+
+def renderChunk(wfilter, chunk, brain, *args,  **kwargs):
+    if brain and not isinstance(brain, dict):
+        brain=packBrain(brain, wfilter.context)
+        
+    kwargs['links'] = brain and [brain] or []
+    kwargs['chunk'] = chunk
+        
+    uid = args and args[0] or None
+    slug = super(WickedFilter,
+                 wfilter)._filterCore(wfilter.wicked_macro,
+                                      template=wfilter.template, **kwargs)
+    if kwargs.get('cache', None):
+        return uid, slug
+    return uid, wfilter.localizeSlug(slug)
+
+def localizeSlug(wfilter, slug):
+    return slug.replace(wfilter.url_signifier, wfilter.getBaseURL())
 
 class WickedFilter(filters.MacroSubstitutionFilter):
     """
     Filter for creating core wiki behavior 
     """
-    implements(IWickedFilter)
 
+    # identity
+    implements(IWickedFilter)
+    query_iface = IWickedQuery
     name = config.FILTER_NAME
     pattern = pattern
-    getMatch = getMatch
-    delkw = staticmethod(delsetif)
+    url_signifier = "&amp;&amp;base_url&amp;&amp;"
 
+    # config attrs
     wicked_macro = _marker
     template = _marker
     fieldname = None
 
-    @cache
+    # methods
+    getMatch = getMatch
+    delkw = staticmethod(delsetif)
+    render = lambda match: renderChunk
+    renderChunk = renderChunk
+    localizeSlug = localizeSlug
+
+    @setup
+    @cache(IMacroCacheManager)
     @query
+    @match
+    @render
     def _filterCore(self, chunk, return_brain=False, normalized=None, **kwargs):
         """
         see utils.py for complete details on how wicked modifies
         the standard macro filter
         """
+        if __debug__:
+            prstack()
+        pass
 
-        # these allow filter core to run without the decorator
-        # but are redundant
-        # if not normalized:
-        #    normalized = titleToNormalizedId(chunk)
+    def getSeeker(self):
+        """
+        @return query object
+        """
+        return self.query_iface(self)
 
-        # these should not change 
-        # for the life of the instance
-        
-        fattrs = 'wicked_macro', 'template',
-        [self.delkw(self, attr, kwargs, _marker) \
-         for attr in fattrs]
+    def getBaseURL(self):
+        base_url = getattr(self, 'base_url', getToolByName(self.context, 'portal_url')())
+        self.base_url = base_url
+        return base_url
 
-        # these must remain more dynamic
-        kwargs['chunk'] = chunk
-        
-        return super(WickedFilter,
-                     self)._filterCore(self.wicked_macro,
-                                       template=self.template, **kwargs)
+    def configure(self, **attrs):
+        """
+        For runtime configuration of filter.  with at, most
+        of configuration data is from the field
+        """
+        # make smarter / safer
+        [(setattr(self, key, attrs[key]), attrs.__delitem__(key)) \
+         for key in attrs.keys() if key != 'return_brain']
+        return attrs
 
-    def getLinkTargetBrain(self, link_text, **kwargs):
+    @onlybrain    
+    @setup    
+    @query
+    @match
+    def getLinkTargetBrain(self, link_text, *args, **kwargs):
         """
         returns a brain of the object that would be the link target
         for the 'link_text' parameter in the context of the 'self.context'
         object
         """
-        return self._filterCore(link_text, return_brain=True,
-                                **kwargs)
+        if __debug__:
+            prstack()
+        pass
 
-    def renderLinkForBrain(self, template, macro, text, brain, **kw):
+    def renderLinkForBrain(self, template, macro, chunk, brain, **kw):
         """
+        XXX replace with chunk
         returns rendered wicked link that would resolve to the object related
         to the specified brain
 
@@ -87,18 +135,18 @@ class WickedFilter(filters.MacroSubstitutionFilter):
 
         - macro: name of the wicked link macro
 
-        - text: text that is the content of the wicked link
+        - chunk: text that is the content of the wicked link
 
         - self.context: object on which the link is being rendered
 
         - brain: object to which the link should resolve
         """
-        kw['links'] = [{'path': brain.getPath(),
-                        'icon': brain.getIcon,
-                        'rel_path': utils.getPathRelToPortal(brain.getPath(),
-                                                       self.context)}]
-        kw['chunk'] = text
-        econtext = createContext(self.context, **kw)
-        template = self.context.restrictedTraverse(path=template)
-        macro = template.macros[macro]
-        return macro_render(macro, self.context, econtext, **kw)
+##         kw['links'] = [packBrain(brain, self.context)]
+##         kw['chunk'] = chunk
+##         econtext = createContext(self.context, **kw)
+##         template = self.context.restrictedTraverse(path=template)
+##         macro = template.macros[macro]
+##         return macro_render(macro, self.context, econtext, **kw)
+        # deprecated, use renderchunk instead
+        uid, brain = self.renderChunk(chunk, brain)
+        return brain
