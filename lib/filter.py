@@ -97,6 +97,9 @@ class WickedFilter(filters.MacroSubstitutionFilter):
 
         link_brain = None
 
+        if brains:
+            uid, link_brain = self.getMatch(chunk, brains, return_brain=return_brain)
+
         if not link_brain:
             if kwargs.get('scope', None):
                 scope = getattr(self.context, kwargs['scope'])
@@ -107,9 +110,10 @@ class WickedFilter(filters.MacroSubstitutionFilter):
             else:
                 query = Eq('getId', getId) | Eq('Title', title)
             brains = catalog.evalAdvancedQuery(query, ('created',))
-            
+
         if brains:
             uid, link_brain = self.getMatch(chunk, brains, return_brain=return_brain)
+
 
         if return_brain:
             return link_brain
