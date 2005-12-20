@@ -100,7 +100,8 @@ class WickedTestCase(FilterTestCase):
 
     def getRenderedWickedField(self, doc):
         fieldname = self.wicked_field
-        text = doc.getField(fieldname).getAccessor(doc)()
+        accessor = doc.getField(fieldname).getAccessor(doc)
+        text = accessor()
         return self.strip(text)
 
     def failIfAddLink(self, doc):

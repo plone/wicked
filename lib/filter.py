@@ -19,8 +19,11 @@ from Products.AdvancedQuery import Eq, Generic
 from Products.wicked import utils, config
 from Products.filter import filter as filters
 from normalize import titleToNormalizedId
+from utils import linkresult, getMatch
 
 pattern = sre.compile('\(\(([\w\W]+?)\)\)') # matches ((Some Text To link 123))
+
+url_signifier = "&amp;&amp;base_url&amp;&amp;"
 
 class WickedFilter(filters.MacroSubstitutionFilter):
     """
@@ -29,6 +32,13 @@ class WickedFilter(filters.MacroSubstitutionFilter):
 
     name = config.FILTER_NAME
     pattern = pattern
+
+    getMatch = linkresult(getMatch)
+    def getBaseURL(self):
+        base_url = getattr(self, 'base_url', getToolByName(self.context, 'portal_url')())
+        self.base_url = base_url
+        return base_url
+        
 
     def _getMatchFromQueryResults(self, chunk, brains):
         """
@@ -74,7 +84,7 @@ class WickedFilter(filters.MacroSubstitutionFilter):
         normalled = titleToNormalizedId(chunk)
         cached_links = kwargs.get('cached_links', {})
         if cached_links.has_key(chunk) and not return_brain:
-            return cached_links[chunk]
+            return cached_links[chunk].replace(url_signifier, self.getBaseURL()) 
 
         catalog = getToolByName(self.context, 'portal_catalog')
         path = '/'.join(self.context.aq_inner.aq_parent.getPhysicalPath())
@@ -86,11 +96,9 @@ class WickedFilter(filters.MacroSubstitutionFilter):
         brains = catalog.evalAdvancedQuery(query, ('created',))
 
         link_brain = None
-        if brains:
-            link_brain = self._getMatchFromQueryResults(chunk, brains)
 
         if not link_brain:
-            if kwargs['scope']:
+            if kwargs.get('scope', None):
                 scope = getattr(self.context, kwargs['scope'])
                 if callable(scope):
                     scope = scope()
@@ -99,24 +107,19 @@ class WickedFilter(filters.MacroSubstitutionFilter):
             else:
                 query = Eq('getId', getId) | Eq('Title', title)
             brains = catalog.evalAdvancedQuery(query, ('created',))
-            if brains:
-                link_brain = self._getMatchFromQueryResults(chunk, brains)
+            
+        if brains:
+            uid, link_brain = self.getMatch(chunk, brains, return_brain=return_brain)
 
         if return_brain:
             return link_brain
-        
-        if link_brain:
-            # XXX do we need to support 'links' as a sequence or should
-            #     we change to a single 'link'
-            kwargs['links'] = [{'path': link_brain.getPath(),
-                                'icon': link_brain.getIcon,
-                                'rel_path': utils.getPathRelToPortal(link_brain.getPath(),
-                                                                     self.context)}]
-        else:
-            kwargs['links'] = []
+
+        kwargs['links'] = link_brain and [link_brain] or []
         kwargs['chunk'] = chunk
         macro = kwargs['wicked_macro']; del kwargs['wicked_macro']
-        return self._macro_renderer(macro, **kwargs)
+
+        return self._macro_renderer(macro, **kwargs).replace(url_signifier, self.getBaseURL()) 
+
 
     def getLinkTargetBrain(self, link_text, **kwargs):
         """
@@ -150,4 +153,8 @@ class WickedFilter(filters.MacroSubstitutionFilter):
         econtext = createContext(self.context, **kw)
         template = self.context.restrictedTraverse(path=template)
         macro = template.macros[macro]
-        return macro_render(macro, self.context, econtext, **kw)
+        
+        return macro_render(macro, self.context, econtext, **kw).replace('$$portal_url$$', self.getBaseURL())
+
+
+

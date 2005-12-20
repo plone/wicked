@@ -119,6 +119,7 @@ class WikiField(fapi.FilterField):
         refcat = getToolByName(instance, REFERENCE_MANAGER)
         for link in new_links.keys():
             brain = getBrain(link, **kwargs)
+                
             if brain is None:
                 new_links.pop(link)
             else:

@@ -133,6 +133,7 @@ class TestWikiLinking(Base):
         self.failIfWickedLink(self.page1, w3)
 
         self.folder.manage_delObjects(ids=[w1.id])
+
         self.failUnlessWickedLink(self.page1, w2)
         self.failIfWickedLink(self.page1, w3)
 
@@ -306,6 +307,7 @@ class TestRemoteLinking(Base):
         w3.setBody("((%s))" % w1.id)
         self.failUnlessWickedLink(w3, w1)
         self.failIfWickedLink(w3, w2)
+        
 
 
 def test_suite():
