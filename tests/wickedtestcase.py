@@ -15,6 +15,7 @@ import Products.wicked.config as config
 from Products.wicked.utils import parseDepends, doc_file
 from Products.wicked.api import titleToNormalizedId
 from Products.filter.tests.filtertestcase import fivezcml, filterzcml, setUp, tearDown, zcml, FilterTestCase
+from Products.wicked.lib import field
 import Products.wicked
 
 
@@ -101,7 +102,7 @@ class WickedTestCase(FilterTestCase):
 
     def getRenderedWickedField(self, doc):
         fieldname = self.wicked_field
-        text = doc.getField(fieldname).getAccessor(doc)()
+        text = field.WikiField.get(doc.getField(fieldname), doc)
         return self.strip(text)
 
     def failIfAddLink(self, doc):

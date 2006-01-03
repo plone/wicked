@@ -104,8 +104,6 @@ class TestWikiLinking(Base):
         self.failUnlessWickedLink(w3, w1)
         self.failIfWickedLink(w3, w2)
 
-
-
     def testInexactRemoteTitleNotBlockRemoteTitle(self):
         f2 = makeContent(self.folder, 'f2', 'Folder')
         w1 = makeContent(self.folder, 'w1', self.wicked_type,
@@ -150,13 +148,16 @@ class TestWikiLinking(Base):
         w2 = makeContent(f3, id, self.wicked_type,
                          title='W2 Title')
         self.page1.setBody("((%s))" % id)
-        self.failUnlessWickedLink(self.page1, w1)
         self.failIfWickedLink(self.page1, w2)
         self.failIfWickedLink(self.page1, w3)
+        self.failUnlessWickedLink(self.page1, w1)
 
         f2.manage_delObjects(ids=[w1.id])
-        self.failUnlessWickedLink(self.page1, w3)
         self.failIfWickedLink(self.page1, w2)
+
+        # fails due to caching
+        self.failUnlessWickedLink(self.page1, w3)
+
 
     def testDupRemoteTitleMatchesOldest(self):
         self.replaceCreatedIndex()

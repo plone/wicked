@@ -11,8 +11,8 @@ def test_suite():
     from Testing.ZopeTestCase import ZopeDocTestSuite
 
     return unittest.TestSuite((
-        ZopeDocFileSuite('cache.txt', package='Products.wicked.lib.factories'),
-        ZopeDocTestSuite('Products.wicked.lib.factories'),
+        ZopeDocFileSuite('cache.txt', package='Products.wicked.lib'),
+        ZopeDocTestSuite('Products.wicked.lib.factories')
         ))
 
 if __name__ == '__main__':

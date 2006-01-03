@@ -45,7 +45,7 @@ class TestLinkCache(WickedTestCase):
 
         cat = getToolByName(self.portal, 'portal_catalog')
         brain = cat(id=pg2_id)[0]
-        uid, rendered = self.filter.renderChunk(self.page2.Title(), brain, cache=True)
+        uid, rendered = self.filter.renderChunk(self.page2.Title(), [brain], cache=True)
         self.failUnlessEqual(self.strip(wicked_ccm.get(pg2_id)), self.strip(rendered))
 
     def test_cacheIsUsed(self):

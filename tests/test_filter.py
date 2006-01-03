@@ -32,7 +32,7 @@ class TestWickedFilter(WickedTestCase):
 
     def test_getLinkTargetBrain(self):
         brain = self.filter.getLinkTargetBrain(self.page2.getId())
-        self.failUnless(brain.getObject()) == self.page2
+        self.failUnless(brain.getObject() == self.page2)
 
     def test_renderChunk(self):
         cat = getToolByName(self.portal, 'portal_catalog')
@@ -40,7 +40,7 @@ class TestWickedFilter(WickedTestCase):
         field = self.page1.getField(self.wicked_field)
 
         self.filter.configure(**dict(template=field.template, wicked_macro=field.wicked_macro))
-        uid, rendered = self.filter.renderChunk(brain.getId, brain)
+        uid, rendered = self.filter.renderChunk(brain.getId, [brain])
         self.failUnless(rendered in field.getAccessor(self.page1)())
 
 ##     def test_decoratorchaining(self):
