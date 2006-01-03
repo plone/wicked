@@ -10,38 +10,34 @@
 #   - and contributors
 #
 ##########################################################
-
-
+"""
+CMF/AT centric basic wikish filter
+"""
 from Products.CMFCore.utils import getToolByName
 from Products.filter import filter as filters
 from Products.filter.utils import createContext, macro_render
 from Products.wicked import utils, config
 from interfaces import IWickedFilter, IWickedQuery, IMacroCacheManager
-from normalize import titleToNormalizedId
 from zope.interface import implements
+
+import filtercore as fc
 import sre
 
 _marker = object()
 
 pattern = sre.compile(r'\(\(([\w\W]+?)\)\)') # matches ((Some Text To link 123))
 
-from filtercore import getMatch, setup, cache, \
-     query, match, packBrain, onlybrain, \
-     prstack
-from utils import delsetif
-
-
-
-
-
-def renderChunk(wfilter, chunk, brain, *args,  **kwargs):
-    if brain and not isinstance(brain, dict):
-        brain=packBrain(brain, wfilter.context)
+def renderChunk(wfilter, chunk, brains, *args,  **kwargs):
+    uid = ''
+    brains = filter(None, brains)
+    if brains:
+        uid = brains[0].UID
         
-    kwargs['links'] = brain and [brain] or []
+    brains = [fc.packBrain(b, wfilter.context) for b in brains]
+        
+    kwargs['links'] = brains
     kwargs['chunk'] = chunk
         
-    uid = args and args[0] or None
     slug = super(WickedFilter,
                  wfilter)._filterCore(wfilter.wicked_macro,
                                       template=wfilter.template, **kwargs)
@@ -56,74 +52,65 @@ class WickedFilter(filters.MacroSubstitutionFilter):
     """
     Filter for creating core wiki behavior 
     """
+    implements(IWickedFilter)
 
     # identity
-    implements(IWickedFilter)
     query_iface = IWickedQuery
     name = config.FILTER_NAME
     pattern = pattern
     url_signifier = "&amp;&amp;base_url&amp;&amp;"
 
+    _configure_exclude=dict(return_brain=True)
+
     # config attrs
+    scope = _marker
     wicked_macro = _marker
     template = _marker
     fieldname = None
 
     # methods
-    getMatch = getMatch
-    delkw = staticmethod(delsetif)
+    getMatch = staticmethod(fc.getMatch)
     render = lambda match: renderChunk
     renderChunk = renderChunk
     localizeSlug = localizeSlug
-
-    @setup
-    @cache(IMacroCacheManager)
-    @query
-    @match
+    configure = fc.configure
+    
+    @fc.setup
+    @fc.cache(IMacroCacheManager)
+    @fc.query
     @render
     def _filterCore(self, chunk, return_brain=False, normalized=None, **kwargs):
         """
         see utils.py for complete details on how wicked modifies
         the standard macro filter
         """
-        if __debug__:
-            prstack()
         pass
 
-    def getSeeker(self):
+    def getSeeker(self, chunk, normalled):
         """
         @return query object
         """
-        return self.query_iface(self)
+        seeker = self.query_iface(self)
+        seeker.configure(chunk, normalled, self.scope)
+        return seeker
 
     def getBaseURL(self):
         base_url = getattr(self, 'base_url', getToolByName(self.context, 'portal_url')())
         self.base_url = base_url
         return base_url
 
-    def configure(self, **attrs):
-        """
-        For runtime configuration of filter.  with at, most
-        of configuration data is from the field
-        """
-        # make smarter / safer
-        [(setattr(self, key, attrs[key]), attrs.__delitem__(key)) \
-         for key in attrs.keys() if key != 'return_brain']
-        return attrs
-
-    @onlybrain    
-    @setup    
-    @query
-    @match
-    def getLinkTargetBrain(self, link_text, *args, **kwargs):
+    @fc.setup    
+    @fc.query
+    def getLinkTargetBrain(self, chunk, brains, **kwargs):
         """
         returns a brain of the object that would be the link target
         for the 'link_text' parameter in the context of the 'self.context'
         object
         """
-        if __debug__:
-            prstack()
-        pass
+        if brains:
+            return brains.pop()
+        return None
+        
 
     def renderLinkForBrain(self, template, macro, chunk, brain, **kw):
         """
@@ -148,5 +135,10 @@ class WickedFilter(filters.MacroSubstitutionFilter):
 ##         macro = template.macros[macro]
 ##         return macro_render(macro, self.context, econtext, **kw)
         # deprecated, use renderchunk instead
-        uid, brain = self.renderChunk(chunk, brain)
+        uid, brain = self.renderChunk(chunk, [brain])
         return brain
+    
+if __name__=="__main__":
+    from testing.filtercore import dummy, fakecacheiface, fakefilter
+    import doctest
+    doctest.testmod()

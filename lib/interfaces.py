@@ -101,5 +101,34 @@ class IWickedQuery(Interface):
     dataobjects for wicked prep
     for the macro parser
     """
+    
+    chunk = Attribute('unaltered string from inside ((wicked link))')
+    normalized = Attribute('normalled chunk')
+    scope = Attribute('scoping parameter for "scoped" searches')
 
+    def scopedSearch(best_match):
+        """
+        @param best_match : attempt to make
+        best match for query returned
 
+        @return: list of dataobjects
+        """
+        
+    def search(chunk, normalized, best_match):
+        """
+        @param best_match : attempt to make
+        best match for query returned
+
+        @return : list of dataobjects
+        """
+        
+    def configure(chunk, normalized, scope):
+        """
+        configure set instance attributes
+        
+        @param chunk : instance attr 
+        @param normalized : instance attr
+        @param scope : instance attr
+
+        @return : None
+        """

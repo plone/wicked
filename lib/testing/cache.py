@@ -49,24 +49,7 @@ def backlinkTools():
 def setupTools(tools):
     portal_tools.update(tools)
 
-class pdo(dict):
-    """
-    pseudo data object....masquerades as a brain
-    """
-
-    def __init__(self, **kwargs):
-        self.update(kwargs)
-
-    def __getattr__(self, key):
-        ret = self.get(key, None)
-        if ret: return ret
-        return super(FakeBrain, self).__getattr__(key)
-
-    def getObject(self):
-        self.UID = lambda : self.UID
-        return self
-
-
+from general import pdo
 
 ## class pRefCat(dict):
 ##     def _queryFor(self, **kw):

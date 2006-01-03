@@ -47,7 +47,7 @@ class ATBacklinkManager(object):
                                  self.context,
                                  relationship=self.relation,
                                  referenceClass=self.refKlass)
-        uid, rendered = self.wfilter.renderChunk(link, brain, cache=True)
+        uid, rendered = self.wfilter.renderChunk(link, [brain], cache=True)
         self.cache.set((intern(normalize(link)), brain.UID), rendered)  
 
     
@@ -106,38 +106,64 @@ class ATBacklinkManager(object):
             self.refcat._deleteReference(obj)
             self.cache.unset(obj.targetUID(), use_uid=True)
 
+def match(query):
+    def match(self, best_match=True):
+        data = query(self)
+        if data and best_match:
+            return [self.context.getMatch(self.chunk, data, normalled=self.normalled)]
+        return data
+    return match
+
+_marker = object()
+
 class WickedCatalogInquisitor(object):
     """
     CMFish catalog query handler
     """
     implements(IWickedQuery)
+
+    chunk = _marker
+    normalled = _marker
+    scope = _marker
     
     def __init__(self, context):
         self.context = context # the filter
-        content = self.content = self.context.context
+        content = self.content = context.context
+        self.scope = context.scope
         self.catalog = getToolByName(content, 'portal_catalog')
         self.path = '/'.join(content.aq_inner.aq_parent.getPhysicalPath())    
         self.evalQ = self.catalog.evalAdvancedQuery
 
-    def scopedSearch(self, scope):
+    @match
+    def scopedSearch(self):
         chunk, title = self.chunk, self.title
         query = (Eq('getId', chunk) | Eq('Title', title))
-        if scope:
-            scope = getattr(self.content, scope)
+        if not self.scope is _marker:
+            # XXX let's move this out of attr storage
+            # on the content to at least an annotation
+            scope = getattr(self.content, self.scope, self.scope)
             if callable(scope):
                 scope = scope()
-            query = Generic('path', scope) & query
+            if scope:
+                query = Generic('path', scope) & query
         return self.evalQ(query, ('created',))
 
-    def search(self,  chunk, normalized):
-        self.chunk = chunk
+    @match
+    def search(self):
+        chunk = self.chunk
+        normalled = self.normalled
         getId = chunk
         self.title = title = '"%s"' % chunk
         query = Generic('path', {'query': self.path, 'depth': 1}) \
-                & (Eq('getId', chunk) | Eq('Title', title) | Eq('getId', normalized))
+                & (Eq('getId', chunk) | Eq('Title', title) | Eq('getId', normalled))
+        result = self.evalQ(query, ('created',))
+        return result
 
-        return self.evalQ(query, ('created',))
-
+    def configure(self, chunk, normalled, scope):
+        self.chunk = chunk
+        self.normalled = normalled
+        self.scope = scope
+        
 from cache import CacheStore
 
 class ContentCacheManager(object):

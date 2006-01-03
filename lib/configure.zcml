@@ -21,6 +21,7 @@
      provides=".interfaces.IWickedQuery"
      permission="zope2.Public"
      />
+
   <adapter
      for="Products.wicked.lib.interfaces.IWickedFilter"
      factory=".factories.ATBacklinkManager"

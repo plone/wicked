@@ -10,45 +10,21 @@
 #   - and contributors
 #
 ##########################################################
-
 from AccessControl import ClassSecurityInfo
 from ZPublisher.HTTPRequest import FileUpload
 
-from relation import Backlink
-from filter import WickedFilter
-from Products.wicked import config, utils
+from Products.wicked.utils import getFilter 
 from Products.filter import api as fapi
 
 from Products.Archetypes import public as atapi
 from Products.Archetypes.Registry import registerField
 
 from Products.CMFCore.utils import getToolByName
-from Products.CMFCore.Expression import Expression
-from Products.CMFCore.Expression import createExprContext
-from interfaces import IMacroCacheManager
+from interfaces import IMacroCacheManager, IBacklinkManager
 
-try:
-    # When Reference are in CMFCore
-    from Products.CMFCore.reference_config import *
-    from Products.CMFCore.ReferenceCatalog import Reference
-    from Products.CMFCore.Referenceable import Referenceable
-except ImportError:
-    # And while they still live in Archetypes
-    from Products.Archetypes.ReferenceEngine import Reference
-    from Products.Archetypes.Referenceable import Referenceable
-    from Products.Archetypes.config import REFERENCE_CATALOG as REFERENCE_MANAGER
-    from Products.Archetypes.config import UID_CATALOG as UID_MANAGER
-
+from filter import WickedFilter
 from filter import pattern as linkregex 
-from normalize import titleToNormalizedId
-from factories import ATBacklinkManager as BacklinkManager 
-
-def removeParens(wikilink):
-    wikilink.replace('((', '')
-    wikilink.replace('))', '')
-    return wikilink
-
-
+from utils import removeParens
 
 class WikiField(fapi.FilterField):
     """ drop-in wiki """
@@ -76,7 +52,7 @@ class WikiField(fapi.FilterField):
         kwargs['wicked_macro'] = self.wicked_macro
         kwargs['fieldname'] = self.getName()
         return super(WikiField, self).get(instance, mimetype=mimetype,
-                                        raw=raw, **kwargs)
+                                          raw=raw, **kwargs)
         
     def set(self, instance, value, **kwargs):
         """
@@ -94,19 +70,18 @@ class WikiField(fapi.FilterField):
             # a file was uploaded, get the (possibly transformed) value
             value_str = self.get(instance, skip_filters=True)
 
-        new_links = []
         found = linkregex.findall(value_str)
 
-        if len(found):
-            new_links = found
-            new_links = map(removeParens, new_links)
+        if not len(found):
+            return
 
-        wicked = utils.getFilter(instance)
+        wicked = getFilter(instance)
         wicked.configure(**dict(fieldname=self.getName(),
-                              wicked_macro=self.wicked_macro,
-                              template=self.template))
-
-        BacklinkManager(wicked).manageLinks(new_links, self.scope)
+                                wicked_macro=self.wicked_macro,
+                                template=self.template))
+        
+        new_links = [removeParens(link) for link in found]
+        IBacklinkManager(wicked).manageLinks(new_links, self.scope)
 
 registerField(WikiField,
               title='Wiki',
