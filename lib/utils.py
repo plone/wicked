@@ -41,6 +41,14 @@ def getRelativePath(path, instance):
 ##     if getattr(obj, attr, marker) is marker:
 ##         setattr(obj, attr, value)
 
+import inspect
+def prstack():
+    for e in inspect.stack():
+        if e:
+            line = list(e[1:])
+            line[3] = '\n'.join(line[3]).strip()
+            print "%s line %s %s \n-- %s --" %tuple(line[:4])
+
 
 if __name__=="__main__":
     import doctest

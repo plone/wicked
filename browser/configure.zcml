@@ -1,6 +1,12 @@
 <configure xmlns="http://namespaces.zope.org/zope"
            xmlns:browser="http://namespaces.zope.org/browser">
 <!--           xmlns:ploneschema="http://namespaces.plone.org/ploneschema" -->
-
+<browser:page
+   for='Products.wicked.interfaces.IAmWicked'
+   name='link_macros'
+   permission='zope.Public'
+   layer='wicked'
+   template='www/link_macros.pt'
+/>
 
 </configure>

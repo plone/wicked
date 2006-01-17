@@ -1,5 +1,15 @@
 <configure xmlns="http://namespaces.zope.org/zope"
 	   xmlns:five="http://namespaces.zope.org/five">
+
+   <!-- This would be unnecessary in a real z3 application as the implements
+         declaration in the content directive should handle this -->
+
+  <adapter							         
+     for="..interfaces.IAmWicked"				         
+     provides="zope.app.annotation.interfaces.IAnnotations"	         
+     factory="zope.app.annotation.attribute.AttributeAnnotations"     
+     />                                                               
+
   <adapter
      name = "Wicked Filter"
      for="Products.wicked.interfaces.IAmWicked"

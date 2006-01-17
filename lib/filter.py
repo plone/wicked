@@ -76,7 +76,7 @@ class WickedFilter(filters.MacroSubstitutionFilter):
     configure = fc.configure
     
     @fc.setup
-    @fc.cache(IMacroCacheManager)
+    @fc.cache
     @fc.query
     @render
     def _filterCore(self, chunk, return_brain=False, normalized=None, **kwargs):

@@ -266,11 +266,11 @@ class TestRemoteLinking(Base):
 
     def testLocalIdBeatsRemoteId(self):
         f2 = makeContent(self.folder, 'f2', 'Folder')
-        w1 = makeContent(f2, self.page1.id, self.wicked_type,
+        w1 = makeContent(f2, self.page1.getId(), self.wicked_type,
                          title='W1 Title')
         w2 = makeContent(f2, 'w2_id', self.wicked_type,
                          title='W2 Title')
-        w2.setBody("((%s))" % self.page1.id)
+        w2.setBody("((%s))" % self.page1.getId())
         self.failUnlessWickedLink(w2, w1)
         self.failIfWickedLink(w2, self.page1)
 
@@ -318,4 +318,8 @@ def test_suite():
     return suite
 
 if __name__ == '__main__':
+    import pdb; pdb.set_trace()
     framework()
+    import AppKit
+    vicki = AppKit.NSSpeechSynthesizer.new()
+    vicki.startSpeakinString(u'your tests are done bitch')

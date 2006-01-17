@@ -1,8 +1,3 @@
-"""
-A simple mapping layer
-
-This could eventually act as the link editing storage
-"""
 from persistent import Persistent
 from persistent.mapping import PersistentMapping
 from BTrees.OOBTree import OOBTree

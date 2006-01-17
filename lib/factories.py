@@ -1,13 +1,12 @@
-from zope.interface import implements
-
-from Products.CMFCore.utils import getToolByName
 from Products.AdvancedQuery import Eq, Generic
-
+from Products.CMFCore.utils import getToolByName
+from Products.wicked import config
+from filtercore import match
 from interfaces import IContentCacheManager, IWickedQuery, IATBacklinkManager, IMacroCacheManager
 from normalize import titleToNormalizedId as normalize
-from Products.wicked import config
 from pprint import pformat as format
 from relation import Backlink
+from zope.interface import implements
 
 class ATBacklinkManager(object):
     implements(IATBacklinkManager)
@@ -21,13 +20,12 @@ class ATBacklinkManager(object):
         self.context = wfilter.context
         self.renderLink = wfilter.renderLinkForBrain
         self.getBrain = wfilter.getLinkTargetBrain
-        self.cache = IMacroCacheManager(self.wfilter)
+        self.cm = IMacroCacheManager(self.wfilter)
         self.cat = getToolByName(self.context, 'portal_catalog')
         self.refcat = getToolByName(self.context, 'reference_catalog')
         self.suid = self.context.UID()
         self.template = wfilter.template
         self.wicked_macro = wfilter.wicked_macro
-
 
     def getLinks(self):
         """
@@ -48,7 +46,7 @@ class ATBacklinkManager(object):
                                  relationship=self.relation,
                                  referenceClass=self.refKlass)
         uid, rendered = self.wfilter.renderChunk(link, [brain], cache=True)
-        self.cache.set((intern(normalize(link)), brain.UID), rendered)  
+        self.cm.set((intern(link), brain.UID), rendered)  
 
     
     def _preplinks(self, links=dict()):
@@ -104,15 +102,9 @@ class ATBacklinkManager(object):
             self.refcat._queryFor(self.suid, brain.UID, self.relation))
         for obj in objs:
             self.refcat._deleteReference(obj)
-            self.cache.unset(obj.targetUID(), use_uid=True)
+            self.cm.unset(obj.targetUID(), use_uid=True)
 
-def match(query):
-    def match(self, best_match=True):
-        data = query(self)
-        if data and best_match:
-            return [self.context.getMatch(self.chunk, data, normalled=self.normalled)]
-        return data
-    return match
+            
 
 _marker = object()
 
@@ -165,45 +157,36 @@ class WickedCatalogInquisitor(object):
         self.scope = scope
         
 from cache import CacheStore
+from zope.app.annotation.interfaces import IAnnotations, IAnnotatable
+
+CACHE_KEY = 'Products.wicked.lib.factories.ContentCacheManager'
 
 class ContentCacheManager(object):
 
     implements(IContentCacheManager)
-    cache_attr = '_wicked_cache'
 
     def __init__(self, context):
         self.context = context # the filter
         self.content = context.context # the parent object
         self.name = self.context.fieldname
 
-    def _getKeyStore(self):
-        con, attr = self.content.aq_base, self.cache_attr
-        if not hasattr(con, attr):
-            store = [CacheStore(id_=self.content.absolute_url())]
-            setattr(con, attr, store)
-            con._p_changed=True
-        return getattr(con, attr)[0]
+    def _getStore(self):
+        cache_store = getattr(self, 'cache_store', _marker)
+        if cache_store == _marker:
+            ann = IAnnotations(self.content)
+            cache_store = ann.get(CACHE_KEY)
+            if not cache_store:
+                cache_store = CacheStore(id_=self.content.absolute_url())
+                ann[CACHE_KEY] = cache_store
+            self.cache_store = cache_store 
+        return cache_store
 
     def _getCache(self):
-        store = self._getKeyStore()
+        store = self._getStore()
         cache = store.getCache(self.name)
         return cache
     
     def get(self, key, default=None):
-        """
-        >>> from Products.wicked.lib.testing.cache import cachetestsetup as setup
-        >>> content, ccm = setup()
-        >>> key = 'bob'
-        >>> ccm.get(key)
-
-        >>> _marker = object()
-        >>> ccm.get(key, _marker) is _marker
-        True
-        >>> ccm.set((key, 'bobid'), 'some text')
-        'some text'
-        >>> ccm.get(key)
-        'some text'
-        """
         cache = self._getCache()
         return cache.get(key, default)
         
@@ -226,4 +209,8 @@ class ContentCacheManager(object):
             del cache[key]
             return text
         return
+
+    def reset(self, uid, text):
+        store = self._getStore()
+        store.set(uid, text)
 

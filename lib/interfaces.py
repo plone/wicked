@@ -1,10 +1,14 @@
 from zope.interface import Interface, Attribute
-from Products.filter.interfaces import IMacroFilter
+try:
+    from Products.filter.interfaces import IMacroFilter
+except ImportError:
+    IMacroFilter = Interface
 
 class IWickedFilter(IMacroFilter):
     """
     Wicked field filter
     """
+    ### this need complete documentation and test to verify
 
 class IBacklinkManager(Interface):
     """

@@ -23,8 +23,10 @@ quite useful.
 __authors__ = 'Whit Morriss <whit@kalistra.com>'
 __docformat__ = 'restructuredtext'
 
+from zope.interface import implements
 from Products.Archetypes import public as atapi
 from Products.Archetypes.references import Reference
+from Products.wicked.utils import getFilter 
 from Products.wicked import config
 
 class Backlink(Reference):
@@ -34,8 +36,11 @@ class Backlink(Reference):
     """
     relationship = config.BACKLINK_RELATIONSHIP
 
-    def __init__(self, rID, sID, tID, relationship, **kwargs):
-        super(Backlink, self).__init__(rID, sID, tID, relationship, **kwargs)
+#    def __init__(self, rID, sID, tID, relationship, **kwargs):
+#        super(Backlink, self).__init__(rID, sID, tID, relationship, **kwargs)
+
+    def __repr__(self):
+        return "<Backlink sid:%s tid:%s rel:%s>" %(self.sourceUID, self.targetUID, self.relationship)
 
     def targetURL(self):
         """
@@ -47,4 +52,4 @@ class Backlink(Reference):
         return '#'
 
 
-
+        

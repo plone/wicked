@@ -1,5 +1,10 @@
-def dummy(kdict, name='dummy'):
-    return type(name, (object,), kdict)()
+from interfaces import ITestObject
+from Products.Five.utilities.marker import mark
+
+def dummy(kdict, name='dummy', iface=ITestObject):
+    obj = type(name, (object,), kdict)()
+    mark(obj, iface)
+    return obj 
 
 def getToolByName(context, tool_name):
     """

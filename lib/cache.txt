@@ -1,5 +1,21 @@
-basic manager for quick and dirty caching links
-on a content object.
+=======
+ cache
+=======
+
+basic manager for quick and dirty caching and editing of links
+on a content object. Uses zope3's annotation implementation for
+storage.  
+
+Let load a little zcml so we can do annotation storage
+
+    >>> from zope.app.tests.placelesssetup import setUp, tearDown
+    >>> from Products.Five import zcml
+    >>> setUp() 
+    >>> from Products.wicked.lib import testing
+    >>> import Products.Five
+    >>> zcml.load_config('meta.zcml', Products.Five)
+    >>> zcml.load_config("permissions.zcml", Products.Five)
+    >>> zcml.load_config('annotations.zcml', testing)
 
 First, fake some AT content and a filter
 
@@ -31,10 +47,10 @@ text to cache
     >>> ccm.set((bob.getId, bob.UID), bob.text)
     'some text'
     
-    >>> getattr(content, ccm.cache_attr)[0]
+    >>> ccm.cache_store
     CacheStore '/you/are/here' {'body': Cache '/you/are/here' {'bob': 'bobid', 'dog': 'dogid'}} :: [('bobid', 'some text'), ('dogid', 'some dog text')]
 
-    >>> store = getattr(content, ccm.cache_attr)[0]
+    >>> store = ccm.cache_store
     >>> store._cache['dogid']
     'some dog text'
     >>> store._cache['bobid']
@@ -58,3 +74,24 @@ text to cache
     'some dog text'
 
     >>> ccm.unset('bogusid', use_uid=True)
+
+Original get tests
+
+    >>> from Products.wicked.lib.testing.cache import cachetestsetup as setup
+    >>> content, ccm = setup()
+    >>> key = 'bob'
+    >>> ccm.get(key)
+
+    >>> _marker = object()
+    >>> ccm.get(key, _marker) is _marker
+    True
+    
+    >>> ccm.set((key, 'bobid'), 'some text')
+    'some text'
+    
+    >>> ccm.get(key)
+    'some text'
+
+Cleanup and exit
+
+    >>> tearDown()
