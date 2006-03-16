@@ -32,8 +32,6 @@ def setupCA():
     fivezcml.clear()
     
 
-FilterTestCase.setupCA = staticmethod(setupCA)
-
 # Dynamic bootstapping based on product config
 def installConfiguredProducts():
     config, handler = parseDepends()
@@ -67,7 +65,7 @@ class WickedTestCase(FilterTestCase):
     
     def afterSetUp(self):
         super(WickedTestCase, self).afterSetUp()
-
+        
         # add some pages
         self.page1 = makeContent(self.folder,
                                  titleToNormalizedId(TITLE1),
@@ -144,4 +142,4 @@ class WickedTestCase(FilterTestCase):
         # XXX make test stronger
         return dest.absolute_url() in self.getRenderedWickedField(doc)
 
-ptc.setupPloneSite(products=['Archetypes', 'wicked'])
+ptc.setupPloneSite(products=['Archetypes', 'wicked'], required_zcml=setupCA)

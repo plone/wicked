@@ -318,8 +318,5 @@ def test_suite():
     return suite
 
 if __name__ == '__main__':
-    import pdb; pdb.set_trace()
     framework()
-    import AppKit
-    vicki = AppKit.NSSpeechSynthesizer.new()
-    vicki.startSpeakinString(u'your tests are done bitch')
+
