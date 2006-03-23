@@ -1,0 +1,29 @@
+<tal:wicked_link>
+  <span tal:condition="view/howmany" tal:omit-tag="">
+    <span tal:condition="not:view/multiple" tal:omit-tag=''> 
+      <span tal:define="link view/links" tal:omit-tag=''>
+	<span class='wikilink_resolved'>
+	  <a tal:define="path link/path;
+                         icon link/icon;
+                         rel_path link/rel_path" 
+             tal:attributes="href string:&&base_url&&/${rel_path}">
+            <img tal:condition="icon"
+                 tal:attributes="src icon"/><span tal:replace="view/chunk" /></a>
+	</span>
+      </span>
+    </span>
+    <span tal:condition="view/multiple" tal:omit-tag="">  
+      <span tal:define="link view/singlelink" tal:omit-tag=""> 
+	<span metal:use-macro="here/wicked_link/macros/linkmenu"> 
+	  the first link
+	</span>
+      </span>
+    </span>
+  </span>
+  <span tal:condition="not: view/howmany" tal:omit-tag=''>
+    <span tal:content="view/chunk" class='wikilink_unresolved'>A CHUNK</span>
+    <a class="wickedadd"
+       tal:attributes="href string:$here_url/@@wickedadd?Title=${view/chunk}&section=${view/section}"
+       tal:define="here_url here/absolute_url">+</a>
+  </span>
+</tal:wicked_link>
