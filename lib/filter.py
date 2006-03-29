@@ -15,10 +15,12 @@ CMF/AT centric basic wikish filter
 """
 from Products.CMFCore.utils import getToolByName
 from Products.filter import filter as filters
-from Products.filter.utils import createContext, macro_render
 from Products.wicked import utils, config
-from interfaces import IWickedFilter, IWickedQuery, IMacroCacheManager
+from interfaces import IWickedFilter, IWickedQuery
 from zope.interface import implements
+from Products.wicked.lib import interfaces  
+from zope.component import getMultiAdapter
+from Products.wicked.lib.utils import memoizedproperty
 
 import filtercore as fc
 import sre
@@ -29,18 +31,19 @@ pattern = sre.compile(r'\(\(([\w\W]+?)\)\)') # matches ((Some Text To link 123))
 
 def renderChunk(wfilter, chunk, brains, *args,  **kwargs):
     uid = ''
-    brains = filter(None, brains)
+    brains = [b for b in brains if b]
     if brains:
         uid = brains[0].UID
         
-    brains = [fc.packBrain(b, wfilter.context) for b in brains]
-        
+    brains = [fc.packBrain(b) for b in brains]
+    
     kwargs['links'] = brains
     kwargs['chunk'] = chunk
-        
-    slug = super(WickedFilter,
-                 wfilter)._filterCore(wfilter.wicked_macro,
-                                      template=wfilter.template, **kwargs)
+    
+    #slug = super(WickedFilter,
+    #             wfilter)._filterCore(wfilter.wicked_macro,
+    #                                  template=wfilter.template, **kwargs)
+    
     if kwargs.get('cache', None):
         return uid, slug
     return uid, wfilter.localizeSlug(slug)
@@ -48,7 +51,7 @@ def renderChunk(wfilter, chunk, brains, *args,  **kwargs):
 def localizeSlug(wfilter, slug):
     return slug.replace(wfilter.url_signifier, wfilter.getBaseURL())
 
-class WickedFilter(filters.MacroSubstitutionFilter):
+class WickedFilter(object):
     """
     Filter for creating core wiki behavior 
     """
@@ -66,7 +69,7 @@ class WickedFilter(filters.MacroSubstitutionFilter):
     scope = _marker
     wicked_macro = _marker
     template = _marker
-    fieldname = None
+    section = None
 
     # methods
     getMatch = staticmethod(fc.getMatch)
@@ -90,7 +93,7 @@ class WickedFilter(filters.MacroSubstitutionFilter):
         """
         @return query object
         """
-        seeker = self.query_iface(self)
+        seeker = getMultiAdapter((self, self.context), self.query_iface)
         seeker.configure(chunk, normalled, self.scope)
         return seeker
 
@@ -128,15 +131,24 @@ class WickedFilter(filters.MacroSubstitutionFilter):
 
         - brain: object to which the link should resolve
         """
-##         kw['links'] = [packBrain(brain, self.context)]
-##         kw['chunk'] = chunk
-##         econtext = createContext(self.context, **kw)
-##         template = self.context.restrictedTraverse(path=template)
-##         macro = template.macros[macro]
-##         return macro_render(macro, self.context, econtext, **kw)
-        # deprecated, use renderchunk instead
         uid, brain = self.renderChunk(chunk, [brain])
         return brain
+    
+    @memoizedproperty
+    def cache_manager(self):
+        cachemanager = interfaces.IContentCacheManager(self.context)
+        cachemanager.setName(self.section)
+        return cachemanager
+
+    @memoizedproperty
+    def renderer(self):
+        renderer = getMultiAdapter((self.context, self.context.REQUEST), Interface, 'link_renderer')
+        render.section = self.section
+        
+    def manageLinks(self, links):
+        manager = getMultiAdapter((self, self.context), interfaces.IBacklinkManager)
+        manager.manageLinks(links)
+
     
 if __name__=="__main__":
     from testing.filtercore import dummy, fakecacheiface, fakefilter
