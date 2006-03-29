@@ -1,12 +1,7 @@
 <configure xmlns="http://namespaces.zope.org/zope"
            xmlns:browser="http://namespaces.zope.org/browser">
 
-  <!-- browser:page
-     for='Products.wicked.interfaces.IAmWicked'
-     name='link_macros'
-     permission='zope.Public'
-     template='www/link_macros.pt'
-     / -->
+  <include file="renderer.zcml" />
 
   <browser:pages
      for="..interfaces.IAmWicked"
