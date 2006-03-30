@@ -13,24 +13,38 @@ schema['body'].wicked_macro='wicked_test'
 
 import Products.wicked.config as config
 from Products.wicked.utils import parseDepends, doc_file
+from Products.wicked.lib.testing.xml import xstrip as strip
 from Products.wicked.api import titleToNormalizedId
-from Products.filter.tests.filtertestcase import fivezcml, filterzcml, setUp, tearDown, zcml, FilterTestCase
+from Products.filter.tests.filtertestcase import FilterTestCase
 from Products.wicked.lib import field
-import Products.wicked
 
+from Testing.ZopeTestCase.placeless import zcml, setUp, tearDown
+
+import Products.testing as testing
+import Products.wicked.lib
+import Products.wicked.browser
+import Products.Five as Five
+import Products.Archetypes as AT
+import Products.CMFCore as CMFCore
+import Products.filter as txtfilter
+import Products.testing as testing
+
+from zope.app.apidoc.component import getProvidedAdapters as gpa
+from zope.interface import Interface
 
 def setupCA():
-    tearDown()
     setUp()
-    fivezcml.loadmeta()
-    fivezcml.load('permissions.zcml')
-    #fivezcml.zcml.load_config('configure.zcml', Products.wicked)
-    fivezcml.zcml.load_config('configure.zcml', Products.wicked.lib)
-    
-    # once we have a filter directive
-    #filterzcml.loadmeta()
-    fivezcml.clear()
-    
+    load = zcml.load_config
+    load('meta.zcml', Five)
+    load('permissions.zcml', Five)
+    load('event.zcml', Five)
+    load('deprecated.zcml', Five)
+    load('configure.zcml', AT)
+    load('configure.zcml', CMFCore)
+    load("traversal.zcml", testing)
+    load('configure.zcml', txtfilter)
+    load('configure.zcml', Products.wicked.lib)
+    load('configure.zcml', Products.wicked.browser)
 
 # Dynamic bootstapping based on product config
 def installConfiguredProducts():
@@ -63,9 +77,10 @@ USELXML = False
 # class in order to assert things about your Product.
 class WickedTestCase(FilterTestCase):
     
+    setUpCA=staticmethod(setupCA)    
+
     def afterSetUp(self):
         super(WickedTestCase, self).afterSetUp()
-        
         # add some pages
         self.page1 = makeContent(self.folder,
                                  titleToNormalizedId(TITLE1),
@@ -74,30 +89,8 @@ class WickedTestCase(FilterTestCase):
                                  titleToNormalizedId(TITLE2),
                                  self.wicked_type, title=TITLE2)
 
-    def strip(self, text):
-        """
-        if lxml is available, use it to strip out whitespace
-        """
-        text = text.strip()
-        if not text:
-            return text
-        try:
-            from lxml import etree
-        except ImportError:
-            return text
-
-        # ganked from zopt and sfive
-
-        xsltfile = os.path.join(os.path.dirname(__file__), 'strip.xsl')
-        xslt = file(xsltfile)
-        xslt_doc = etree.parse(xslt)
-        style = etree.XSLT(xslt_doc)
-
-        textfile = StringIO(text)
-        doc = etree.parse(textfile)
-        result = style.apply(doc)
-        return style.tostring(result)
-
+    strip = staticmethod(strip)
+ 
     def getRenderedWickedField(self, doc):
         fieldname = self.wicked_field
         text = field.WikiField.get(doc.getField(fieldname), doc)
@@ -125,11 +118,15 @@ class WickedTestCase(FilterTestCase):
         if dest in text:
             self.fail("%s FOUND:\n\n %s" %(dest, text))
 
+    failIfMatch = failIfWickedLink
+
     def failUnlessWickedLink(self, doc, dest):
         dest = dest.absolute_url()
         text = self.getRenderedWickedField(doc)
         if not dest in text:
             self.fail("%s NOT FOUND:\n\n %s" %(dest, text))
+
+    failUnlessMatch = failUnlessWickedLink
 
     def hasAddLink(self, doc):
         """ does wicked field text contain a wicked-generated add link? """

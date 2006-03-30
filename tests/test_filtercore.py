@@ -6,7 +6,7 @@ except: pass
 
 sys.path.insert(0, base)
 
-from filtercore import test_suite
+from utils import test_suite
 if __name__ == '__main__':
     unittest.TextTestRunner().run(test_suite())
 
