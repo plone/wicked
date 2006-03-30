@@ -3,8 +3,6 @@ from Products.filter import api as fapi
 from Products.wicked.config import FILTER_NAME
 from StringIO import StringIO
 from ZODB.POSException import ConflictError
-# remove as hard dep
-
 from os.path import join, abspath, dirname, basename
 from zope.component import getAdapter
 
