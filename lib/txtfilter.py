@@ -50,12 +50,10 @@ class WickedFilter(WickedBase):
 
     # config attrs
     scope = _marker
-
     section = None
 
     # methods
     getMatch = staticmethod(utils.getMatch)
-    render = lambda match: renderChunk
     configure = utils.configure
     
     def _filterCore(self, chunk, **kwargs):
@@ -64,6 +62,16 @@ class WickedFilter(WickedBase):
         links=self.getLinks(chunk, normalled)
         self.renderer.load(links, chunk)
         return self.renderer()
+
+    @utils.linkcache
+    @utils. memoize
+    def getLinks(self, chunk, normalled):
+        self.resolver.configure(chunk, normalled, self.scope)
+        brains = self.resolver.search
+        if not brains:
+            brains = self.resolver.scopedSearch
+        links = [utils.packBrain(b) for b in brains if b]
+        return links
 
     @memoizedproperty
     def resolver(self):
@@ -81,16 +89,6 @@ class WickedFilter(WickedBase):
         
     def manageLinks(self, links):
         self.backlinker.manageLinks(links)
-
-    @utils.linkcache
-    @utils. memoize
-    def getLinks(self, chunk, normalled):
-        self.resolver.configure(chunk, normalled, self.scope)
-        brains = self.resolver.search
-        if not brains:
-            brains = self.resolver.scopedSearch
-        links = [utils.packBrain(b) for b in brains if b]
-        return links
         
     @memoizedproperty
     def cache(self):
