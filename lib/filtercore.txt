@@ -68,11 +68,11 @@ Check for cached data.  if found, return. If not, run the stack and stuff
 result in the cache.  'cache' is the only decorator that executes
 behavior before and after the method it wraps.
 
+The cache manager is a multiadapter registered to the filter and
+content.  We can simply set an attr on the stub to simulate this.
+
 Currently, the cache returns rendered data. This will be refactored to return 
 some sort of renderable data object.
-
-'cache' can take the argument iface to manual set the cache
-management interface for testing purposes.
 
 First we define a surrogate that will simulate current behavior
 of the stack beneath cache::
@@ -84,10 +84,11 @@ of the stack beneath cache::
     ...     return uid, '$$' + norm
 
 We'll use a dictionary as our cache::
-
+				   
     >>> fcache = {'bl-ah':'blah.txt'}
-    >>> _filtercore = cache(_filtercore, iface=fakecacheiface(fcache))
+    >>> _filtercore = cache(_filtercore)
     >>> wfilter = fakefilter()
+    >>> wfilter.cache=fakecacheiface(fcache)
 
 Data objects returned by a query should get passes
 through with the brain flag::
@@ -128,7 +129,7 @@ III. query & match
 	on the query implementation(see factories.py)
 
 Essentially, query is a logic switch: it gets a query object
-implementing IWickedQuery (called a seeker) from the filter
+implementing IWickedQuery (called a resolver) from the filter
 and makes it perform a search. if that search fails,
 query uses the object to perform a scoped search.
 
@@ -160,7 +161,8 @@ Look for something that is scoped::
 Test with top of stack('setup' & 'cache')::
 
     >>> fcache = {'bl-ah':'blah.txt'}
-    >>> _filtercore = setup(cache(_filtercore, iface=fakecacheiface(fcache)))
+    >>> _filtercore = setup(cache(_filtercore))
+    >>> wfilter.cache=fakecacheiface(fcache)
     >>> _filtercore(wfilter, 'Bab bam')
     ['We are brains!']
 
