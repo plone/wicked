@@ -1,3 +1,4 @@
+from zope.interface import Interface
 from Products.filter.interfaces import IFilterable, IFieldFilter
 
 class IAmWicked(IFilterable):
@@ -9,7 +10,14 @@ class IAmWicked(IFilterable):
     for some processing
     """
 
+
 class IWickedFilter(IFieldFilter):
     """
     Wicked field filter
+    """
+
+
+class IWickedTarget(Interface):
+    """
+    marker interface for an object linked to in a wicked text area
     """
