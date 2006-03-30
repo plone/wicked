@@ -13,17 +13,16 @@
 from AccessControl import ClassSecurityInfo
 from ZPublisher.HTTPRequest import FileUpload
 
-from Products.wicked.utils import getFilter 
+from Products.wicked.utils import getFilter
 from Products.filter import api as fapi
 
 from Products.Archetypes import public as atapi
 from Products.Archetypes.Registry import registerField
 
 from Products.CMFCore.utils import getToolByName
-from interfaces import IMacroCacheManager, IBacklinkManager
 
-from filter import WickedFilter
-from filter import pattern as linkregex 
+from txtfilter import WickedFilter
+from txtfilter import pattern as linkregex 
 from utils import removeParens
 
 class WikiField(fapi.FilterField):
@@ -48,9 +47,7 @@ class WikiField(fapi.FilterField):
         """
         # configuration
         kwargs['scope'] = self.scope
-        kwargs['template'] = self.template
-        kwargs['wicked_macro'] = self.wicked_macro
-        kwargs['fieldname'] = self.getName()
+        kwargs['section'] = self.getName()
         return super(WikiField, self).get(instance, mimetype=mimetype,
                                           raw=raw, **kwargs)
         
@@ -75,13 +72,13 @@ class WikiField(fapi.FilterField):
         if not len(found):
             return
 
+        config = dict(section=self.getName(),
+                      scope=self.scope)
         wicked = getFilter(instance)
-        wicked.configure(**dict(fieldname=self.getName(),
-                                wicked_macro=self.wicked_macro,
-                                template=self.template))
+        wicked.configure(**config)
         
         new_links = [removeParens(link) for link in found]
-        IBacklinkManager(wicked).manageLinks(new_links, self.scope)
+        wicked.manageLinks(new_links)
 
 registerField(WikiField,
               title='Wiki',
