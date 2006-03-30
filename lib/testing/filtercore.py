@@ -1,4 +1,5 @@
 from general import dummy
+from Products.wicked.lib.factories import ContentCacheManager     
 
 def fakecacheiface(cached):
     def call(*args):
@@ -14,9 +15,6 @@ def fakecacheiface(cached):
 class query(object):
     
     brains = ['We are brains!']
-    
-    def __init__(self, chunk, normalized, scope):
-        self.configure(chunk, normalized, scope)
     
     def scopedSearch(self):
         if self.chunk != 'dud':
@@ -45,7 +43,9 @@ def fakefilter():
                            x.replace(self.url_signifier, 'http://fakeurl/'))
     kdict = dict(configure=conf, url_signifier="$$", localizeSlug=localizeSlug, scope='/scope/')
     wfilter = dummy(kdict, name='wfilter')
-    wfilter.query_iface = query
+    wfilter.query_iface = query()
     wfilter.getMatch = argchug(('uid', 'link'))
-    wfilter.getSeeker = lambda chunk, normalized: query(chunk, normalized, wfilter.scope)
+    wfilter.resolver = query()
+    wfilter.section=hash(wfilter)
+    wfilter.cache=ContentCacheManager(dummy(dict()))
     return wfilter

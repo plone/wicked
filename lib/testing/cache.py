@@ -20,6 +20,8 @@ class Filter(object):
 
     def filter(self, *args, **kwargs):
         pass
+    
+    section='body'
 
 
 from Products.wicked.lib.factories import ContentCacheManager     
@@ -28,8 +30,11 @@ def cachetestsetup():
     content.aq_base = content
     content.absolute_url=lambda : '/you/are/here'
     fil = Filter(content)
-    fil.fieldname = 'body'
-    return content, ContentCacheManager(fil)
+    ccm=ContentCacheManager(content)
+    ccm.setName(fil.section)
+    fil.cache=ccm
+
+    return content, ccm
 
 portal_tools = dict()
 def getToolByName(context, toolname, default):
