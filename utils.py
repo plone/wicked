@@ -1,16 +1,18 @@
-from zope.app import zapi
 from Products.CMFCore.utils import getToolByName
+from Products.filter import api as fapi
+from Products.wicked.config import FILTER_NAME
 from StringIO import StringIO
-
 from ZODB.POSException import ConflictError
+# remove as hard dep
+
 from os.path import join, abspath, dirname, basename
+from zope.component import getAdapter
+
 import ZConfig
 import os.path
-from Products.wicked.config import FILTER_NAME
-from Products.filter import api as fapi
 
 def getFilter(obj):
-    return zapi.getAdapter(obj, fapi.IFieldFilter, FILTER_NAME)
+    return getAdapter(obj, fapi.IFieldFilter, FILTER_NAME)
 
 ## Configuration utilities
 DIR_PATH = abspath(dirname(__file__))
@@ -61,8 +63,3 @@ def installDepends(portal):
              'optional' : optional_handler,
              })
 
-def getPathRelToPortal(path, instance):
-    portal_path = getToolByName(instance,
-                                'portal_url').getPortalPath().split('/')
-    path = path.split('/')
-    return '/'.join(path[len(portal_path):])
