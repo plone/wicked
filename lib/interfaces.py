@@ -1,12 +1,8 @@
 from zope.interface import Interface, Attribute
-try:
-    from Products.filter.interfaces import IMacroFilter
-except ImportError:
-    IMacroFilter = Interface
 
-class IWickedFilter(IMacroFilter):
+class IWickedFilter(Interface):
     """
-    Wicked field filter
+    Wicked resolving filter
     """
     ### this need complete documentation and test to verify
 
@@ -82,10 +78,10 @@ class IContentCacheManager(IMacroCacheManager):
     """
     a cache manager that cache per content instance
     on the content type itself. It manages a dual level data
-    structure: dict(fieldname=dict(key=value))
+    structure: dict(section=dict(key=value))
     """
     cache_attr = Attribute('attribute to access cache through')
-    fieldname = Attribute('attribute to access sub-cache through')
+    section = Attribute('attribute to access sub-cache through')
 
     def _getStore():
         """
