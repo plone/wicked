@@ -1,4 +1,5 @@
 <configure xmlns="http://namespaces.zope.org/zope"
 	   xmlns:five="http://namespaces.zope.org/five">
     <include package=".lib" />
+    <include package=".browser" />
 </configure>
