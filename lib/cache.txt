@@ -10,7 +10,6 @@ Let load a little zcml so we can do annotation storage
 
     >>> from zope.app.tests.placelesssetup import setUp, tearDown
     >>> from Products.Five import zcml
-    >>> setUp() 
     >>> from Products.wicked.lib import testing
     >>> import Products.Five
     >>> zcml.load_config('meta.zcml', Products.Five)
@@ -22,15 +21,14 @@ First, fake some AT content and a filter
     >>> from Products.wicked.lib.testing.cache import cachetestsetup, Filter, dummy
     >>> content, ccm = cachetestsetup()
     >>> fil = Filter(content)
-    >>> fil.fieldname = 'body'
+    >>> fil.section = 'body'
     >>> from Products.wicked.lib.factories import ContentCacheManager
-    >>> ccm=ContentCacheManager(fil)
+    >>> ccm=ContentCacheManager(content)
+    >>> ccm.setName(fil.section)
 
 Check and make sure the __init__ does the right thing
 
-    >>> ccm.context == fil
-    True
-    >>> ccm.content == content
+    >>> ccm.context == content
     True
 
 Lets manage that hot content cache!
