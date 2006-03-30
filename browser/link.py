@@ -44,17 +44,16 @@ class BasicLink(object):
         return self.counter.next()
 
     @clearbefore
-    def load(self, links, chunk, section=_marker):
+    def load(self, links, chunk):
         self._links = links
         self.chunk = chunk
-        assert section is not _marker, 'Must supply a section name'
-        self.section = section
 
 
 class BasicFiveLink(BrowserView, BasicLink):
     """
     Five prepared link implementation
     """
+    __init__=BasicLink.__init__
 
 import unittest
 from zope.testing import doctest

@@ -12,7 +12,7 @@
 			 singlelink
 			 links
 			 count"
-     class='.link.BasicLink'
+     class='.link.BasicFiveLink'
     />
 
 </configure>

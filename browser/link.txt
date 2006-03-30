@@ -1,0 +1,37 @@
+=============
+ wicked link
+=============
+
+link.WickedLink is a class for binding to a view / multiadapter for
+rendering wicked links.
+
+this is a basic documentation of the linking class::
+
+    >>> import link
+    >>> context, request = object(), object()
+    >>> wlink = link.BasicLink(context, request)
+    >>> context == wlink.context
+    True
+    
+    >>> wlink.load(['link'], 'whee', section='fieldname')
+    >>> wlink.multiple
+    False
+
+    >>> wlink.howmany
+    1
+
+    >>> wlink.singlelink
+    'link'
+
+    >>> wlink.links
+    ['link']
+
+    >>> wlink.load(['link', 'link2'], 'Title', section='fieldname')
+    >>> wlink.multiple
+    True
+
+    >>> wlink.singlelink
+    'link'
+
+    >>> wlink.links
+    ['link', 'link2']

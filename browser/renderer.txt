@@ -15,9 +15,8 @@ rolling.
     ...     from zope.publisher.interfaces.browser import IDefaultBrowserLayer
     ... except:
     ...     from zope.publisher.interfaces.browser import IBrowserRequest as IDefaultBrowserLayer
-    >>> from Products.wicked.utils import strip as xstrip
     >>> from Products.Five.utilities.marker import mark
-    >>> from zope.app.tests.placelesssetup import setUp, tearDown
+    >>> from zope.app.testing.placelesssetup import setUp, tearDown
     >>> from Products.Five import zcml
     >>> import Products.Five
     >>> import Products.testing as testing
@@ -39,14 +38,25 @@ rolling.
     >>> link=dict(path='/apath',
     ...           icon='anicon.ico',
     ...           uid='uid')
-    >>> renderer.load([link], 'Chunk', section='fieldname')
-    >>> print xstrip(renderer())
-    <span class="wikilink_resolved" id="fieldname-uid"><a href="http://nohost/apath"><img src="anicon.ico">Chunk</a></span>
+    >>> renderer.load([link], 'Chunk')
+    >>> renderer.section='fieldname'
+    >>> from Products.wicked.lib.testing.xml import xstrip
+    >>> print  xstrip(renderer())
+    <span class="wicked_resolved" id="fieldname-uid"><a href="http://nohost/apath"><img src="anicon.ico"><span class="chunk">Chunk</span></a></span>
     ...
 
-    >>> renderer.load([], 'Chunk 2', section='fieldname2')
+    >>> renderer.load([], 'Chunk 2')
     >>> print xstrip(renderer())
-    <span class="wikilink_unresolved" id="fieldname2-1"><span class="chunk">Chunk 2</span><a class="wickedadd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk%202&amp;section=fieldname2">+</a></span>
+    <span class="wicked_unresolved" id="fieldname-1"><span class="chunk">Chunk 2</span><a class="wickedadd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk%202&amp;section=fieldname">+</a></span>
     ...
+
+Test counter::
+
+    >>> renderer.load([], 'Chunk 3')
+    >>> print xstrip(renderer())
+    <span class="wicked_unresolved" id="fieldname-2"><span class="chunk">Chunk 3</span><a class="wickedadd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk%203&amp;section=fieldname">+</a></span>
+    ...
+
+Cleanup::
 
     >>> tearDown()

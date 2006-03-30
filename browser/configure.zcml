@@ -1,11 +1,12 @@
 <configure xmlns="http://namespaces.zope.org/zope"
-           xmlns:browser="http://namespaces.zope.org/browser">
+           xmlns:browser="http://namespaces.zope.org/browser"
+	   xmlns:five="http://namespaces.zope.org/five">
 
   <include file="renderer.zcml" />
 
   <browser:pages
      for="..interfaces.IAmWicked"
-     class='.wickedservice.WickedAdd'
+     class='.add.WickedAdd'
      permission='zope.Public'>
 
     <browser:page
@@ -18,5 +19,11 @@
        attribute='addMenu'
        />
   </browser:pages>
+
+  <five:traversable
+     class="Products.CMFCore.DynamicType.DynamicType" />
+
+  <five:traversable
+     class="Products.Archetypes.BaseObject.BaseObject" />
 
 </configure>

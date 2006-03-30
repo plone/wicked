@@ -72,6 +72,7 @@ This is not working properly in the test, but works in the browser::
     >>> print http(r'''
     ... GET /plone/Members/test_user_1_/@@wickedadd?Title=%s HTTP/1.1
     ... ''' %quote(title))
-    HTTP/1.1 404 Not Found...
+    HTTP/1.1 302 Moved Temporarily...
 
+    
     >>> tearDown()
