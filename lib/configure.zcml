@@ -1,8 +1,21 @@
 <configure xmlns="http://namespaces.zope.org/zope"
 	   xmlns:five="http://namespaces.zope.org/five">
 
-   <!-- This would be unnecessary in a real z3 application as the implements
-         declaration in the content directive should handle this -->
+  <adapter
+     name = "Wicked Filter"
+     for="Products.wicked.interfaces.IAmWicked"
+     factory="Products.wicked.lib.txtfilter.WickedFilter"
+     provides="Products.filter.interfaces.IFieldFilter"
+     permission="zope2.Public"
+     />
+
+  <adapter
+     factory="Products.wicked.lib.factories.ATBacklinkManager"
+     for="Products.wicked.lib.interfaces.IWickedFilter
+	  Products.wicked.interfaces.IAmWicked"
+     provides="Products.wicked.lib.interfaces.IBacklinkManager"
+     permission="zope2.Public"
+     />
 
   <adapter							         
      for="..interfaces.IAmWicked"				         
@@ -11,31 +24,17 @@
      />                                                               
 
   <adapter
-     name = "Wicked Filter"
-     for="Products.wicked.interfaces.IAmWicked"
-     factory="Products.wicked.lib.filter.WickedFilter"
-     provides="Products.filter.interfaces.IFieldFilter"
-     permission="zope2.Public"
-     />
-
-  <adapter
-     for="Products.wicked.lib.interfaces.IWickedFilter"
+     for="..interfaces.IAmWicked"
      factory=".factories.ContentCacheManager"
-     provides=".interfaces.IMacroCacheManager"
+     provides=".interfaces.IContentCacheManager"
      permission="zope2.Public"
      />
 
   <adapter
-     for="Products.wicked.lib.interfaces.IWickedFilter"
-     factory=".factories.WickedCatalogInquisitor"
+     for="Products.wicked.lib.interfaces.IWickedFilter
+	  ..interfaces.IAmWicked"
+     factory=".factories.AdvQueryMatchingSeeker"
      provides=".interfaces.IWickedQuery"
-     permission="zope2.Public"
-     />
-
-  <adapter
-     for="Products.wicked.lib.interfaces.IWickedFilter"
-     factory=".factories.ATBacklinkManager"
-     provides=".interfaces.IBacklinkManager"
      permission="zope2.Public"
      />
 
