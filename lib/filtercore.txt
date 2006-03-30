@@ -2,6 +2,8 @@
 >wicked filtercore<
 ===================
 
+### BBB needs to be rewritten
+
 _filterCore is the focal point of an  IMacroFilter object; it
 executes the rendering of links on every wicked link found in
 a block of filtered text. 
