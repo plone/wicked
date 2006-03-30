@@ -1,12 +1,16 @@
 from Products.AdvancedQuery import Eq, Generic
+from Products.Archetypes.interfaces._referenceable import IReferenceable
 from Products.CMFCore.utils import getToolByName
+from Products.Five.utilities.marker import mark
 from Products.wicked import config
-from filtercore import match
+from Products.wicked.interfaces import IWickedTarget
 from interfaces import IContentCacheManager, IWickedQuery, IATBacklinkManager, IMacroCacheManager
 from normalize import titleToNormalizedId as normalize
 from pprint import pformat as format
 from relation import Backlink
 from zope.interface import implements
+from utils import memoizedproperty, memoize
+import utils
 
 class ATBacklinkManager(object):
     implements(IATBacklinkManager)
@@ -14,67 +18,76 @@ class ATBacklinkManager(object):
     relation = config.BACKLINK_RELATIONSHIP
     refKlass = Backlink
     
-    def __init__(self, wfilter):
-        assert wfilter.fieldname
+    def __init__(self, wfilter, context):
         self.wfilter = wfilter
-        self.context = wfilter.context
-        self.renderLink = wfilter.renderLinkForBrain
-        self.getBrain = wfilter.getLinkTargetBrain
-        self.cm = IMacroCacheManager(self.wfilter)
-        self.cat = getToolByName(self.context, 'portal_catalog')
+        self.context = context
+        self.cm = wfilter.cache
+        self.resolver = wfilter.resolver
+        self.getMatch = wfilter.getMatch
+        ## ATism: remove ASAP
         self.refcat = getToolByName(self.context, 'reference_catalog')
         self.suid = self.context.UID()
-        self.template = wfilter.template
-        self.wicked_macro = wfilter.wicked_macro
 
     def getLinks(self):
         """
         Returns dataobjects representing backlinks
         """
-        cat = self.cat
         refbrains = self.refcat._queryFor(relationship=self.relation,
                                  tid=self.suid, sid=None)
         if refbrains:
             uids = [brain.sourceUID for brain in refbrains]
-            return cat(UID=uids)
+            ## XXX non-orthogonal
+            return self.resolver.queryUIDs(uids)
         return []
-
-
-    def set(self, brain, link):
-        self.refcat.addReference(brain.getObject(),
-                                 self.context,
-                                 relationship=self.relation,
-                                 referenceClass=self.refKlass)
-        uid, rendered = self.wfilter.renderChunk(link, [brain], cache=True)
-        self.cm.set((intern(link), brain.UID), rendered)  
-
     
     def _preplinks(self, links=dict()):
         return links and dict([(normalize(link), link) for link in links]) \
                      or dict()
 
-
-    def addLinks(self, links, scope, dups=tuple()):
+    def manageLinks(self, new_links):
         # asyncing backlinking would help
-        dups = set(dups)
+        # this has been heavily optimized
+        scope=self.wfilter.scope
+        dups = set(self.removeLinks(new_links))
 
-        for link in links:
-            brain = self.getBrain(link, **dict(scope=scope))
-            if isinstance(brain, tuple):
-                import pdb; pdb.set_trace()
+        resolver = self.resolver
 
-            if not brain or brain.UID in dups: continue
-            self.set(brain, link)
+        norm=tuple()
+        for link in new_links:
+            normalled=normalize(link)
+            norm+=normalled,
+            self.resolver.aggregate(link, normalled, scope)
+            
+        for link, normalled in zip(link, norm):
+            match = self.getMatch(link, resolver.agg_brains, normalled=normalled)
+            if not match:
+                match = self.getMatch(link, resolver.agg_scoped_brains, normalled=normalled)
+            if not match or match.UID in dups: continue
+            self.manageLink(match, normalled)
 
+    def manageLink(self, obj, normalled):
+        if hasattr(obj, 'getObject'):
+            # brain, other sort of pseudo object
+            obj = obj.getObject()
 
-    def manageLinks(self, new_links, scope=None):
-        if new_links:
-            dups = self.removeLinks(new_links)
-            self.addLinks(new_links, scope, dups)
+        if not IReferenceable.providedBy(obj):
+            # backlink not possible
+            return
 
+        mark(obj, IWickedTarget)
+        self.refcat.addReference(obj,
+                                 self.context,
+                                 relationship=self.relation,
+                                 referenceClass=self.refKlass)
+        
+        path = '/'.join(obj.getPhysicalPath())
+        data = dict(path=path,
+                    icon=obj.getIcon(),
+                    uid=obj.UID())
+        
+        self.cm.set((intern(normalled), obj.UID()), [data])  
 
     def removeLinks(self, exclude=tuple()):
-
         oldlinks = self.getLinks()
         if not oldlinks:
             return set()
@@ -85,7 +98,6 @@ class ATBacklinkManager(object):
         
         [self.remove(brain) for brain in set(oldlinks) - dups]
         return [b.UID for b in dups]
-
 
     def match(self, brain, getlink):
         """
@@ -104,12 +116,11 @@ class ATBacklinkManager(object):
             self.refcat._deleteReference(obj)
             self.cm.unset(obj.targetUID(), use_uid=True)
 
-            
 
 _marker = object()
-
-class WickedCatalogInquisitor(object):
+class AdvQueryMatchingSeeker(object):
     """
+    An advanced query specific 
     CMFish catalog query handler
     """
     implements(IWickedQuery)
@@ -118,43 +129,104 @@ class WickedCatalogInquisitor(object):
     normalled = _marker
     scope = _marker
     
-    def __init__(self, context):
-        self.context = context # the filter
-        content = self.content = context.context
-        self.scope = context.scope
-        self.catalog = getToolByName(content, 'portal_catalog')
-        self.path = '/'.join(content.aq_inner.aq_parent.getPhysicalPath())    
+    def __init__(self, wicked, context):
+        self.wicked = context # the filter
+        self.context = context
+        self.scope = wicked.scope
+        self.catalog = getToolByName(context, 'portal_catalog')
+        self.path = '/'.join(context.aq_inner.aq_parent.getPhysicalPath())    
         self.evalQ = self.catalog.evalAdvancedQuery
-
-    @match
-    def scopedSearch(self):
-        chunk, title = self.chunk, self.title
-        query = (Eq('getId', chunk) | Eq('Title', title))
-        if not self.scope is _marker:
-            # XXX let's move this out of attr storage
-            # on the content to at least an annotation
-            scope = getattr(self.content, self.scope, self.scope)
-            if callable(scope):
-                scope = scope()
-            if scope:
-                query = Generic('path', scope) & query
-        return self.evalQ(query, ('created',))
-
-    @match
-    def search(self):
-        chunk = self.chunk
-        normalled = self.normalled
-        getId = chunk
-        self.title = title = '"%s"' % chunk
-        query = Generic('path', {'query': self.path, 'depth': 1}) \
-                & (Eq('getId', chunk) | Eq('Title', title) | Eq('getId', normalled))
-        result = self.evalQ(query, ('created',))
-        return result
 
     def configure(self, chunk, normalled, scope):
         self.chunk = chunk
         self.normalled = normalled
         self.scope = scope
+
+    def _query(self, query, sort=('created',)):
+        if sort:
+            return self.evalQ(query, sort)
+        else:
+            return self.evalQ(query)
+
+    def queryUIDs(self, uids):
+        return self._query(Generic('UID', uids), sort=None)
+
+    @property
+    def scopedQuery(self):
+        chunk, title = self.chunk, self.title
+        query = (Eq('getId', chunk) | Eq('Title', title))
+        if not self.scope is _marker:
+            # XXX let's move this out of attr storage
+            # on the content to at least an annotation
+            scope = getattr(self.context, self.scope, self.scope)
+            if callable(scope):
+                scope = scope()
+            if scope:
+                query = Generic('path', scope) & query
+        return query
+
+    @property
+    def basicQuery(self):
+        chunk, normalled = self.chunk, self.normalled
+        getId = chunk
+        self.title = title = '"%s"' % chunk
+        query = Generic('path', {'query': self.path, 'depth': 1}) \
+                & (Eq('getId', chunk) | Eq('Title', title) | Eq('getId', normalled))
+        return query
+
+    @property
+    @utils.match
+    def scopedSearch(self):
+        return self._query(self.scopedQuery)
+
+    @property
+    @utils.match
+    def search(self):
+        return self._query(self.basicQuery)
+
+    def _aggquery(self, name, query):
+        curr = getattr(self, '_bquery', _marker)
+        if curr is _marker:
+            curr = query
+        else:
+            curr |= query
+        setattr(self, '_bquery', curr)
+        return curr
+
+    @property
+    def bquery(self):
+        return self._aggquery('_bquery', self.basicQuery)
+
+    @property
+    def squery(self):
+        return self._aggquery('_squery', self.scopedQuery)
+
+
+    # memo prevents dups
+    @memoize 
+    def aggregate(self, link, normalled, scope):
+        """
+        builds aggregated queries for scoped and basic
+        """
+        self.configure(link, normalled, scope)
+        self.bquery 
+        self.squery 
+
+    @memoizedproperty
+    def agg_brains(self):
+        """
+        aggregregate search returns
+        """
+        return self._query(self.bquery)
+
+    @memoizedproperty
+    def agg_scoped_brains(self):
+        """
+        aggregregate search returns
+        """
+        return self._query(self.squery)
+
+    __call__ = _query
         
 from cache import CacheStore
 from zope.app.annotation.interfaces import IAnnotations, IAnnotatable
@@ -162,21 +234,20 @@ from zope.app.annotation.interfaces import IAnnotations, IAnnotatable
 CACHE_KEY = 'Products.wicked.lib.factories.ContentCacheManager'
 
 class ContentCacheManager(object):
-
     implements(IContentCacheManager)
-
     def __init__(self, context):
-        self.context = context # the filter
-        self.content = context.context # the parent object
-        self.name = self.context.fieldname
+        self.context = context
+
+    def setName(self, name):
+        self.name = name
 
     def _getStore(self):
         cache_store = getattr(self, 'cache_store', _marker)
         if cache_store == _marker:
-            ann = IAnnotations(self.content)
+            ann = IAnnotations(self.context)
             cache_store = ann.get(CACHE_KEY)
             if not cache_store:
-                cache_store = CacheStore(id_=self.content.absolute_url())
+                cache_store = CacheStore(id_=self.context.absolute_url())
                 ann[CACHE_KEY] = cache_store
             self.cache_store = cache_store 
         return cache_store
