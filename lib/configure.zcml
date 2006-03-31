@@ -1,6 +1,8 @@
 <configure xmlns="http://namespaces.zope.org/zope"
 	   xmlns:five="http://namespaces.zope.org/five">
 
+  <include file="events.zcml" />
+	   
   <adapter
      name = "Wicked Filter"
      for="Products.wicked.interfaces.IAmWicked"
