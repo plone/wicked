@@ -42,7 +42,12 @@ class CacheStore(Persistent):
         if val:
             del self._cache[key]
             self._p_changed=True
+            for name, fcache in self.field.items():
+                for slug, uid in fcache.items():
+                    if uid==key:
+                        del fcache[slug]
 
+            
 class Cache(PersistentMapping):
 
     def __init__(self, id_=None, parent=None):
@@ -61,13 +66,13 @@ class Cache(PersistentMapping):
         uid = super(Cache, self).get(key, default)
         return self.parentGet(uid, default)
 
-    def set(self, key, text):
+    def set(self, key, value):
         slug, uid = key
         self[slug] = uid
         self._reverse[uid] = slug
-        self.parent.set(uid, text)
+        self.parent.set(uid, value)
         self._p_changed
-        return text
+        return value
         
     def __getitem__(self, key):
         retval = self.parentGet(key)
