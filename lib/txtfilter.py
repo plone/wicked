@@ -86,6 +86,9 @@ class WickedFilter(WickedBase):
 
     def manageLink(self, obj, link):
         self.backlinker.manageLink(obj, link)
+
+    def unlink(self, uid):
+        self.backlinker.unlink(uid)
         
     def manageLinks(self, links):
         self.backlinker.manageLinks(links)

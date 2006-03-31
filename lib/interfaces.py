@@ -1,5 +1,10 @@
 from zope.interface import Interface, Attribute
 
+class IWickedBacklink(Interface):
+    """
+    Backlink marker
+    """
+    
 class IWickedFilter(Interface):
     """
     Wicked resolving filter

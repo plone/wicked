@@ -45,6 +45,7 @@ def setupCA():
     load('configure.zcml', txtfilter)
     load('configure.zcml', Products.wicked.lib)
     load('configure.zcml', Products.wicked.browser)
+    #load('printevent.zcml', testing)
 
 # Dynamic bootstapping based on product config
 def installConfiguredProducts():

@@ -20,6 +20,10 @@ class Base(WickedTestCase):
         self.login('test_user_1_')
         self.page1.addByWickedLink(Title=kw.get('Title', self.title))
 
+    def moveContent(self, obj, target):
+        cps = obj.aq_parent.manage_copyObjects([obj.getId()])
+        target.manage_pasteObjects(cps)
+
 class TestWikiLinking(Base):
     wicked_type = 'IronicWiki'
     wicked_field = 'body'
@@ -127,12 +131,11 @@ class TestWikiLinking(Base):
                          title=title)
         self.page1.setBody("((%s))" % title)
         self.failUnlessWickedLink(self.page1, w1)
-        self.failIfWickedLink(self.page1, w2)
-        self.failIfWickedLink(self.page1, w3)
 
+        # this also test that deleting uncaches
         self.folder.manage_delObjects(ids=[w1.id])
         self.failUnlessWickedLink(self.page1, w2)
-        self.failIfWickedLink(self.page1, w3)
+
 
     def testDupRemoteIdMatchesOldest(self):
         self.replaceCreatedIndex()
@@ -158,13 +161,18 @@ class TestWikiLinking(Base):
         # fails due to caching
         self.failUnlessWickedLink(self.page1, w3)
 
-
+    def makeFolders(self, *args):
+        folders = list()
+        for id in args:
+            folders.append(makeContent(self.folder, id, 'Folder'))
+        return tuple(folders)
+            
     def testDupRemoteTitleMatchesOldest(self):
         self.replaceCreatedIndex()
         title = 'Duplicate Title'
-        f2 = makeContent(self.folder, 'f2', 'Folder')
-        f3 = makeContent(self.folder, 'f3', 'Folder')
-        f4 = makeContent(self.folder, 'f4', 'Folder')
+        
+        f2, f3, f4 = self.makeFolders('f2', 'f3', 'f4')
+
         w1 = makeContent(f2, 'w1', self.wicked_type,
                          title=title)
         # mix up the order, just to make sure
@@ -180,6 +188,24 @@ class TestWikiLinking(Base):
         f2.manage_delObjects(ids=[w1.id])
         self.failUnlessWickedLink(self.page1, w3)
         self.failIfWickedLink(self.page1, w2)
+
+    def testLinkPersistThroughMove(self):
+        title = 'Move Me'
+        f2, f3 = self.makeFolders('f2', 'f3')
+        w1 = makeContent(f2, 'w1', self.wicked_type,
+                         title=title)
+        
+        # check implicit resolution
+        # this is a pre-test
+        # should set cache
+        self.page1.setBody("((%s))" % title)
+        self.failUnlessWickedLink(self.page1, w1)
+
+        # move w1
+        self.moveContent(w1, f3)
+        
+        # maintain link did not change
+        self.failUnlessWickedLink(self.page1, w1)
 
 class TestDocCreation(Base):
     

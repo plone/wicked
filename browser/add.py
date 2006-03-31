@@ -20,14 +20,14 @@ class WickedAdd(BrowserView):
     def context(self):
         return self._context[0]
 
-    def addContent(self):
+    def addContent(self, title=None, section=None, type_name=_marker):
         # make it possible to pass in container
         # pre-populate with backlinks?
-        type_name = self.request.get('type_name', _marker)
+        type_name = self.request.get('type_name', type_name)
         if type_name is _marker:
             type_name = self.context.portal_type
-        title = self.request.get('Title', '')
-        section = self.request.get('section', '')
+        title = self.request.get('Title', title)
+        section = self.request.get('section', section)
         assert title, 'Must have a title to create content' 
         newcontentid = normalize(title)
         
