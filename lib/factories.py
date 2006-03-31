@@ -116,6 +116,9 @@ class ATBacklinkManager(object):
             self.refcat._deleteReference(obj)
             self.cm.unset(obj.targetUID(), use_uid=True)
 
+    def unlink(self, uid):
+        self.cm.remove(uid)
+
 
 _marker = object()
 class AdvQueryMatchingSeeker(object):
@@ -268,20 +271,24 @@ class ContentCacheManager(object):
         
     def unset(self, key, use_uid=False):
         cache = self._getCache()
+        val = None
         if use_uid:
-            try:
-                key = [tkey for tkey, uid in cache.items() \
-                       if uid == key].pop()
-            except IndexError:
-                return
-        
-        if cache.has_key(key):
-            text = self.get(key)
-            del cache[key]
-            return text
-        return
+            for tkey, uid in cache.items():
+                if uid == key:
+                    val = self.get(tkey)
+                    del cache[tkey]
 
-    def reset(self, uid, text):
+        if cache.has_key(key):
+            val = self.get(key)
+            del cache[key]
+
+        return val
+    
+    def remove(self, uid):
+        store=self._getStore()
+        store.remove(uid)
+
+    def reset(self, uid, value):
         store = self._getStore()
-        store.set(uid, text)
+        store.set(uid, value)
 
