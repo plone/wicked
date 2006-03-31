@@ -23,22 +23,20 @@ quite useful.
 __authors__ = 'Whit Morriss <whit@kalistra.com>'
 __docformat__ = 'restructuredtext'
 
-from zope.interface import implements
 from Products.Archetypes import public as atapi
+from interfaces import IWickedBacklink
 from Products.Archetypes.references import Reference
-from Products.wicked.utils import getFilter 
 from Products.wicked import config
+from Products.wicked.utils import getFilter 
+from zope.interface import implements
 
 class Backlink(Reference):
     """
-    A backlink is a reference set on an object when it is referenced by a definite
-    wiki-link
+    A backlink is a reference set on an object when it is targetted
+    by a resolved wicked-link
     """
+    implements(IWickedBacklink)
     relationship = config.BACKLINK_RELATIONSHIP
-
-#    def __init__(self, rID, sID, tID, relationship, **kwargs):
-#        super(Backlink, self).__init__(rID, sID, tID, relationship, **kwargs)
-
     def __repr__(self):
         return "<Backlink sid:%s tid:%s rel:%s>" %(self.sourceUID, self.targetUID, self.relationship)
 
