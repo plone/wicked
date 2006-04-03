@@ -1,15 +1,17 @@
 from Products.AdvancedQuery import Eq, Generic
-from Products.Archetypes.interfaces._referenceable import IReferenceable
+from Products.Archetypes.interfaces import IReferenceable
 from Products.CMFCore.utils import getToolByName
 from Products.Five.utilities.marker import mark
 from Products.wicked import config
 from Products.wicked.interfaces import IWickedTarget
+from cache import CacheStore
 from interfaces import IContentCacheManager, IWickedQuery, IATBacklinkManager, IMacroCacheManager
 from normalize import titleToNormalizedId as normalize
 from pprint import pformat as format
 from relation import Backlink
-from zope.interface import implements
 from utils import memoizedproperty, memoize
+from zope.app.annotation.interfaces import IAnnotations, IAnnotatable
+from zope.interface import implements
 import utils
 
 class ATBacklinkManager(object):
@@ -229,9 +231,6 @@ class AdvQueryMatchingSeeker(object):
 
     __call__ = _query
         
-from cache import CacheStore
-from zope.app.annotation.interfaces import IAnnotations, IAnnotatable
-
 CACHE_KEY = 'Products.wicked.lib.factories.ContentCacheManager'
 
 class ContentCacheManager(object):
