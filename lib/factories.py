@@ -5,7 +5,7 @@ from Products.Five.utilities.marker import mark
 from Products.wicked import config
 from Products.wicked.interfaces import IWickedTarget
 from cache import CacheStore
-from interfaces import IContentCacheManager, IWickedQuery, IATBacklinkManager, IMacroCacheManager
+from interfaces import IContentCacheManager, IWickedQuery, IATBacklinkManager
 from normalize import titleToNormalizedId as normalize
 from pprint import pformat as format
 from relation import Backlink
