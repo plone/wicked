@@ -32,12 +32,7 @@ class WikiField(fapi.FilterField):
     _properties = fapi.FilterField._properties.copy()
     _properties.update({
         'filter':WickedFilter.name,
-
-        # scope, template, and wicked_macro would work nicely as TALS
-        
         'scope': '',
-        'template': 'wicked_link',
-        'wicked_macro':'wicked_link'
         })
     
     security  = ClassSecurityInfo()
