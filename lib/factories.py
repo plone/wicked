@@ -57,8 +57,8 @@ class ATBacklinkManager(object):
             normalled=normalize(link)
             norm+=normalled,
             self.resolver.aggregate(link, normalled, scope)
-            
-        for link, normalled in zip(link, norm):
+
+        for link, normalled in zip(new_links, norm):
             match = self.getMatch(link, resolver.agg_brains, normalled=normalled)
             if not match:
                 match = self.getMatch(link, resolver.agg_scoped_brains, normalled=normalled)
@@ -132,10 +132,8 @@ class AdvQueryMatchingSeeker(object):
     normalled = _marker
     scope = _marker
     
-    def __init__(self, wicked, context):
-        self.wicked = context # the filter
+    def __init__(self, context):
         self.context = context
-        self.scope = wicked.scope
         self.catalog = getToolByName(context, 'portal_catalog')
         self.path = '/'.join(context.aq_inner.aq_parent.getPhysicalPath())    
         self.evalQ = self.catalog.evalAdvancedQuery
@@ -172,8 +170,8 @@ class AdvQueryMatchingSeeker(object):
     def basicQuery(self):
         chunk, normalled = self.chunk, self.normalled
         getId = chunk
-        self.title = title = '"%s"' % chunk
-        query = Generic('path', {'query': self.path, 'depth': 1}) \
+        self.title = title = "%s" % chunk
+        query = Generic('path', {'query': self.path, 'depth': -1}) \
                 & (Eq('getId', chunk) | Eq('Title', title) | Eq('getId', normalled))
         return query
 
@@ -188,12 +186,12 @@ class AdvQueryMatchingSeeker(object):
         return self._query(self.basicQuery)
 
     def _aggquery(self, name, query):
-        curr = getattr(self, '_bquery', _marker)
+        curr = getattr(self, name, _marker)
         if curr is _marker:
             curr = query
         else:
             curr |= query
-        setattr(self, '_bquery', curr)
+        setattr(self, name, curr)
         return curr
 
     @property
@@ -220,14 +218,14 @@ class AdvQueryMatchingSeeker(object):
         """
         aggregregate search returns
         """
-        return self._query(self.bquery)
+        return self._query(self._bquery)
 
     @memoizedproperty
     def agg_scoped_brains(self):
         """
         aggregregate search returns
         """
-        return self._query(self.squery)
+        return self._query(self._squery)
 
     __call__ = _query
         
@@ -254,7 +252,7 @@ class ContentCacheManager(object):
                 ann[CACHE_KEY] = cache_store
             self.cache_store = cache_store 
         return cache_store
-
+ 
     def _getCache(self):
         store = self._getStore()
         cache = store.getCache(self.name)
