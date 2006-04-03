@@ -13,7 +13,7 @@ from Products.wicked.config import BACKLINK_RELATIONSHIP
 
 has_atct = True
 try:
-    from Products.wicked.example import WickedDoc
+    from Products import ATContentTypes
 except ImportError:
     print "WARNING: ATContentTypes not installed, WickedDoc tests not running"
     has_atct = False
