@@ -46,7 +46,7 @@ class WickedFilter(WickedBase):
     # XXX
     url_signifier = "&amp;&amp;base_url&amp;&amp;"
 
-    _configure_exclude=dict(return_brain=True)
+    _configure_exclude=dict()
 
     # config attrs
     scope = _marker
@@ -78,7 +78,7 @@ class WickedFilter(WickedBase):
         """
         @return query object
         """
-        return getMultiAdapter((self, self.context), self.query_iface)
+        return self.query_iface(self.context)
 
     @memoizedproperty    
     def backlinker(self):
