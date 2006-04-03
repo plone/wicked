@@ -7,12 +7,11 @@ from Products.wicked.interfaces import IWickedTarget
 from cache import CacheStore
 from interfaces import IContentCacheManager, IWickedQuery, IATBacklinkManager
 from normalize import titleToNormalizedId as normalize
-from pprint import pformat as format
 from relation import Backlink
-from utils import memoizedproperty, memoize
+from utils import memoizedproperty, memoize, match
 from zope.app.annotation.interfaces import IAnnotations, IAnnotatable
 from zope.interface import implements
-import utils
+
 
 class ATBacklinkManager(object):
     implements(IATBacklinkManager)
@@ -178,12 +177,12 @@ class AdvQueryMatchingSeeker(object):
         return query
 
     @property
-    @utils.match
+    @match
     def scopedSearch(self):
         return self._query(self.scopedQuery)
 
     @property
-    @utils.match
+    @match
     def search(self):
         return self._query(self.basicQuery)
 

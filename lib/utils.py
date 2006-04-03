@@ -88,7 +88,6 @@ def getMatch(chunk, brains, normalled=None):
     >>> brains[3].Title='A unique title'
     >>> getMatch(brains[3].Title, brains).Title
     'A unique title'
-
     """
     normalled_chunk = normalled
     if not normalled_chunk:
@@ -104,9 +103,9 @@ def getMatch(chunk, brains, normalled=None):
 
     # first, match id
 
-    # trick...
-    # reversing the brains clobbers
-    # older matches with the same id
+    # reversing the brains into a dict clobbers younger matches with
+    # the same id. we'll match against the normalled chunk, then the
+    # chunk (for single work chunks)
 
     btup = [(brain.getId, brain) for brain in brains]
     id_dict = dict(reversed(btup))
