@@ -33,8 +33,7 @@
      />
 
   <adapter
-     for="Products.wicked.lib.interfaces.IWickedFilter
-	  ..interfaces.IAmWicked"
+     for="..interfaces.IAmWicked"
      factory=".factories.AdvQueryMatchingSeeker"
      provides=".interfaces.IWickedQuery"
      permission="zope2.Public"
