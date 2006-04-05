@@ -1,4 +1,5 @@
 from Products.wicked import config, utils
+from zope.app.container.interfaces import IObjectRemovedEvent, IObjectAddedEvent
 
 def handleTargetDeletion(ref, event):
     """
@@ -9,20 +10,24 @@ def handleTargetDeletion(ref, event):
     wicked.unlink(ref.sourceUID)
 
 
-def handleTargetMove(obj, event):
+def handleTargetMoved(obj, event):
     """
     when a target of a link is moved, or renamed we need to notify any
     objects that may be caching pointers
     """
-    #import pdb; pdb.set_trace()
+    # XXX add more tests
+    import pdb; pdb.set_trace()
+    if IObjectRemovedEvent.providedBy(event):
+        return
+    
     refs=obj.getRefs(relationship=config.BACKLINK_RELATIONSHIP)
+    path = '/'.join(event.newParent.getPhysicalPath() + (event.newName,))
     for ref in refs:
-        wicked = utils.getFilter(obj)
+        wicked = utils.getFilter(ref)
         uid = obj.UID()
-        path = '/'.join(obj.getPhysicalPath())
         data = dict(path=path,
                     icon=obj.getIcon(),
                     uid=uid)
-        wicked.cache.uidset(uid, data)
+        wicked.cache.reset(uid, [data])
 
     
