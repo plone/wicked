@@ -16,7 +16,6 @@ def handleTargetMoved(obj, event):
     objects that may be caching pointers
     """
     # XXX add more tests
-    import pdb; pdb.set_trace()
     if IObjectRemovedEvent.providedBy(event):
         return
     
