@@ -4,13 +4,13 @@
     <subscriber
         for="Products.wicked.lib.interfaces.IWickedBacklink
 	     OFS.interfaces.IObjectWillBeRemovedEvent"
-        handler=".events.handleTargetDeletion"
+        handler=".subscriber.handleTargetDeletion"
         />
 
     <subscriber
         for="Products.wicked.interfaces.IWickedTarget
              zope.app.container.interfaces.IObjectMovedEvent"
-        handler=".events.handleTargetMove"
+        handler=".subscriber.handleTargetMoved"
         />
 	  
 </configure>

@@ -73,6 +73,7 @@ class ATBacklinkManager(object):
 
         if not IReferenceable.providedBy(obj):
             # backlink not possible
+            print "bugger"
             return
 
         mark(obj, IWickedTarget)
@@ -111,11 +112,12 @@ class ATBacklinkManager(object):
             return True
                 
     def remove(self, brain):
+        #XXX needs test
         objs = self.refcat._resolveBrains(\
             self.refcat._queryFor(self.suid, brain.UID, self.relation))
         for obj in objs:
             self.refcat._deleteReference(obj)
-            self.cm.unset(obj.targetUID(), use_uid=True)
+            self.cm.unset(obj.targetUID, use_uid=True)
 
     def unlink(self, uid):
         self.cm.remove(uid)
