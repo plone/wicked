@@ -24,8 +24,8 @@ class CacheStore(Persistent):
     def get(self, key, default=None):
         return self._cache.get(key, default)
 
-    def set(self, key, text):
-        self._cache[key] = text
+    def set(self, key, value):
+        self._cache[key] = value
         self._p_changed
 
     def getCache(self, key):
