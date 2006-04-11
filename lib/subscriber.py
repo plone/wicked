@@ -20,7 +20,7 @@ def handleTargetMoved(obj, event):
         return
     
     refs=obj.getRefs(relationship=config.BACKLINK_RELATIONSHIP)
-    path = '/'.join(event.newParent.getPhysicalPath() + (event.newName,))
+    path = '/'.join(obj.getPhysicalPath())
     for ref in refs:
         wicked = utils.getFilter(ref)
         uid = obj.UID()
