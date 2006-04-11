@@ -173,7 +173,7 @@ class AdvQueryMatchingSeeker(object):
     def basicQuery(self):
         chunk, normalled = self.chunk, self.normalled
         getId = chunk
-        self.title = title = "%s" % chunk
+        self.title = title = '"%s"' % chunk
         query = Generic('path', {'query': self.path, 'depth': -1}) \
                 & (Eq('getId', chunk) | Eq('Title', title) | Eq('getId', normalled))
         return query
