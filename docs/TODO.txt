@@ -32,18 +32,5 @@ Misc:
 
 - filter support w/o field replacement
 
-  currently in order for filters to be applied to a field, the field
-  needs to inherit from the FilterField base class.  ideally, this
-  would not be necessary, since this makes it considerably harder to
-  retrofit existing content types w/ wicked-aware fields.  ben saller
-  has ideas about how to handle this using 'eventually' to register
-  event channels on field accessors that would trigger the filters
-  being called... more coming soon
+  This require integration with txtfilter 0.2.0
 
-- improve link caching
-
-  links are currently cached as rendered html.  this is fast, but when
-  folks might be visiting the same page via more than one virtual host
-  (or even via both http and https) then these cached links may be
-  incorrect.  it would be better to cache the path to the object and
-  then to figure out the appropriate URL at render time.
