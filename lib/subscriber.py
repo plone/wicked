@@ -1,6 +1,7 @@
 from Products.wicked import config, utils
 from zope.app.container.interfaces import IObjectRemovedEvent, IObjectAddedEvent
 
+
 def handleTargetDeletion(ref, event):
     """
     Invalidate any pointer before object deletion
