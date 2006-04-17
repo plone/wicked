@@ -4,7 +4,7 @@ mostly borrowed from Bricolite
 from StringIO import StringIO
 from Products.Archetypes.public import listTypes
 from Products.Archetypes.config import REFERENCE_CATALOG
-from Products.Archetypes.Extensions.utils import installTypes, install_subskin
+from Products.Archetypes.Extensions.utils import installTypes
 from Products.CMFCore.utils import getToolByName
 from Products.ZCatalog.ZCatalog import manage_addZCatalog
 from OFS.ObjectManager import BadRequestException
@@ -52,8 +52,6 @@ def installExtendedPathIndex(portal, out):
 def install(self):
     out = StringIO()
     installDepends(self)
-
-    install_subskin(self, out, config.GLOBALS)
 
     installTypes(self, out, listTypes(config.PROJECTNAME), config.PROJECTNAME)
 
