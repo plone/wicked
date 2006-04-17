@@ -77,11 +77,10 @@ USELXML = False
 # This is the test case. You will have to add test_<methods> to your
 # class in order to assert things about your Product.
 class WickedTestCase(FilterTestCase):
-    
-    setUpCA=staticmethod(setupCA)    
 
     def afterSetUp(self):
-        super(WickedTestCase, self).afterSetUp()
+        setupCA()
+
         # add some pages
         self.page1 = makeContent(self.folder,
                                  titleToNormalizedId(TITLE1),

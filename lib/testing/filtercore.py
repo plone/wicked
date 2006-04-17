@@ -1,3 +1,14 @@
+##########################################################
+#
+# Licensed under the terms of the GNU Public License
+# (see docs/LICENSE.GPL)
+#
+# Copyright (c) 2005:
+#   - The Open Planning Project (http://www.openplans.org/)
+#   - Whit Morriss <whit at www.openplans.org>
+#   - and contributors
+#
+##########################################################
 from general import dummy
 from Products.wicked.lib.factories import ContentCacheManager     
 
@@ -39,9 +50,7 @@ def fakefilter():
         [setattr(self, k, v) for k, v in kw.items()]
         return kw
     conf = classmethod(conf)
-    localizeSlug = classmethod(lambda self, x:
-                           x.replace(self.url_signifier, 'http://fakeurl/'))
-    kdict = dict(configure=conf, url_signifier="$$", localizeSlug=localizeSlug, scope='/scope/')
+    kdict = dict(configure=conf, scope='/scope/')
     wfilter = dummy(kdict, name='wfilter')
     wfilter.query_iface = query()
     wfilter.getMatch = argchug(('uid', 'link'))
