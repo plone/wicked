@@ -43,9 +43,6 @@ class WickedFilter(WickedBase):
     query_iface = IWickedQuery
     name = config.FILTER_NAME
 
-    # XXX
-    url_signifier = "&amp;&amp;base_url&amp;&amp;"
-
     _configure_exclude=dict()
 
     # config attrs

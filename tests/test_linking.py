@@ -27,8 +27,7 @@ class Base(WickedTestCase):
     
     def demoCreate(self, **kw):
         self.login('test_user_1_')
-        #addByWickedLink(Title=kw.get('Title', self.title))
-        addview = page.restrictedTraverse('@@wickedadd')
+        addview = self.page1.restrictedTraverse('@@wickedadd')
         addview.addContent(title=self.title, section='body', type_name='IronicWiki')
 
     def moveContent(self, obj, target):

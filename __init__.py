@@ -4,7 +4,7 @@ wicked
 
 """
 
-__authors__ = 'Whit Morriss <whit@kalistra.com>, Rob Miller <ra@burningman.com>'
+__authors__ = 'Whit Morriss <whit at openplans.org>, Rob Miller <ra@burningman.com>'
 __docformat__ = 'restructuredtext'
 
 
