@@ -1,5 +1,6 @@
 from Products.Five import BrowserView
-from Products.wicked.lib.utils import memoize, memoizedproperty, clearbefore, counter
+from Products.wicked.lib.utils import memoize, memoizedproperty, \
+     clearbefore, counter
 
 from interfaces import WickedLink
 

@@ -2,7 +2,8 @@
 	   xmlns:five="http://namespaces.zope.org/five">
 
   <include file="subscriber.zcml" />
-	   
+  <include package="zope.app.annotation" />
+
   <adapter
      name = "Wicked Filter"
      for="Products.wicked.interfaces.IAmWicked"
@@ -18,12 +19,6 @@
      provides="Products.wicked.lib.interfaces.IBacklinkManager"
      permission="zope2.Public"
      />
-
-  <adapter							         
-     for="..interfaces.IAmWicked"				         
-     provides="zope.app.annotation.interfaces.IAnnotations"	         
-     factory="zope.app.annotation.attribute.AttributeAnnotations"     
-     />                                                               
 
   <adapter
      for="..interfaces.IAmWicked"
