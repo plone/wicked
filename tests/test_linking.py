@@ -27,7 +27,9 @@ class Base(WickedTestCase):
     
     def demoCreate(self, **kw):
         self.login('test_user_1_')
-        self.page1.addByWickedLink(Title=kw.get('Title', self.title))
+        #addByWickedLink(Title=kw.get('Title', self.title))
+        addview = page.restrictedTraverse('@@wickedadd')
+        addview.addContent(title=self.title, section='body', type_name='IronicWiki')
 
     def moveContent(self, obj, target):
         cps = obj.aq_parent.manage_copyObjects([obj.getId()])
