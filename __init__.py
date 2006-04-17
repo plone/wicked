@@ -12,7 +12,6 @@ from Globals import package_home
 from Products.Archetypes import public as atapi
 from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore import utils as cmf_utils
-from Products.CMFCore.DirectoryView import registerDirectory
 import config
 import sys
 from AccessControl import ModuleSecurityInfo
@@ -21,7 +20,6 @@ from AccessControl import allow_module, allow_class, allow_type
 import Products.wicked.migration
 # Register Global Tools/Services/Config
 # (Skins)
-registerDirectory(config.SKINS_DIR, config.GLOBALS)
 
 def initialize(context):
     # Importing the content types allows for their registration
