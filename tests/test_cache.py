@@ -12,10 +12,13 @@ from Products.CMFCore.utils import getToolByName
 from Products.Archetypes.utils import shasattr
 from Products.filter import api as fapi
 from Products.wicked import utils
-from Products.wicked.lib.filter import WickedFilter
+from Products.filter.interfaces import IFieldFilter
 from wickedtestcase import WickedTestCase
+from Products.wicked.lib.interfaces import IWickedFilter, IMacroCacheManager
 
-MARKER = 'marker'
+MARKER = dict(path='/apath',
+              icon='anicon.ico',
+              uid='uid')
 
 class TestLinkCache(WickedTestCase):
     wicked_type = 'IronicWiki'
@@ -25,40 +28,39 @@ class TestLinkCache(WickedTestCase):
         """
         sets the body of page1 to be a wicked link of the id of page2
         """
-        WickedTestCase.afterSetUp(self)
+        super(TestLinkCache, self).afterSetUp()
         field = self.page1.getField(self.wicked_field)
-        field.getMutator(self.page1)("((%s))" % self.page2.getId())
+        field.set(self.page1, "((%s))" % self.page2.Title())
         self.field = field
         self.filter = utils.getFilter(self.page1)
-
+        self.filter.configure(**dict(section=field.getName()))
+        self.wicked_ccm = IMacroCacheManager(self.page1)
+        self.wicked_ccm.name=field.getName()
+        
     def test_linkGetsCached(self):
         field = self.field
-        wicked_cache = self.page1._wicked_cache
-        cached_links = wicked_cache[field.getName()]
+        wicked_ccm = self.wicked_ccm
         pg2_id = self.page2.getId()
-        self.failUnless(cached_links.has_key(pg2_id))
-
-        cat = getToolByName(self.portal, 'portal_catalog')
-        brain = cat(id=pg2_id)[0]
-        rendered = self.filter.renderLinkForBrain(field.template,
-                                                  field.wicked_macro,
-                                                  pg2_id,
-                                                  brain)
-        self.failUnless(cached_links[pg2_id] == rendered)
+        val = wicked_ccm.get(pg2_id)
+        self.failUnless(val)
+        data=dict(path='/plone/Members/test_user_1_/dmv-computer-has-died',
+                  icon='plone/document_icon.gif')
+        data['uid']=self.page2.UID()
+        self.failUnlessEqual(set(val[0].items()), set(data.items()))
 
     def test_cacheIsUsed(self):
         field = self.field
-        wicked_cache = self.page1._wicked_cache
-        cached_links = wicked_cache[field.getName()]
+        wicked_ccm = self.wicked_ccm
         pg2_id = self.page2.getId()
-        cached_links[pg2_id] = MARKER
+        wicked_ccm.set((pg2_id, self.page2.UID()), [MARKER])
         value = self.getRenderedWickedField(self.page1)
-        self.failUnless(MARKER in value)
-        self.failIf(self.hasWickedLink(self.page1, self.page2))
+        self.failUnless(MARKER['path'] in value)
+        self.failIfWickedLink(self.page1, self.page2)
         
 
 def test_suite():
     suite = unittest.TestSuite()
+    from Testing.ZopeTestCase import ZopeDocTestSuite
     suite.addTest(unittest.makeSuite(TestLinkCache))
     return suite
 

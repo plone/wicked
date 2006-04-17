@@ -10,40 +10,20 @@
 #   - and contributors
 #
 ##########################################################
-
 from AccessControl import ClassSecurityInfo
 from ZPublisher.HTTPRequest import FileUpload
 
-from relation import Backlink
-from filter import WickedFilter
-from Products.wicked import config, utils
+from Products.wicked.utils import getFilter
 from Products.filter import api as fapi
 
 from Products.Archetypes import public as atapi
 from Products.Archetypes.Registry import registerField
 
 from Products.CMFCore.utils import getToolByName
-from Products.CMFCore.Expression import Expression
-from Products.CMFCore.Expression import createExprContext
 
-try:
-    # When Reference are in CMFCore
-    from Products.CMFCore.reference_config import *
-    from Products.CMFCore.ReferenceCatalog import Reference
-    from Products.CMFCore.Referenceable import Referenceable
-except ImportError:
-    # And while they still live in Archetypes
-    from Products.Archetypes.ReferenceEngine import Reference
-    from Products.Archetypes.Referenceable import Referenceable
-    from Products.Archetypes.config import REFERENCE_CATALOG as REFERENCE_MANAGER
-    from Products.Archetypes.config import UID_CATALOG as UID_MANAGER
-
-from filter import pattern as linkregex 
-
-def removeParens(wikilink):
-    wikilink.replace('((', '')
-    wikilink.replace('))', '')
-    return wikilink
+from txtfilter import WickedFilter
+from txtfilter import pattern as linkregex 
+from utils import removeParens
 
 class WikiField(fapi.FilterField):
     """ drop-in wiki """
@@ -52,27 +32,19 @@ class WikiField(fapi.FilterField):
     _properties = fapi.FilterField._properties.copy()
     _properties.update({
         'filter':WickedFilter.name,
-
-        # scope, template, and wicked_macro would work nicely as TALS
-        
         'scope': '',
-        'template': 'wicked_link',
-        'wicked_macro':'wicked_link'
         })
     
-
     security  = ClassSecurityInfo()
     def get(self, instance, mimetype=None, raw=False, **kwargs):
         """
         Pass in a scope, template and macro, then let filter field do it's magic
         """
+        # configuration
         kwargs['scope'] = self.scope
-        kwargs['template'] = self.template
-        kwargs['wicked_macro'] = self.wicked_macro
-        link_store = getattr(instance.aq_base, '_wicked_cache', {})
-        kwargs['cached_links'] = link_store.get(self.getName(), {})
-        return fapi.FilterField.get(self, instance, mimetype=mimetype,
-                                    raw=raw, **kwargs)
+        kwargs['section'] = self.getName()
+        return super(WikiField, self).get(instance, mimetype=mimetype,
+                                          raw=raw, **kwargs)
         
     def set(self, instance, value, **kwargs):
         """
@@ -90,66 +62,17 @@ class WikiField(fapi.FilterField):
             # a file was uploaded, get the (possibly transformed) value
             value_str = self.get(instance, skip_filters=True)
 
-        new_links = dict()
         found = linkregex.findall(value_str)
-        old_links = instance.getBRefs(relationship=config.BACKLINK_RELATIONSHIP)
 
-        if len(found):
-            new_links = found
-            new_links = map(removeParens, new_links)
-            new_links = dict([(link, False) for link in new_links])
-
-        unlink = [obj.deleteReference for obj in old_links \
-                  if not new_links.has_key(obj.getId())]
-        
-        [delRef(instance,
-                relationship=config.BACKLINK_RELATIONSHIP) \
-         for delRef in unlink]
-        
-        if not len(new_links):
+        if not len(found):
             return
 
-        # add appropriate backlinks, remove stale ones
-        kwargs['scope'] = self.scope 
-        wicked = utils.getFilter(instance)
-
-        renderLink, getBrain = (wicked.renderLinkForBrain,
-                                wicked.getLinkTargetBrain)
-        
-        refcat = getToolByName(instance, REFERENCE_MANAGER)
-        for link in new_links.keys():
-            brain = getBrain(link, **kwargs)
-                
-            if brain is None:
-                new_links.pop(link)
-            else:
-                refcat.addReference(brain.getObject(),
-                                    instance,
-                                    relationship=config.BACKLINK_RELATIONSHIP,
-                                    referenceClass=Backlink,
-                                    link_text=link,
-                                    fieldname=self.getName())
-                
-                rendered = renderLink(self.template, self.wicked_macro,
-                                      link, brain)
-                new_links[link] = rendered
-
-        # move to getter?
-        link_store = getattr(instance.aq_base, '_wicked_cache', {})
-        link_store[self.getName()] = new_links
-        instance._wicked_cache = link_store
-        
-
-
-    def removeLinkFromCache(self, link, instance):
-        """
-        clears a link from the wicked cache on the 'instance' object
-        """
-        link_store = getattr(instance.aq_base, '_wicked_cache', {})
-        cached_links = link_store.get(self.getName(), {})
-        if cached_links.has_key(link):
-            cached_links.pop(link)
-            instance._p_changed = True
+        config = dict(section=self.getName(),
+                      scope=self.scope)
+        wicked = getFilter(instance)
+        wicked.configure(**config)
+        new_links = [removeParens(link) for link in found]
+        wicked.manageLinks(new_links)
 
 registerField(WikiField,
               title='Wiki',

@@ -1,0 +1,95 @@
+=======
+ cache
+=======
+
+basic manager for quick and dirty caching and editing of links
+on a content object. Uses zope3's annotation implementation for
+storage.  
+
+Let load a little zcml so we can do annotation storage
+
+    >>> from zope.app.tests.placelesssetup import setUp, tearDown
+    >>> from Products.Five import zcml
+    >>> from Products.wicked.lib import testing
+    >>> import Products.Five
+    >>> zcml.load_config('meta.zcml', Products.Five)
+    >>> zcml.load_config("permissions.zcml", Products.Five)
+    >>> zcml.load_config('annotations.zcml', testing)
+
+First, fake some AT content and a filter
+
+    >>> from Products.wicked.lib.testing.cache import cachetestsetup, Filter, dummy
+    >>> content, ccm = cachetestsetup()
+    >>> fil = Filter(content)
+    >>> fil.section = 'body'
+    >>> from Products.wicked.lib.factories import ContentCacheManager
+    >>> ccm=ContentCacheManager(content)
+    >>> ccm.setName(fil.section)
+
+Check and make sure the __init__ does the right thing
+
+    >>> ccm.context == content
+    True
+
+Lets manage that hot content cache!
+The cache manager takes a tuple: ('string', UID)  and some
+text to cache
+
+    >>> bob = dummy(dict(getId='bob', UID='bobid', text='some text'))
+    >>> dog = dummy(dict(getId='dog', UID='dogid', text='some dog text'))
+    >>> ccm.get(bob.getId)
+
+    >>> ccm.set((dog.getId, dog.UID),  dog.text)
+    'some dog text'
+    
+    >>> ccm.set((bob.getId, bob.UID), bob.text)
+    'some text'
+    
+    >>> ccm.cache_store
+    CacheStore '/you/are/here' {'body': Cache '/you/are/here' {'bob': 'bobid', 'dog': 'dogid'}} :: [('bobid', 'some text'), ('dogid', 'some dog text')]
+
+    >>> store = ccm.cache_store
+    >>> store._cache['dogid']
+    'some dog text'
+    >>> store._cache['bobid']
+    'some text'
+     
+    >>> ccm.get('bob')
+    'some text'
+
+    >>> ccm.unset('bob')
+    'some text'
+
+    >>> _marker = object()
+    >>> ccm.get('bob', _marker) is _marker
+    True
+    >>> ccm.get('dog')
+    'some dog text'
+    >>> ccm.get('billybob')
+
+    Finally, make sure uid unsetting works
+    >>> ccm.unset('dogid', use_uid=True)
+    'some dog text'
+
+    >>> ccm.unset('bogusid', use_uid=True)
+
+Original get tests
+
+    >>> from Products.wicked.lib.testing.cache import cachetestsetup as setup
+    >>> content, ccm = setup()
+    >>> key = 'bob'
+    >>> ccm.get(key)
+
+    >>> _marker = object()
+    >>> ccm.get(key, _marker) is _marker
+    True
+    
+    >>> ccm.set((key, 'bobid'), 'some text')
+    'some text'
+    
+    >>> ccm.get(key)
+    'some text'
+
+Cleanup and exit
+
+    >>> tearDown()

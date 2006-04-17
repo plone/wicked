@@ -1,0 +1,78 @@
+========================
+ Wicked Browser Service
+========================
+
+*with a smile*
+
+This set of views based around a single class handle the thing that
+makes wicked tick: adding content.
+
+Let's set up a fixture::
+
+    >>> from zope.app.tests.placelesssetup import setUp, tearDown
+    >>> import Products.Five
+    >>> import Products.wicked.lib as lib
+    >>> from Products.Five import zcml
+    >>> from Products import ATContentTypes, Archetypes, CMFCore
+    >>> import Products.testing as testing
+    >>> from Products.wicked import browser
+    >>> setUp()
+    >>> zcml.load_config('meta.zcml', Products.Five)
+    >>> zcml.load_config("permissions.zcml", Products.Five)
+    >>> zcml.load_config("configure.zcml", browser)
+    >>> zcml.load_config("configure.zcml", lib)
+    >>> zcml.load_config("traversal.zcml", testing)
+    >>> zcml.load_config("configure.zcml", CMFCore)
+    >>> zcml.load_config("configure.zcml", Archetypes)
+    >>> zcml.load_config("configure.zcml", ATContentTypes)
+    >>> zcml.load_string("""
+    ...   <configure xmlns="http://namespaces.zope.org/zope"
+    ...              xmlns:five="http://namespaces.zope.org/five">
+    ...       <five:traversable class="Products.ATContentTypes.content.folder.ATFolder" />
+    ...   </configure>""")
+
+    >>> from Products.Five.utilities.marker import mark
+    >>> from Products.wicked.interfaces import IAmWicked
+    >>> from Products.Five.traversable import FakeRequest
+    >>> from Products.Five.tests.testing import manage_addFiveTraversableFolder
+    >>> from Products.Five.tests.testing import simplecontent as sc 
+    >>> from Products.Five.tests.testing.fancycontent import manage_addFancyContent
+    >>> try:
+    ...     from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+    ... except:
+    ...     from zope.publisher.interfaces.browser import IBrowserRequest as IDefaultBrowserLayer
+
+This is a test to check the basic setup(addmenu is TBA ;) )::
+
+    >>> manage_addFiveTraversableFolder(self.folder, 'testfo', title='T Fo!')
+    >>> testfo = self.folder.testfo
+    >>> mark(testfo, IAmWicked)
+    >>> view=testfo.restrictedTraverse('@@wickedaddmenu')
+    >>> view()
+    1
+
+Now let's test the adding feature. This is roughly the same as the
+pythonscript, but now the creation of a wiki page will set an entry
+in the cache of the original document::
+
+    >>> testfo.portal_type = 'Document'
+    >>> testfo.isReferenceable=True
+    >>> mark(self.folder, IAmWicked)
+    >>> title = 'Test Doc'
+    >>> self.folder.REQUEST.set('Title', title)
+    >>> self.folder.REQUEST.set('portal_type', 'Document')
+    >>> view=testfo.restrictedTraverse('@@wickedadd')
+    >>> retadd = view()
+    >>> print retadd
+    http://nohost/plone/Members/test_user_1_/test-doc/edit?portal_status_message=%22Test%20Doc%22%20has%20been%20created
+
+This is not working properly in the test, but works in the browser::
+
+    >>> from urllib import quote
+    >>> print http(r'''
+    ... GET /plone/Members/test_user_1_/@@wickedadd?Title=%s HTTP/1.1
+    ... ''' %quote(title))
+    HTTP/1.1 302 Moved Temporarily...
+
+    
+    >>> tearDown()

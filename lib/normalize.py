@@ -34,17 +34,20 @@ def normalizeISO(text=""):
         fixed.append(c)
     return "".join(fixed)
 
+
+pattern1 = re.compile(r"^([^\.]+)\.(\w{,4})$")
+pattern2 = re.compile(r'r"([\W\-]+)"')
 def titleToNormalizedId(title=""):
     title = title.lower()
     title = title.strip()
     title = normalizeISO(title)
     base = title
     ext = ""
-    m = re.match(r"^([^\.]+)\.(\w{,4})$",title)
+    m = pattern1.match(title)
     if m:
         base = m.groups()[0]
         ext = m.groups()[1]
-    parts = re.split(r"([\W\-]+)",base)
+    parts = pattern2.split(base)
         
     slug = re.sub(r"[\W\-]+","-",base)
     slug = re.sub(r"^\-+","",slug)
@@ -66,7 +69,10 @@ tests = [
 (u'About folder.gif', u'about-folder.gif')]
 
 if __name__ == "__main__":
+    import profile
+
     for original,correct in tests:
         sanitized = titleToNormalizedId(original)
         print sanitized
+
 

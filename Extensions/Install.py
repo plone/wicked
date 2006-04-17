@@ -63,10 +63,11 @@ def install(self):
     configureWysiwyg(self, out)
 
     pc = getToolByName(self, 'portal_catalog')
-    try:
+    if not 'UID' in pc.schema():
         pc.addColumn('UID')
-    except :
-        pass
+        
+    if not 'UID' in pc.indexes():
+        pc.addIndex('UID', 'FieldIndex')
 
     print >> out, "Successfully installed %s." % config.PROJECTNAME
     return out.getvalue()

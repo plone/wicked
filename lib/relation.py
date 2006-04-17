@@ -24,20 +24,21 @@ __authors__ = 'Whit Morriss <whit@kalistra.com>'
 __docformat__ = 'restructuredtext'
 
 from Products.Archetypes import public as atapi
+from interfaces import IWickedBacklink
 from Products.Archetypes.references import Reference
 from Products.wicked import config
+from Products.wicked.utils import getFilter 
+from zope.interface import implements
 
 class Backlink(Reference):
     """
-    A backlink is a reference set on an object when it is reference by a definite
-    wiki-link
+    A backlink is a reference set on an object when it is targetted
+    by a resolved wicked-link
     """
+    implements(IWickedBacklink)
     relationship = config.BACKLINK_RELATIONSHIP
-
-    def __init__(self, rID, sID, tID, relationship, **kwargs):
-        Reference.__init__(self, rID, sID, tID, relationship, **kwargs)
-        self.link_text = kwargs['link_text']
-        self.fieldname = kwargs['fieldname']
+    def __repr__(self):
+        return "<Backlink sid:%s tid:%s rel:%s>" %(self.sourceUID, self.targetUID, self.relationship)
 
     def targetURL(self):
         """
@@ -48,9 +49,5 @@ class Backlink(Reference):
             return target.absolute_url()
         return '#'
 
-    def delHook(self, tool, sourceObject=None, targetObject=None):
-        """
-        invalidate ourselves from the targetObject's link cache
-        """
-        field = targetObject.getField(self.fieldname)
-        field.removeLinkFromCache(self.link_text, targetObject)
+
+        

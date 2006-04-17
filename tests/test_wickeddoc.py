@@ -13,7 +13,7 @@ from Products.wicked.config import BACKLINK_RELATIONSHIP
 
 has_atct = True
 try:
-    from Products.wicked.example import WickedDoc
+    from Products import ATContentTypes
 except ImportError:
     print "WARNING: ATContentTypes not installed, WickedDoc tests not running"
     has_atct = False
@@ -27,9 +27,8 @@ class TestWickedDoc(WickedTestCase):
                               title='WD1 Title')
         wd1.setText("((%s)) ((%s))" % (self.page1.Title(),
                                        "Nonexistent Title"))
-        self.failUnless(self.hasWickedLink(wd1, self.page1))
-        self.failUnless(self.hasAddLink(wd1))
-
+        self.failUnlessWickedLink(wd1, self.page1)
+        self.failUnlessAddLink(wd1)
 
 def test_suite():
     suite = unittest.TestSuite()
