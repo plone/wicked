@@ -14,7 +14,7 @@
 CMF/AT centric basic wikish filter
 """
 from Products.CMFCore.utils import getToolByName
-from Products.filter import filter as filters
+from Products.filter import txtfilter as filters
 from Products.wicked import utils, config
 from Products.wicked.lib import interfaces  
 from Products.wicked.lib import utils
