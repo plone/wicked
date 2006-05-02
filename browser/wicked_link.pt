@@ -6,9 +6,8 @@
 	      tal:attributes="id string:${view/section}-${link/uid}">
 	  <a tal:attributes="href link/url">
             <img tal:condition="link/icon"
-                 tal:attributes="src link/icon" />
-	    <span class="chunk" tal:content="view/chunk" />
-	  </a>
+                 tal:attributes="src link/icon" /><span class="chunk" tal:content="view/chunk" />
+          </a>
 	</span>
       </span>
     </span>
@@ -23,10 +22,9 @@
   <span tal:condition="not: view/howmany" tal:omit-tag=''>
     <span tal:attributes="id string:${view/section}-${view/count}" 
 	  class="wicked_unresolved">
-      <span class="chunk" tal:content="view/chunk" >A CHUNK</span>
       <a class="wickedadd"
 	 tal:attributes="href string:$here_url/@@wickedadd?Title=${view/chunk}&section=${view/section}"
-	 tal:define="here_url here/absolute_url">+</a>
+	 tal:define="here_url here/absolute_url"><span class="chunk" tal:content="view/chunk" >A CHUNK</span>+</a>
     </span>
   </span>
 </tal:wicked_link>

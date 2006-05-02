@@ -41,11 +41,14 @@ class WickedAdd(BrowserView):
         section = self.request.get('section', section)
         assert title, 'Must have a title to create content' 
         newcontentid = normalize(title)
-        
-        # XXX this is ambiguous as to where content will end up depending
-        #     on whether 'context' is folderish
-        self.context.invokeFactory(type_name, id=newcontentid,
-                                   title=title)
+
+        # put the new object at the same level as the context
+        # XXX this will only work w/ Z2-style acquisition
+        # XXX the property trick above isn't working, context still comes
+        # back wrapped in the view :-(
+        parent = self._context[0].aq_parent
+        parent.invokeFactory(type_name, id=newcontentid,
+                             title=title)
 
         # XXX move marker to own package, add notifier
         # make this handled by an event
