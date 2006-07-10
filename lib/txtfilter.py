@@ -61,7 +61,7 @@ class WickedFilter(WickedBase):
         return self.renderer()
 
     @utils.linkcache
-    @utils. memoize
+    @utils.memoize
     def getLinks(self, chunk, normalled):
         self.resolver.configure(chunk, normalled, self.scope)
         brains = self.resolver.search
