@@ -166,17 +166,10 @@ def configure(self, **attrs):
      if not self._configure_exclude.has_key(key)]
     return attrs and attrs
 
-
-
-
-
-
-
 def removeParens(wikilink):
     wikilink.replace('((', '')
     wikilink.replace('))', '')
     return wikilink
-
 
 def counter():
     count=0
