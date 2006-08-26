@@ -7,6 +7,7 @@ if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
 
 from Testing import ZopeTestCase
+from Products.CMFPlone.Portal import PloneGenerator
 from wickedtestcase import WickedTestCase, makeContent, TITLE2
 from Products.wicked.lib.normalize import titleToNormalizedId
 from Products.wicked.config import BACKLINK_RELATIONSHIP
@@ -310,7 +311,6 @@ class TestRemoteLinking(Base):
         w2.setBody("((%s))" % self.page1.getId())
         self.failIfWickedLink(w2, self.page1)
         self.failUnlessWickedLink(w2, w1)
-
 
     def testLocalTitleBeatsRemoteId(self):
         self.replaceCreatedIndex()

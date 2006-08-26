@@ -59,13 +59,16 @@ def install(self):
 
     configureReferenceCatalog(self, out)
     configureWysiwyg(self, out)
-
+    reindex = None
     pc = getToolByName(self, 'portal_catalog')
     if not 'UID' in pc.schema():
         pc.addColumn('UID')
+        reindex = True
         
     if not 'UID' in pc.indexes():
         pc.addIndex('UID', 'FieldIndex')
-
+        reindex = True
+        
+    pc.manage_reindexIndex('UID')
     print >> out, "Successfully installed %s." % config.PROJECTNAME
     return out.getvalue()
