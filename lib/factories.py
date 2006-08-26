@@ -12,23 +12,25 @@
 from Products.AdvancedQuery import Eq, Generic
 from Products.Archetypes.interfaces import IReferenceable
 from Products.CMFCore.utils import getToolByName
-from Products.Five.utilities.marker import mark
+from zope.interface import alsoProvides as mark
 from Products.wicked import config
 from Products.wicked.interfaces import IWickedTarget
 from cache import CacheStore
 from interfaces import IContentCacheManager, IWickedQuery, IATBacklinkManager
 from normalize import titleToNormalizedId as normalize
 from relation import Backlink
-from utils import memoizedproperty, memoize, match
+from utils import memoizedproperty, memoize, match, packBrain
 from zope.app.annotation.interfaces import IAnnotations, IAnnotatable
 from zope.interface import implements
-
+from Missing import Value as MissingValue
 
 class ATBacklinkManager(object):
     implements(IATBacklinkManager)
 
     relation = config.BACKLINK_RELATIONSHIP
     refKlass = Backlink
+
+    packBrain = staticmethod(packBrain)
     
     def __init__(self, wfilter, context):
         self.wfilter = wfilter
@@ -74,17 +76,20 @@ class ATBacklinkManager(object):
             match = self.getMatch(link, resolver.agg_brains, normalled=normalled)
             if not match:
                 match = self.getMatch(link, resolver.agg_scoped_brains, normalled=normalled)
-            if not match or match.UID in dups: continue
+            if not match:
+                continue
+            if match.UID != MissingValue and match.UID in dups:
+                continue
             self.manageLink(match, normalled)
 
     def manageLink(self, obj, normalled):
+        # need IObject iface for catalog brains
         if hasattr(obj, 'getObject'):
             # brain, other sort of pseudo object
             obj = obj.getObject()
 
         if not IReferenceable.providedBy(obj):
             # backlink not possible
-            print "bugger"
             return
 
         mark(obj, IWickedTarget)
@@ -273,10 +278,10 @@ class ContentCacheManager(object):
         cache = self._getCache()
         return cache.get(key, default)
         
-    def set(self, key, text):
+    def set(self, key, value):
         cache = self._getCache()
-        cache.set(key, text)
-        return text
+        cache.set(key, value)
+        return value
         
     def unset(self, key, use_uid=False):
         cache = self._getCache()
