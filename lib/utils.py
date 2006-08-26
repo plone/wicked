@@ -45,8 +45,8 @@ def packBrain(brain):
 def getMatch(chunk, brains, normalled=None):
     """
     Given a set of query results and the wicked link text, return
-    the brain that represents the correct object to link to, or
-    None
+    the single brain that represents the correct object to link to, or
+    None.
     
     Assumes that brains are already ordered oldest to newest, so
     the first absolute match is the one returned.  Matches on id
@@ -104,8 +104,12 @@ def getMatch(chunk, brains, normalled=None):
     if not normalled_chunk:
         normalled_chunk = normalize(chunk)
     normalled_chunk = intern(normalled_chunk)
-    
-    link_brain = None
+    if not isinstance(brains, list):
+        # make a copy to AdvancedQuery sequencing issues
+        brains = [x for x in brains]
+
+    # inspect single return case
+
     if len(brains) == 1 and \
            (intern(brains[0].getId) is normalled_chunk \
             or intern(brains[0].getId.strip()) is intern(chunk.strip()) \
@@ -125,7 +129,6 @@ def getMatch(chunk, brains, normalled=None):
             return id_dict[unk]
 
     # second, match Title
-    
     brains=[brain for brain in brains \
             if intern(normalize(brain.Title)) is normalled_chunk]
     

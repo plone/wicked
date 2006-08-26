@@ -10,9 +10,9 @@ from Testing import ZopeTestCase
 
 from Products.CMFCore.utils import getToolByName
 from Products.Archetypes.utils import shasattr
-from Products.filter import api as fapi
+from Products.txtfilter import api as fapi
 from Products.wicked import utils
-from Products.filter.interfaces import IFieldFilter
+from Products.txtfilter.interfaces import IFieldFilter
 from wickedtestcase import WickedTestCase
 from Products.wicked.lib.interfaces import IWickedFilter, IMacroCacheManager
 

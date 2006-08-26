@@ -8,7 +8,7 @@
      name = "Wicked Filter"
      for="Products.wicked.interfaces.IAmWicked"
      factory="Products.wicked.lib.txtfilter.WickedFilter"
-     provides="Products.filter.interfaces.IFieldFilter"
+     provides="Products.txtfilter.interfaces.IFieldFilter"
      permission="zope2.Public"
      />
 

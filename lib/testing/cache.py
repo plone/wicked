@@ -11,7 +11,7 @@
 ##########################################################
 from zope.interface import implements, Interface
 try:
-    from Products.filter.interfaces import IMacroFilter
+    from Products.txtfilter.interfaces import IMacroFilter
 except ImportError:
     IMacroFilter = Interface
 

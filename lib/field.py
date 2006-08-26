@@ -14,7 +14,7 @@ from AccessControl import ClassSecurityInfo
 from ZPublisher.HTTPRequest import FileUpload
 
 from Products.wicked.utils import getFilter
-from Products.filter import api as fapi
+from Products.txtfilter import api as fapi
 
 from Products.Archetypes import public as atapi
 from Products.Archetypes.Registry import registerField

@@ -30,7 +30,7 @@ from Products.wicked import config as config
 from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.utils import getToolByName
 
-from Products.filter import api as fapi
+from Products.txtfilter import api as fapi
 from Products.wicked import api as wapi
 
 schema = atapi.BaseSchema.copy() + atapi.Schema((
