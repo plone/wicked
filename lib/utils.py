@@ -10,8 +10,10 @@
 #
 ##########################################################
 from normalize import titleToNormalizedId as normalize
+from collective.testing.utils import pmfunk
 
 def linkcache(func):
+    #@pmfunk
     def cache(wfilter, chunk, normalized):
         # cache depends on query and match
         # this could use some untangling
@@ -36,10 +38,37 @@ def match(query):
 def packBrain(brain):
     """
     converts dataobjects in to template ready dictionaries
+
+    >>> from Missing import Value
+    >>> class brain(object):
+    ...     def getPath(self):
+    ...         return '/path'
+    ...     data_record_id_=123
+    ...     UID='unique'
+    ...     getIcon='/donkey.gif'
+    >>> packBrain(brain())['uid']
+    'unique'
+
+    packBrain needs to filter out Missing.Value that make creep in.
+
+    >>> fbrain = brain()
+    >>> brain.UID=Value
+    >>> packBrain(fbrain)['uid']
+    123
     """
+    from Missing import Value
+
+    # missing values are not hashable nor can they be dict keys.  they
+    # should never see the light of day. In the rare case that the UID
+    # index is updated for an object, substitute the record id
+
+    uid = brain.UID
+    if uid is Value:
+        uid = brain.data_record_id_
+    
     return dict(path=brain.getPath(),
                 icon=brain.getIcon,
-                uid=brain.UID,
+                uid=uid,
                 rid=brain.data_record_id_)
 
 def getMatch(chunk, brains, normalled=None):
