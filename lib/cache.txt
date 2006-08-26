@@ -8,7 +8,7 @@ storage.
 
 Let load a little zcml so we can do annotation storage
 
-    >>> from zope.app.tests.placelesssetup import setUp, tearDown
+    >>> from zope.testing.cleanup import cleanUp
     >>> from Products.Five import zcml
     >>> from Products.wicked.lib import testing
     >>> import Products.Five
@@ -92,4 +92,4 @@ Original get tests
 
 Cleanup and exit
 
-    >>> tearDown()
+    >>> cleanUp()

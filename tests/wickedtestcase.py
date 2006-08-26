@@ -1,10 +1,11 @@
 import os
 from cStringIO import StringIO
 from Testing import ZopeTestCase
+from Testing.ZopeTestCase import PortalTestCase
 from Products.CMFCore.utils  import getToolByName
 from Products.PloneTestCase import ptc 
-#import cmftc
-#from Products.Archetypes.tests.ArchetypesTestCase import ArcheSiteTestCase
+from Products.PloneTestCase.layer import ZCMLLayer 
+
 from Products.wicked.Extensions.Install import install as installWicked
 
 # monkey patch config into ironicwiki schema
@@ -15,37 +16,11 @@ import Products.wicked.config as config
 from Products.wicked.utils import parseDepends, doc_file
 from Products.wicked.lib.testing.xml import xstrip as strip
 from Products.wicked.api import titleToNormalizedId
-from Products.filter.tests.filtertestcase import FilterTestCase
+from Products.txtfilter.tests.txtfiltertestcase import FilterTestCase
 from Products.wicked.lib import field
-
-from Testing.ZopeTestCase.placeless import zcml, setUp, tearDown
-
-import Products.testing as testing
-import Products.wicked.lib
-import Products.wicked.browser
-import Products.Five as Five
-import Products.Archetypes as AT
-import Products.CMFCore as CMFCore
-import Products.filter as txtfilter
-import Products.testing as testing
 
 from zope.app.apidoc.component import getProvidedAdapters as gpa
 from zope.interface import Interface
-
-def setupCA():
-    setUp()
-    load = zcml.load_config
-    load('meta.zcml', Five)
-    load('permissions.zcml', Five)
-    load('event.zcml', Five)
-    load('deprecated.zcml', Five)
-    load('configure.zcml', AT)
-    load('configure.zcml', CMFCore)
-    load("traversal.zcml", testing)
-    load('configure.zcml', txtfilter)
-    load('configure.zcml', Products.wicked.lib)
-    load('configure.zcml', Products.wicked.browser)
-    #load('printevent.zcml', testing)
 
 # Dynamic bootstapping based on product config
 def installConfiguredProducts():
@@ -79,8 +54,6 @@ USELXML = False
 class WickedTestCase(FilterTestCase):
 
     def afterSetUp(self):
-        setupCA()
-
         # add some pages
         self.page1 = makeContent(self.folder,
                                  titleToNormalizedId(TITLE1),
@@ -139,4 +112,4 @@ class WickedTestCase(FilterTestCase):
         # XXX make test stronger
         return dest.absolute_url() in self.getRenderedWickedField(doc)
 
-ptc.setupPloneSite(products=['Archetypes', 'wicked'], required_zcml=setupCA)
+ptc.setupPloneSite(products=['Archetypes', 'wicked'])

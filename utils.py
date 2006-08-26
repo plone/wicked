@@ -1,5 +1,5 @@
 from Products.CMFCore.utils import getToolByName
-from Products.filter import api as fapi
+from Products.txtfilter import api as fapi
 from Products.wicked.config import FILTER_NAME
 from StringIO import StringIO
 from ZODB.POSException import ConflictError

@@ -9,14 +9,13 @@ makes wicked tick: adding content.
 
 Let's set up a fixture::
 
-    >>> from zope.app.tests.placelesssetup import setUp, tearDown
+    >>> from zope.testing.cleanup import cleanUp
     >>> import Products.Five
     >>> import Products.wicked.lib as lib
     >>> from Products.Five import zcml
     >>> from Products import ATContentTypes, Archetypes, CMFCore
     >>> import Products.testing as testing
     >>> from Products.wicked import browser
-    >>> setUp()
     >>> zcml.load_config('meta.zcml', Products.Five)
     >>> zcml.load_config("permissions.zcml", Products.Five)
     >>> zcml.load_config("configure.zcml", browser)
@@ -75,4 +74,4 @@ This is not working properly in the test, but works in the browser::
     HTTP/1.1 302 Moved Temporarily...
 
     
-    >>> tearDown()
+    >>> cleanUp()

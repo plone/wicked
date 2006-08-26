@@ -9,7 +9,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.ZCatalog.ZCatalog import manage_addZCatalog
 from OFS.ObjectManager import BadRequestException
 
-from Products.filter.Extensions.Install import configureWysiwyg
+from Products.txtfilter.Extensions.Install import configureWysiwyg
 from Products.wicked.utils import installDepends
 from Products.wicked import config
 

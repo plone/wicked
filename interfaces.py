@@ -1,5 +1,5 @@
 from zope.interface import Interface
-from Products.filter.interfaces import IFilterable, IFieldFilter
+from Products.txtfilter.interfaces import IFilterable, IFieldFilter
 from zope.app.annotation.interfaces import IAttributeAnnotatable
 
 

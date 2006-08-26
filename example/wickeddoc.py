@@ -38,7 +38,7 @@ try:
 except ImportError: # ATCT 0.2
     from Products.ATContentTypes.config import ATDOCUMENT_CONTENT_TYPE
 
-from Products.filter import api as fapi
+from Products.txtfilter import api as fapi
 
 from Products.wicked import config as config
 from Products.wicked import api as wapi
