@@ -16,11 +16,10 @@ rolling.
     ... except:
     ...     from zope.publisher.interfaces.browser import IBrowserRequest as IDefaultBrowserLayer
     >>> from Products.Five.utilities.marker import mark
-    >>> from zope.app.testing.placelesssetup import setUp, tearDown
+    >>> from zope.testing.cleanup import cleanUp
     >>> from Products.Five import zcml
     >>> import Products.Five
     >>> import Products.testing as testing
-    >>> setUp()
     >>> zcml.load_config('meta.zcml', Products.Five)
     >>> zcml.load_config("permissions.zcml", Products.Five)
     >>> zcml.load_config("renderer.zcml", browser)
@@ -47,14 +46,14 @@ rolling.
 
     >>> renderer.load([], 'Chunk 2')
     >>> print xstrip(renderer())
-    <span class="wicked_unresolved" id="fieldname-1"><span class="chunk">Chunk 2</span><a class="wickedadd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk%202&amp;section=fieldname">+</a></span>...
+    <span class="wicked_unresolved" id="fieldname-1"><a class="wickedadd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk%202&amp;section=fieldname"><span class="chunk">Chunk 2</span>+</a></span>...
 
 Test counter::
 
     >>> renderer.load([], 'Chunk 3')
     >>> print xstrip(renderer())
-    <span class="wicked_unresolved" id="fieldname-2"><span class="chunk">Chunk 3</span><a class="wickedadd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk%203&amp;section=fieldname">+</a></span>...
+    <span class="wicked_unresolved" id="fieldname-2"><a class="wickedadd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk%203&amp;section=fieldname"><span class="chunk">Chunk 3</span>+</a></span>...
 
 Cleanup::
 
-    >>> tearDown()
+    >>> cleanUp()
