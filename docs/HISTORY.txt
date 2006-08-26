@@ -1,0 +1,15 @@
+wicked 1.0a
+
+  r29296
+
+  * renamed all imports to refer to renamed Products.txtfilter
+    [whit]
+ 
+  * fixed lazy map issue with AdvancedQuery & matching
+    [whit]  
+
+  * updated tests to have basic layer support via the PloneTestCase
+    trunk.
+
+  
+  
