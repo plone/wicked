@@ -248,7 +248,6 @@ def test_suite():
 
     return unittest.TestSuite((
         doctest.DocFileSuite('decorator_intro.txt', optionflags=optionflags),
-        #doctest.DocFileSuite('filtercore.txt', optionflags=optionflags),
         doctest.DocTestSuite('utils', optionflags=optionflags)
         ))
 
