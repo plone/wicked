@@ -22,15 +22,19 @@ from zope.testing import doctest
 from Products.ATContentTypes.tests.atcttestcase import ATCTFunctionalSiteTestCase 
 optionflags = doctest.REPORT_ONLY_FIRST_FAILURE | doctest.ELLIPSIS
 
+from collective.testing.layer import ZCMLLayer
+
 def test_suite():
     import unittest
-    from Testing.ZopeTestCase import ZopeDocFileSuite, FunctionalDocFileSuite
-    return unittest.TestSuite((
+    from Testing.ZopeTestCase import FunctionalDocFileSuite
+    suite = unittest.TestSuite((
             FunctionalDocFileSuite('add.txt',
                                    package='Products.wicked.browser',
                                    test_class=ATCTFunctionalSiteTestCase,                                   
                                    optionflags=optionflags)
             ,),)
+    suite.layer = ZCMLLayer
+    return suite
 
 if __name__ == '__main__':
     framework()
