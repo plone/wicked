@@ -10,7 +10,6 @@
 #
 ##########################################################
 from normalize import titleToNormalizedId as normalize
-from collective.testing.utils import pmfunk
 
 def linkcache(func):
     #@pmfunk
