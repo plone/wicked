@@ -9,10 +9,10 @@
 #   - and contributors
 #
 ##########################################################
+from Missing import Value as MissingValue
 from Products.AdvancedQuery import Eq, Generic
 from Products.Archetypes.interfaces import IReferenceable
 from Products.CMFCore.utils import getToolByName
-from zope.interface import alsoProvides as mark
 from Products.wicked import config
 from Products.wicked.interfaces import IWickedTarget
 from cache import CacheStore
@@ -20,9 +20,9 @@ from interfaces import IContentCacheManager, IWickedQuery, IATBacklinkManager
 from normalize import titleToNormalizedId as normalize
 from relation import Backlink
 from utils import memoizedproperty, memoize, match, packBrain
-from zope.app.annotation.interfaces import IAnnotations, IAnnotatable
+from zope.annotation.interfaces import IAnnotations, IAnnotatable
+from zope.interface import alsoProvides as mark
 from zope.interface import implements
-from Missing import Value as MissingValue
 
 class ATBacklinkManager(object):
     implements(IATBacklinkManager)
@@ -65,7 +65,6 @@ class ATBacklinkManager(object):
         dups = set(self.removeLinks(new_links))
 
         resolver = self.resolver
-
         norm=tuple()
         for link in new_links:
             normalled=normalize(link)
@@ -73,7 +72,7 @@ class ATBacklinkManager(object):
             self.resolver.aggregate(link, normalled, scope)
 
         for link, normalled in zip(new_links, norm):
-            match = self.getMatch(link, resolver.agg_brains, normalled=normalled)
+            match = self.getMatch(link, resolver.agg_brains, normalled=normalled)            
             if not match:
                 match = self.getMatch(link, resolver.agg_scoped_brains, normalled=normalled)
             if not match:
@@ -221,7 +220,6 @@ class AdvQueryMatchingSeeker(object):
     def squery(self):
         return self._aggquery('_squery', self.scopedQuery)
 
-
     # memo prevents dups
     @memoize 
     def aggregate(self, link, normalled, scope):
@@ -237,7 +235,7 @@ class AdvQueryMatchingSeeker(object):
         """
         aggregregate search returns
         """
-        return self._query(self._bquery)
+        return [brain for brain in self._query(self._bquery)]
 
     @memoizedproperty
     def agg_scoped_brains(self):
