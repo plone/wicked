@@ -1,9 +1,10 @@
 <configure xmlns="http://namespaces.zope.org/zope"
 	   xmlns:five="http://namespaces.zope.org/five">
 
-  <include file="subscriber.zcml" />
   <!-- include package="zope.app.annotation" / -->
+  <include file="subscriber.zcml" />
   <include package="zope.annotation" />
+  <include package=".browser" />
 
   <adapter
      name = "Wicked Filter"
