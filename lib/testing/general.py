@@ -1,5 +1,5 @@
 from interfaces import ITestObject
-from Products.Five.utilities.marker import mark
+from zope.interface import alsoProvides as mark
 
 def dummy(kdict, name='dummy', iface=ITestObject):
     obj = type(name, (object,), kdict)()
