@@ -32,6 +32,7 @@ from Products.CMFCore.utils import getToolByName
 
 from Products.txtfilter import api as fapi
 from Products.wicked import api as wapi
+from zope.annotation.interfaces import IAttributeAnnotatable 
 
 schema = atapi.BaseSchema.copy() + atapi.Schema((
     wapi.WikiField( "body",
@@ -57,7 +58,7 @@ schema = atapi.BaseSchema.copy() + atapi.Schema((
 
 class IronicWiki(atapi.BaseContent):
     """ Ironic wiki Portal Content """
-    implements(IAmWicked)
+    implements(IAmWicked, IAttributeAnnotatable)
 
     archetype_name = portal_type = meta_type = 'IronicWiki'
     schema=schema
