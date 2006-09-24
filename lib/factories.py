@@ -237,14 +237,14 @@ class AdvQueryMatchingSeeker(object):
         """
         aggregregate search returns
         """
-        return self._query(self._bquery)
+        return [brain for brain in self._query(self._bquery)]
 
     @memoizedproperty
     def agg_scoped_brains(self):
         """
         aggregregate search returns
         """
-        return self._query(self._squery)
+        return [brain for brain in self._query(self._squery)]
 
     __call__ = _query
         
