@@ -10,10 +10,8 @@
 #
 ##########################################################
 from normalize import titleToNormalizedId as normalize
-from collective.testing.utils import pmfunk
 
 def linkcache(func):
-    #@pmfunk
     def cache(wfilter, chunk, normalized):
         # cache depends on query and match
         # this could use some untangling
@@ -241,15 +239,12 @@ memoize = _m.memoize
 memoizedproperty = _m.memoizedproperty
 clearbefore = _m.clearbefore
     
-import unittest
-from zope.testing import doctest
-optionflags = doctest.REPORT_ONLY_FIRST_FAILURE | doctest.ELLIPSIS
 def test_suite():
-
-    return unittest.TestSuite((
-        doctest.DocFileSuite('decorator_intro.txt', optionflags=optionflags),
-        doctest.DocTestSuite('utils', optionflags=optionflags)
-        ))
+    import unittest
+    from zope.testing import doctest
+    optionflags = doctest.REPORT_ONLY_FIRST_FAILURE | doctest.ELLIPSIS
+    return doctest.DocTestSuite('Products.wicked.lib.utils',
+                                optionflags=optionflags)
 
 if __name__=="__main__":
     unittest.TextTestRunner().run(test_suite())
