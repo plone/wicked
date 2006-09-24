@@ -6,15 +6,8 @@ basic manager for quick and dirty caching and editing of links
 on a content object. Uses zope3's annotation implementation for
 storage.  
 
-Let load a little zcml so we can do annotation storage
-
-    >>> from zope.testing.cleanup import cleanUp
-    >>> from Products.Five import zcml
     >>> from Products.wicked.lib import testing
-    >>> import Products.Five
-    >>> zcml.load_config('meta.zcml', Products.Five)
-    >>> zcml.load_config("permissions.zcml", Products.Five)
-    >>> zcml.load_config('annotations.zcml', testing)
+    >>> from zope.annotation.interfaces import IAttributeAnnotatable as IAA  
 
 First, fake some AT content and a filter
 
@@ -35,8 +28,8 @@ Lets manage that hot content cache!
 The cache manager takes a tuple: ('string', UID)  and some
 text to cache
 
-    >>> bob = dummy(dict(getId='bob', UID='bobid', text='some text'))
-    >>> dog = dummy(dict(getId='dog', UID='dogid', text='some dog text'))
+    >>> bob = dummy(dict(getId='bob', UID='bobid', text='some text'), iface=IAA)
+    >>> dog = dummy(dict(getId='dog', UID='dogid', text='some dog text'), iface=IAA)
     >>> ccm.get(bob.getId)
 
     >>> ccm.set((dog.getId, dog.UID),  dog.text)
@@ -90,6 +83,5 @@ Original get tests
     >>> ccm.get(key)
     'some text'
 
-Cleanup and exit
 
-    >>> cleanUp()
+
