@@ -1,8 +1,9 @@
 from interfaces import ITestObject
 from zope.interface import alsoProvides as mark
 
-def dummy(kdict, name='dummy', iface=ITestObject):
-    obj = type(name, (object,), kdict)()
+def dummy(kdict, name='dummy', iface=ITestObject, bases=(object,)):
+    """ factory for dummies """
+    obj = type(name, bases, kdict)()
     mark(obj, iface)
     return obj 
 
