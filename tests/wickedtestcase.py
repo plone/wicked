@@ -4,7 +4,8 @@ from Testing import ZopeTestCase
 from Testing.ZopeTestCase import PortalTestCase
 from Products.CMFCore.utils  import getToolByName
 from Products.PloneTestCase import ptc 
-from Products.PloneTestCase.layer import ZCMLLayer 
+from collective.testing.layer import ZCMLLayer 
+from Products.Archetypes.tests.atsitetestcase import ATSiteTestCase
 
 from Products.wicked.Extensions.Install import install as installWicked
 
@@ -16,7 +17,6 @@ import Products.wicked.config as config
 from Products.wicked.utils import parseDepends, doc_file
 from Products.wicked.lib.testing.xml import xstrip as strip
 from Products.wicked.api import titleToNormalizedId
-from Products.txtfilter.tests.txtfiltertestcase import FilterTestCase
 from Products.wicked.lib import field
 
 from zope.app.apidoc.component import getProvidedAdapters as gpa
@@ -51,7 +51,7 @@ USELXML = False
 
 # This is the test case. You will have to add test_<methods> to your
 # class in order to assert things about your Product.
-class WickedTestCase(FilterTestCase):
+class WickedTestCase(ATSiteTestCase):
 
     def afterSetUp(self):
         # add some pages

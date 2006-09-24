@@ -3,9 +3,6 @@ import unittest
 from sets import Set
 import traceback
 
-if __name__ == '__main__':
-    execfile(os.path.join(sys.path[0], 'framework.py'))
-
 from Testing import ZopeTestCase
 from wickedtestcase import WickedTestCase, makeContent
 from Products.wicked.lib.normalize import titleToNormalizedId
@@ -36,5 +33,4 @@ def test_suite():
         suite.addTest(unittest.makeSuite(TestWickedDoc))
     return suite
 
-if __name__ == '__main__' and has_atct:
-    framework()
+

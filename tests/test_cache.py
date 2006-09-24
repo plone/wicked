@@ -2,10 +2,6 @@ import os, sys, time
 import unittest
 from sets import Set
 import traceback
-
-if __name__ == '__main__':
-    execfile(os.path.join(sys.path[0], 'framework.py'))
-
 from Testing import ZopeTestCase
 
 from Products.CMFCore.utils import getToolByName
@@ -64,5 +60,3 @@ def test_suite():
     suite.addTest(unittest.makeSuite(TestLinkCache))
     return suite
 
-if __name__ == '__main__':
-    framework()

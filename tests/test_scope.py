@@ -3,16 +3,12 @@ import unittest
 from sets import Set
 import traceback
 
-if __name__ == '__main__':
-    execfile(os.path.join(sys.path[0], 'framework.py'))
-
 from Testing import ZopeTestCase
 
 from Products.wicked.lib.normalize import titleToNormalizedId
 from Products.wicked.config import BACKLINK_RELATIONSHIP
 from Products.wicked.example import IronicWiki
 from wickedtestcase import WickedTestCase, makeContent
-
 
 def scopeTester(self):
     """
@@ -59,6 +55,3 @@ def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestWickedScope))
     return suite
-
-if __name__ == '__main__':
-    framework()
