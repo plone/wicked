@@ -2,7 +2,8 @@
 	   xmlns:five="http://namespaces.zope.org/five">
 
   <include file="subscriber.zcml" />
-  <include package="zope.app.annotation" />
+  <!-- include package="zope.app.annotation" / -->
+  <include package="zope.annotation" />
 
   <adapter
      name = "Wicked Filter"
