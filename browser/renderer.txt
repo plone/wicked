@@ -15,16 +15,7 @@ rolling.
     ...     from zope.publisher.interfaces.browser import IDefaultBrowserLayer
     ... except:
     ...     from zope.publisher.interfaces.browser import IBrowserRequest as IDefaultBrowserLayer
-    >>> from Products.Five.utilities.marker import mark
-    >>> from zope.app.testing.placelesssetup import setUp, tearDown
-    >>> from Products.Five import zcml
-    >>> import Products.Five
-    >>> import Products.testing as testing
-    >>> setUp()
-    >>> zcml.load_config('meta.zcml', Products.Five)
-    >>> zcml.load_config("permissions.zcml", Products.Five)
-    >>> zcml.load_config("renderer.zcml", browser)
-    >>> zcml.load_config("traversal.zcml", testing)
+    >>> from zope.interface import alsoProvides as mark
     >>> from Products.Five.tests.testing import manage_addFiveTraversableFolder
     >>> from Products.wicked.lib.testing.general import dummy
     >>> request = dummy(dict(physicalPathToURL=lambda x, y, z: 'http://url'),
@@ -55,6 +46,3 @@ Test counter::
     >>> print xstrip(renderer())
     <span class="wicked_unresolved" id="fieldname-2"><span class="chunk">Chunk 3</span><a class="wickedadd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk%203&amp;section=fieldname">+</a></span>...
 
-Cleanup::
-
-    >>> tearDown()

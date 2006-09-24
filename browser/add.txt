@@ -9,30 +9,13 @@ makes wicked tick: adding content.
 
 Let's set up a fixture::
 
-    >>> from zope.testing.cleanup import cleanUp
     >>> import Products.Five
     >>> import Products.wicked.lib as lib
     >>> from Products.Five import zcml
     >>> from Products import ATContentTypes, Archetypes, CMFCore
-    >>> import Products.testing as testing
     >>> from Products.wicked import browser
-    >>> zcml.load_config('meta.zcml', Products.Five)
-    >>> zcml.load_config("permissions.zcml", Products.Five)
-    >>> zcml.load_config("configure.zcml", browser)
-    >>> zcml.load_config("configure.zcml", lib)
-    >>> zcml.load_config("traversal.zcml", testing)
-    >>> zcml.load_config("configure.zcml", CMFCore)
-    >>> zcml.load_config("configure.zcml", Archetypes)
-    >>> zcml.load_config("configure.zcml", ATContentTypes)
-    >>> zcml.load_string("""
-    ...   <configure xmlns="http://namespaces.zope.org/zope"
-    ...              xmlns:five="http://namespaces.zope.org/five">
-    ...       <five:traversable class="Products.ATContentTypes.content.folder.ATFolder" />
-    ...   </configure>""")
-
     >>> from Products.Five.utilities.marker import mark
     >>> from Products.wicked.interfaces import IAmWicked
-    >>> from Products.Five.traversable import FakeRequest
     >>> from Products.Five.tests.testing import manage_addFiveTraversableFolder
     >>> from Products.Five.tests.testing import simplecontent as sc 
     >>> from Products.Five.tests.testing.fancycontent import manage_addFancyContent
@@ -74,4 +57,4 @@ This is not working properly in the test, but works in the browser::
     HTTP/1.1 302 Moved Temporarily...
 
     
-    >>> cleanUp()
+
