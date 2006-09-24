@@ -20,11 +20,11 @@ _marker=object()
 class BasicLink(object):
     """renderer for wicked links"""
     section = _marker
-    counter=counter()
     
     def __init__(self, context, request):
         self._context = (context,)
         self.request = request
+        self.counter=counter()
         
     @property
     def context(self):
