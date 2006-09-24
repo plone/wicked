@@ -14,15 +14,15 @@
 CMF/AT centric basic wikish filter
 """
 from Products.CMFCore.utils import getToolByName
-from Products.txtfilter import filter as filters
+from Products.txtfilter.filter import Filter
 from Products.wicked import utils, config
 from Products.wicked.lib import interfaces  
 from Products.wicked.lib import utils
 from Products.wicked.lib.utils import memoizedproperty, memoize
 from interfaces import IWickedFilter, IWickedQuery
+from normalize import titleToNormalizedId as normalize
 from zope.component import getMultiAdapter
 from zope.interface import implements, Interface
-from normalize import titleToNormalizedId as normalize
 
 import sre
 
@@ -30,14 +30,12 @@ _marker = object()
 
 pattern = sre.compile(r'\(\(([\w\W]+?)\)\)') # matches ((Some Text To link 123))
 
-class WickedBase(filters.Filter):
-    pattern = pattern
-
-class WickedFilter(WickedBase):
+class WickedFilter(Filter):
     """
-    Filter for creating core wiki behavior 
+    Filter for creating core wikish behavior 
     """
     implements(IWickedFilter)
+    pattern = pattern
 
     # identity
     query_iface = IWickedQuery
