@@ -1,6 +1,6 @@
 from zope.interface import Interface
 from Products.txtfilter.interfaces import IFilterable, IFieldFilter
-from zope.app.annotation.interfaces import IAttributeAnnotatable
+from zope.annotation.interfaces import IAttributeAnnotatable
 
 
 class IAmWicked(IFilterable, IAttributeAnnotatable):
