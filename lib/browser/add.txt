@@ -11,14 +11,13 @@ Let's set up a fixture::
 
     >>> import Products.Five
     >>> import Products.wicked.lib as lib
-    >>> from Products.Five import zcml
     >>> from Products import ATContentTypes, Archetypes, CMFCore
-    >>> from Products.wicked import browser
-    >>> from Products.Five.utilities.marker import mark
+    >>> from zope.interface import alsoProvides as mark
     >>> from Products.wicked.interfaces import IAmWicked
     >>> from Products.Five.tests.testing import manage_addFiveTraversableFolder
     >>> from Products.Five.tests.testing import simplecontent as sc 
     >>> from Products.Five.tests.testing.fancycontent import manage_addFancyContent
+    >>> from zope.annotation.interfaces import IAttributeAnnotatable 
     >>> try:
     ...     from zope.publisher.interfaces.browser import IDefaultBrowserLayer
     ... except:
@@ -29,6 +28,7 @@ This is a test to check the basic setup(addmenu is TBA ;) )::
     >>> manage_addFiveTraversableFolder(self.folder, 'testfo', title='T Fo!')
     >>> testfo = self.folder.testfo
     >>> mark(testfo, IAmWicked)
+    >>> mark(testfo, IAttributeAnnotatable)
     >>> view=testfo.restrictedTraverse('@@wickedaddmenu')
     >>> view()
     1
@@ -40,6 +40,7 @@ in the cache of the original document::
     >>> testfo.portal_type = 'Document'
     >>> testfo.isReferenceable=True
     >>> mark(self.folder, IAmWicked)
+    >>> mark(self.folder, IAttributeAnnotatable)
     >>> title = 'Test Doc'
     >>> self.folder.REQUEST.set('Title', title)
     >>> self.folder.REQUEST.set('portal_type', 'Document')

@@ -10,7 +10,6 @@ rolling.
 
     >>> from zope.component import getMultiAdapter
     >>> from Products.wicked.interfaces import IAmWicked
-    >>> from Products.wicked import browser
     >>> try:
     ...     from zope.publisher.interfaces.browser import IDefaultBrowserLayer
     ... except:

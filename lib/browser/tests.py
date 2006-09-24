@@ -7,11 +7,11 @@ def test_suite():
     from Products.ATContentTypes.tests.atcttestcase import ATCTFunctionalSiteTestCase 
     from Testing.ZopeTestCase import FunctionalDocFileSuite, ZopeDocFileSuite
     suites = (FunctionalDocFileSuite('add.txt',
-                                    package='Products.wicked.browser',
+                                    package='Products.wicked.lib.browser',
                                     test_class=ATCTFunctionalSiteTestCase,                                   
                                     optionflags=optionflags),
               ZopeDocFileSuite('renderer.txt',
-                               package='Products.wicked.browser',
+                               package='Products.wicked.lib.browser',
                                optionflags=optionflags))
 
     [setattr(suite, 'layer', ZCMLLayer) for suite in suites]
