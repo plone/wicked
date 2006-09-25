@@ -23,6 +23,7 @@ __docformat__ = 'restructuredtext'
 
 from zope.interface import implements
 from Products.wicked.interfaces import IAmWicked
+from zope.annotation.interfaces import IAttributeAnnotatable 
 
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore import CMFCorePermissions
@@ -69,7 +70,7 @@ schema = ATDocument.schema.copy() + atapi.Schema((
      
 class WickedDoc(ATDocument):
     """ A page in the portal; supports wiki linking. """
-    implements(IAmWicked)
+    implements(IAmWicked, IAttributeAnnotatable)
     archetype_name='Wicked Doc'
     portal_type= meta_type ='WickedDoc'
     schema=schema

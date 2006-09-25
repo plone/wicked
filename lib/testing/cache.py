@@ -15,6 +15,8 @@ try:
 except ImportError:
     IMacroFilter = Interface
 
+from zope.annotation.interfaces import IAttributeAnnotatable   
+from Products.wicked.lib.factories import ContentCacheManager     
 from general import dummy
 
 class Filter(object):
@@ -34,17 +36,14 @@ class Filter(object):
     
     section='body'
 
-
-from Products.wicked.lib.factories import ContentCacheManager     
 def cachetestsetup():
-    content = dummy({}) 
+    content = dummy({}, iface=IAttributeAnnotatable) 
     content.aq_base = content
     content.absolute_url=lambda : '/you/are/here'
     fil = Filter(content)
     ccm=ContentCacheManager(content)
     ccm.setName(fil.section)
     fil.cache=ccm
-
     return content, ccm
 
 portal_tools = dict()

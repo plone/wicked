@@ -1,4 +1,27 @@
 from zope.interface import Interface, Attribute
+from Products.txtfilter.interfaces import IFilterable, IFieldFilter
+from zope.annotation.interfaces import IAnnotatable
+
+class IAmWicked(IFilterable, IAnnotatable):
+    """
+    wicked content...
+
+    note that this interface is not required for wicked to work, just
+    to distinguish particular objects as intending to use wicked
+    for some processing
+    """
+
+
+class IWickedFilter(IFieldFilter):
+    """
+    Wicked field filter
+    """
+
+
+class IWickedTarget(Interface):
+    """
+    marker interface for an object linked to in a wicked text area
+    """
 
 class IWickedBacklink(Interface):
     """

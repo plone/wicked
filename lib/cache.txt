@@ -3,33 +3,32 @@
 =======
 
 basic manager for quick and dirty caching and editing of links
-on a content object. Uses zope3's annotation implementation for
+on a content object. Uses zope3's attr annotation implementation for
 storage.  
 
     >>> from Products.wicked.lib import testing
-    >>> from zope.annotation.interfaces import IAttributeAnnotatable as IAA  
+    >>> from Products.wicked.lib.factories import ContentCacheManager
+    >>> from Products.wicked.lib.testing.cache import cachetestsetup, Filter, dummy
 
 First, fake some AT content and a filter
 
-    >>> from Products.wicked.lib.testing.cache import cachetestsetup, Filter, dummy
     >>> content, ccm = cachetestsetup()
     >>> fil = Filter(content)
     >>> fil.section = 'body'
-    >>> from Products.wicked.lib.factories import ContentCacheManager
     >>> ccm=ContentCacheManager(content)
     >>> ccm.setName(fil.section)
 
-Check and make sure the __init__ does the right thing
+Check and make sure the __init__ does the right thing::
 
     >>> ccm.context == content
     True
 
 Lets manage that hot content cache!
 The cache manager takes a tuple: ('string', UID)  and some
-text to cache
+text to cache::
 
-    >>> bob = dummy(dict(getId='bob', UID='bobid', text='some text'), iface=IAA)
-    >>> dog = dummy(dict(getId='dog', UID='dogid', text='some dog text'), iface=IAA)
+    >>> bob = dummy(dict(getId='bob', UID='bobid', text='some text'))
+    >>> dog = dummy(dict(getId='dog', UID='dogid', text='some dog text'))
     >>> ccm.get(bob.getId)
 
     >>> ccm.set((dog.getId, dog.UID),  dog.text)
