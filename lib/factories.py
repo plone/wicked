@@ -84,7 +84,6 @@ class ATBacklinkManager(object):
 
         if not IReferenceable.providedBy(obj):
             # backlink not possible
-            print "bugger"
             return
 
         mark(obj, IWickedTarget)
