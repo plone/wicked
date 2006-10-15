@@ -4,8 +4,6 @@ if __name__ == '__main__':
 
 def test_suite():
     import unittest
-    
-    from Testing.ZopeTestCase import ZopeDocFileSuite
     from Testing.ZopeTestCase import ZopeDocTestSuite
 
     return unittest.TestSuite((
