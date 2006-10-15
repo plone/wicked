@@ -4,7 +4,7 @@ if __name__ == '__main__':
 
 def test_suite():
     import unittest
-    from Testing.ZopeTestCase import ZopeDocTestSuite
+    from Testing.ZopeTestCase import ZopeDocFileSuite
 
     return unittest.TestSuite((
         ZopeDocFileSuite('cache.txt', package='Products.wicked.lib'),
