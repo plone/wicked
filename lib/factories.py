@@ -197,12 +197,12 @@ class AdvQueryMatchingSeeker(object):
     @property
     @match
     def scopedSearch(self):
-        return self._query(self.scopedQuery)
+        return list(self._query(self.scopedQuery))
 
     @property
     @match
     def search(self):
-        return self._query(self.basicQuery)
+        return list(self._query(self.basicQuery))
 
     def _aggquery(self, name, query):
         curr = getattr(self, name, _marker)
