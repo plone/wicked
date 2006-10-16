@@ -1,11 +1,21 @@
+wicked 1.0rc2
+  
+  * coerce all returns from AdvancedQuery to lists to avoid
+    non-sequential access errors
+
+  * remove zcml boilerplate in browser functional tests
+
 wicked 1.0rc1
 
   r29419
 
   * added a reindex of added UID index for older Plones
+  [whit]
 
   * added filtering in ATBacklinkManager and in packBrains for
     Missing.Value (why is this bs still in zope2?)
+  [whit]
+ 
 
   r29296
 
