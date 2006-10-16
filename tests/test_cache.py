@@ -28,7 +28,7 @@ class TestLinkCache(WickedTestCase):
         """
         sets the body of page1 to be a wicked link of the id of page2
         """
-        super(TestLinkCache, self).afterSetUp()
+        WickedTestCase.afterSetUp(self)
         field = self.page1.getField(self.wicked_field)
         field.set(self.page1, "((%s))" % self.page2.Title())
         self.field = field
