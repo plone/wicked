@@ -20,6 +20,24 @@ Proposed User Interface:
   current folder, decide whether or not to render the add links based
   on this
 
+Plone 3
+-------
+
+* zcml directives for::
+  - txtfilter dispatch on arbitrary callable (so filter dispatch is by decoration rather than replacement or inheritance)
+  - backlink dispatch on arbitrary callable
+
+* configlet
+
+ - z3 utility for maintain state information for configlet
+
+ - making dispatch decorators able to toggle behavior on and off
+
+* cachefu support(to kick documents with wicked links when links are resolved underneath)
+
+* package reorganization of txtfilter and wicked to adhere to python package standards
+
+
 Misc:
 ----
 
@@ -30,7 +48,7 @@ Misc:
   allow site managers to specify the destination content type, so wiki
   pages can be replaced by any arbitrary wicked-aware type
 
-- filter support w/o field replacement
+- txtfilter support w/o field replacement
 
-  This require integration with txtfilter 0.2.0
+  This require integration with txtfilter trunk
 

@@ -8,8 +8,9 @@
 Abstract::
 ----------
 
- wicked is a framework addition to Archetypes to allow developers to add
- wiki-ish behavior to AT content objects via a schema field.
+ wicked is a framework addition to allow developers to add wiki-ish
+ behavior to content objects via getters and setters to a content
+ display area.
 
 
 Premise::
@@ -17,12 +18,12 @@ Premise::
 
  Wiki does two things really well: convenient document creation,
  immediate interlinking of documents.  To leverage these features,
- wiki's have a nasty tendency to aggregate random other features.
+ wiki's have a nasty tendency to aggregate random other features in a
+ haphazard way.
 
- wicked will attempt to reduce 'wiki' to a feature of content rather
- by stripping away everything except for providing a framework for
- creating, tracking, and managing wiki links within a CMF site.
- wicked will yield all other feature unto the CMS
+ wicked reduces 'wiki' to a feature of content by stripping away
+ everything except for for creating, tracking, and managing wiki links
+ within a CMF site.  wicked will yield all other feature unto the CMS
 
 
 Goals::
@@ -50,7 +51,7 @@ Credits
 
  Concepts: Alexander Limi
            Benjamin Saller
+	   Alberto Berti
 
 
-wicked uses ObjectRealms' Bricolite product as a model and borrows heavily
-from it.
+wicked grew out of ObjectRealms' Bricolite product.

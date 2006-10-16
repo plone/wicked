@@ -1,14 +1,15 @@
 Details::
 ---------
 
- wicked depends on the 'filter' product (see REQUIREMENTS.txt).  The
- filter product allows developers to specify 'filters' for AT schema
- fields; these will be applied to those fields when the accessor is
- called.  In wicked's case, the text of a field is parsed for wicked
- links, and any that are found are either resolved or turned into a
- new "add" link.  For now, a field must inherit from the FilterField
- class for filtering to work, but we hope to be able to allow filters
- to be applied without the use of this mix-in in the future.
+ wicked depends on the 'txtfilter' product (see REQUIREMENTS.txt).
+ The filter product allows developers to specify 'filters' for AT
+ schema fields; these will be applied to those fields when the
+ accessor is called.  In wicked's case, the text of a field is parsed
+ for wicked links, and any that are found are either resolved or
+ turned into a new "add" link.  For now, a field must inherit from the
+ FilterField class for filtering to work, but we hope to be able to
+ allow filters to be applied without the use of this mix-in in the
+ future.
 
  wicked ships w/ two example content types.  The first of these is
  IronicWiki, so called because it ironically mimics older-style wiki
