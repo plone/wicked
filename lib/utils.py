@@ -132,9 +132,9 @@ def getMatch(chunk, brains, normalled=None):
     if not normalled_chunk:
         normalled_chunk = normalize(chunk)
     normalled_chunk = intern(normalled_chunk)
-    if not isinstance(brains, list):
+    if not isinstance(brains, list) or not isinstance(brains, tuple):
         # make a copy to AdvancedQuery sequencing issues
-        brains = [x for x in brains]
+        brains = list(brains)
 
     # inspect single return case
 
