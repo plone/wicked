@@ -7,7 +7,6 @@ if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
 
 from Testing import ZopeTestCase
-from Products.CMFPlone.Portal import PloneGenerator
 from wickedtestcase import WickedTestCase, makeContent, TITLE2
 from Products.wicked.lib.normalize import titleToNormalizedId
 from Products.wicked.config import BACKLINK_RELATIONSHIP
