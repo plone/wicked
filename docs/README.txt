@@ -47,7 +47,7 @@ Credits
 
  Authors:  Whit Morriss
            Rob Miller
-	   Anders Pearson 
+	   Anders Pearson  
 
  Concepts: Alexander Limi
            Benjamin Saller
