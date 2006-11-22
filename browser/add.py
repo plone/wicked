@@ -42,10 +42,12 @@ class WickedAdd(BrowserView):
         assert title, 'Must have a title to create content' 
         newcontentid = normalize(title)
         
-        # XXX this is ambiguous as to where content will end up depending
-        #     on whether 'context' is folderish
-        self.context.invokeFactory(type_name, id=newcontentid,
-                                   title=title)
+        # put the new object at the same level as the context
+        # XXX the property trick for context doesn't work, we still
+        #     get the object wrapped in the view
+        parent = self._context[0].aq_parent
+        parent.invokeFactory(type_name, id=newcontentid,
+                             title=title)
 
         # XXX move marker to own package, add notifier
         # make this handled by an event
