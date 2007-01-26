@@ -1,0 +1,54 @@
+========================
+ Wicked Browser Service
+========================
+
+*with a smile*
+
+This set of views based around a single class handle the thing that
+makes wicked tick: adding content.
+
+Let's set up a fixture::
+
+    >>> from zope.interface import alsoProvides as mark
+    >>> from wicked.interfaces import IAmWicked
+    >>> from Products.Five.tests.testing import manage_addFiveTraversableFolder
+    >>> from zope.annotation.interfaces import IAttributeAnnotatable 
+    >>> from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+
+This is a test to check the basic setup(addmenu is TBA ;) )::
+
+    >>> manage_addFiveTraversableFolder(self.folder, 'testfo', title='T Fo!')
+    >>> testfo = self.folder.testfo
+    >>> mark(testfo, IAmWicked)
+    >>> mark(testfo, IAttributeAnnotatable)
+    >>> view=testfo.restrictedTraverse('@@wickedaddmenu')
+    >>> view()
+    1
+
+Now let's test the adding feature. This is roughly the same as the
+pythonscript, but now the creation of a wiki page will set an entry
+in the cache of the original document::
+
+    >>> testfo.portal_type = 'Document'
+    >>> testfo.isReferenceable=True
+    >>> mark(self.folder, IAmWicked)
+    >>> mark(self.folder, IAttributeAnnotatable)
+    >>> title = 'Test Doc'
+    >>> self.folder.REQUEST.set('Title', title)
+    >>> self.folder.REQUEST.set('portal_type', 'Document')
+    >>> self.folder.REQUEST.set('section', 'text')
+    >>> view=testfo.restrictedTraverse('@@wickedadd')
+    >>> retadd = view()
+
+@@ check response for redirect?
+
+This is not working properly in the test, but works in the browser::
+
+    >>> from urllib import quote
+    >>> print http(r'''
+    ... GET /plone/Members/test_user_1_/@@wickedadd?Title=%s HTTP/1.1
+    ... ''' %quote(title))
+    HTTP/1.1 302 Moved Temporarily...
+
+    
+
