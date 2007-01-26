@@ -1,0 +1,47 @@
+================
+ Link Rendering
+================
+
+`test link rendering as a multiadapter`
+
+wicked uses browser:page to take care of setting up the multiadapter +
+template binding.  Lazy? yes. Future safe? probably better than hand
+rolling.
+
+    >>> from zope.component import getMultiAdapter
+    >>> from wicked.interfaces import IAmWicked
+    >>> try:
+    ...     from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+    ... except:
+    ...     from zope.publisher.interfaces.browser import IBrowserRequest as IDefaultBrowserLayer
+    >>> from zope.interface import alsoProvides as mark
+    >>> from Products.Five.tests.testing import manage_addFiveTraversableFolder
+    >>> from wicked.testing.general import dummy
+    >>> request = dummy(dict(physicalPathToURL=lambda x, y, z: 'http://url'),
+    ...                 iface=IDefaultBrowserLayer, name='request')
+    >>> manage_addFiveTraversableFolder(self.folder, 'testfo', title='folder')
+    >>> context = self.folder.testfo
+    >>> mark(context, IAmWicked)
+    >>> from zope.interface import Interface
+    >>> renderer = getMultiAdapter((context, request), Interface, 'link_renderer')
+    >>> renderer = self.folder.testfo.restrictedTraverse('@@link_renderer')
+    >>> link=dict(path='/apath',
+    ...           icon='anicon.ico',
+    ...           uid='uid')
+    >>> renderer.load([link], 'Chunk')
+    >>> renderer.section='fieldname'
+    >>> from wicked.testing.xml import xstrip
+    >>> print  xstrip(renderer())
+    <span class="wicked_resolved" id="fieldname-uid"><a href="http://nohost/apath"><img src="anicon.ico"><span class="chunk">Chunk</span></a></span>
+    ...
+
+    >>> renderer.load([], 'Chunk 2')
+    >>> print xstrip(renderer())
+    <span class="wicked_unresolved" id="fieldname-1"><span class="chunk">Chunk 2</span><a class="wickedadd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk%202&amp;section=fieldname">+</a></span>...
+
+Test counter::
+
+    >>> renderer.load([], 'Chunk 3')
+    >>> print xstrip(renderer())
+    <span class="wicked_unresolved" id="fieldname-2"><span class="chunk">Chunk 3</span><a class="wickedadd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk%203&amp;section=fieldname">+</a></span>...
+

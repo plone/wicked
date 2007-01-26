@@ -1,0 +1,9 @@
+Changelog for wicked
+
+    (name of developer listed in brackets)
+
+wicked - 1.0.1 Unreleased
+
+    - Initial package structure.
+      [zopeskel]
+
