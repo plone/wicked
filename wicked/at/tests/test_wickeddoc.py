@@ -20,7 +20,7 @@ class TestWickedDoc(WickedTestCase):
     wicked_field = 'text'
 
     def test_filterApplied(self):
-        wd1 = makeContent(self.folder, 'wd1', 'WickedDoc',
+        wd1 = makeContent(self.folder, 'wd1', self.wicked_type,
                               title='WD1 Title')
         wd1.setText("((%s)) ((%s))" % (self.page1.Title(),
                                        "Nonexistent Title"))

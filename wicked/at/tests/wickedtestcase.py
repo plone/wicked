@@ -4,14 +4,14 @@ from Testing import ZopeTestCase
 from Testing.ZopeTestCase import PortalTestCase
 from Products.CMFCore.utils  import getToolByName
 from Products.PloneTestCase import ptc
-from Products.PloneTestCase.layer import PloneSite 
+from Products.PloneTestCase.layer import PloneSite, ZCML
 from wicked.atcontent.Extensions.Install import install as installWicked
 import wicked.at.config as config
 from wicked.testing.xml import xstrip as strip
 from wicked.normalize import titleToNormalizedId
 from wicked.registration import BasePloneWickedRegistration 
 from zope.interface import Interface
-
+from zope.testing.cleanup import cleanUp
 
 ptc.setupPloneSite(products=['wicked.atcontent'])
 
@@ -21,9 +21,16 @@ TITLE2 = 'DMV Computer has died'
 USELXML = False
 
 import transaction as txn
-#from collective.testing.debug import autopsy
+from Products.Five.fiveconfigure import _registerPackage
 
-class WickedSite(PloneSite):
+class RegisterATContent:
+    @classmethod
+    def setUp(cls):
+        import wicked.atcontent
+        from wicked.atcontent.zope2 import initialize
+        _registerPackage(wicked.atcontent, initialize)
+
+class WickedSite(RegisterATContent, PloneSite):
 
     @classmethod
     def setUp(cls):
@@ -43,11 +50,16 @@ class WickedSite(PloneSite):
         txn.commit()
         ZopeTestCase.close(app)
 
+## class WickedATSite(RegisterATContent, WickedSite):
+##     """get that reg in"""
+
+WickedATSite = WickedSite
+
 # This is the test case. You will have to add test_<methods> to your
 # class in order to assert things about your Product.
 class WickedTestCase(ptc.PloneTestCase):
 
-    layer = WickedSite
+    layer = WickedATSite
     setter = 'setBody'
 
     def set_text(self, content, text, **kw):

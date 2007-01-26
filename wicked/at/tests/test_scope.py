@@ -8,7 +8,7 @@ from Testing import ZopeTestCase
 from wicked.normalize import titleToNormalizedId
 from wicked.config import BACKLINK_RELATIONSHIP
 from wicked.atcontent.ironicwiki import IronicWiki
-from wickedtestcase import WickedTestCase, makeContent, WickedSite
+from wickedtestcase import WickedTestCase, makeContent, WickedATSite
 
 from zope.component import adapter, provideAdapter
 from zope.interface import implementer, Interface
@@ -34,7 +34,7 @@ def scopeTester(field, context):
     return path
 
 
-class Scoped(WickedSite):
+class Scoped(WickedATSite):
     
     @classmethod
     def setUp(cls):
