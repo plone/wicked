@@ -16,10 +16,12 @@ from zope.app.schema.vocabulary import IVocabularyFactory
 from zope.component import getSiteManager
 from zope.interface import implements
 from zope.schema.vocabulary import SimpleVocabulary
-import pkg_resources
 
-get_points = pkg_resources.iter_entry_points
-
+try:
+    import pkg_resources
+    get_points = pkg_resources.iter_entry_points
+except ImportError:
+    get_points = []
 
 class BaseWickedRegistration(object):
     """abstract base: add a docstring to display a description on the
