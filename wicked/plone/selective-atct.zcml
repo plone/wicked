@@ -86,5 +86,8 @@
 	   wicked.fieldevent.interfaces.IFieldStorageEvent"
       />
 
+   <!-- subscriber 
+      factory="wicked.txtfilter.backlink_handler"
+      provides="wicked.fieldevent.IFieldValueSetter" /-->
 
 </configure>

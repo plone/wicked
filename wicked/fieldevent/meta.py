@@ -7,7 +7,6 @@ from wicked.fieldevent.interfaces import IFieldValue
 from wicked.fieldevent.interfaces import IFieldValueSetter
 import itertools
 import zope.component.zcml
-import zope.app.security.fields
 import zope.configuration.fields as fields
 import zope.interface
 import zope.schema
