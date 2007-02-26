@@ -14,4 +14,9 @@
 
   <five:implements class="Products.Archetypes.Referenceable.Referenceable"
 		   interface="wicked.interfaces.IAmWicked" />
+
+  <subscriber 
+     factory="wicked.txtfilter.backlink_handler"
+     provides="wicked.fieldevent.IFieldValueSetter" />
+
 </configure>
