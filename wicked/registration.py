@@ -2,9 +2,10 @@ from wicked.at.seeker import IWickedQuery, AdvQueryMatchingSeeker
 from wicked.cache import ICacheManager, ContentCacheManager
 from wicked.txtfilter import WickedFilter, IWickedFilter
 from wicked.txtfilter import IAmWickedField, IFieldEvent
-from wicked.txtfilter import BrackettedWickedFilter
+from wicked.txtfilter import BrackettedWickedFilter, BacklinkRegistrationProxy
 from wicked import utils
 from wicked.fieldevent.interfaces import IFieldRenderEvent, IFieldStorageEvent
+from wicked.fieldevent.interfaces import IFieldValueSetter
 from wicked.interfaces import IAmWicked
 from wicked.interfaces import IAmWickedField
 from wicked.interfaces import IWickedFilter
@@ -21,7 +22,8 @@ try:
     import pkg_resources
     get_points = pkg_resources.iter_entry_points
 except ImportError:
-    get_points = []
+    get_points = lambda :[]
+
 
 class BaseWickedRegistration(object):
     """abstract base: add a docstring to display a description on the
@@ -52,18 +54,16 @@ class BaseWickedRegistration(object):
         # @@ add logging
         handle_adapter_reg = self.sm.registerAdapter
         handle_subscriber_reg = self.sm.registerHandler
+        handle_sub_adapter_reg = self.sm.registerSubscriptionAdapter
         if unregister:
             handle_adapter_reg = self.sm.unregisterAdapter
             handle_subscriber_reg = self.sm.unregisterHandler
+            handle_sub_adapter_reg = self.sm.unregisterSubscriptionAdapter
         
         self.handle_txtfilter(handle_adapter_reg)
         handle_subscriber_reg(self.subscriber[0], required=self.required)
-        return (handle_adapter_reg, handle_subscriber_reg)
-    
-    def unregister(self):
-        # @@ add logging
-        self.handle_txtfilter(unregister=True)
-        self.sm.unregisterHandler(self.subscriber[0], required=self.required)
+        handle_sub_adapter_reg(self.backlink_handler)
+        return (handle_adapter_reg, handle_subscriber_reg, handle_sub_adapter_reg)
 
     def handle_txtfilter(self, handle, event=None, txtfilter=None, unregister=False):
         """helper for common reg of txtfilter"""
@@ -83,6 +83,8 @@ class BaseWickedRegistration(object):
 class BasePloneWickedRegistration(BaseWickedRegistration):
     """Basic wicked behavior for Plone. Registers a fieldevent
     subscriber and the wicked filter."""
+    backlink_handler = BacklinkRegistrationProxy
+
 
 class BasePloneMediaWickedRegistration(BasePloneWickedRegistration):
     """Same as basic but with square bracket style linking"""
@@ -99,15 +101,17 @@ class SelectiveRegistration(BaseWickedRegistration):
     seeker = AdvQueryMatchingSeeker
     seeker_provides = IWickedQuery
     other_events = (IWickedEvent, IFieldStorageEvent)
+    backlink_handler = BacklinkRegistrationProxy
 
     @property
     def cache_required(self):
         return (self.txtfilter_provides, self.content)
     
     def handle(self, unregister=False):
-        handle_adapter_reg, handle_subscriber_reg = super(SelectiveRegistration, self).handle(unregister=unregister)
+        handle_adapter_reg, handle_subscriber_reg, handle_sub_adapter_reg = super(SelectiveRegistration, self).handle(unregister=unregister)
         self.handle_cache(handle_adapter_reg)
         self.handle_seeker(handle_adapter_reg)
+        
         for event in self.other_events:
             self.handle_txtfilter(handle_adapter_reg, event=event)
         return (handle_adapter_reg, handle_subscriber_reg)
