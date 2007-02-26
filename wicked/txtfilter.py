@@ -186,6 +186,13 @@ def backlink_handler(field, event):
     wicked.manageLinks(new_links)
 
 
+class BacklinkRegistrationProxy(object):
+    """cuz you can't pickle functions with decorators"""
+    implements(IFieldValueSetter)
+    adapts(IAmWickedField, IFieldStorageEvent)
+    
+    __init__ = staticmethod(backlink_handler)
+
 ## toy example code ##
     
 @adapter(IAmWickedField, IAmWicked, IFieldRenderEvent)
