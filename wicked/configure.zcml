@@ -40,8 +40,8 @@
       />
 
    <!-- handles backlinking  -->
-   <subscriber 
+   <!-- subscriber 
       factory="wicked.txtfilter.backlink_handler"
-      provides="wicked.fieldevent.IFieldValueSetter" />
+      provides="wicked.fieldevent.IFieldValueSetter" / -->
 
 </configure>
