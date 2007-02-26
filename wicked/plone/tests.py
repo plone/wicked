@@ -4,7 +4,7 @@ import unittest
 from Products.PloneTestCase import ptc, five
 from Products.PloneTestCase.layer import ZCML, PloneSite
 from wicked.at.tests import wickedtestcase as wtc
-from wicked.at.tests import test_cache, test_linking, test_rendering, test_scope, test_wickeddoc
+from wicked.at.tests import test_cache, test_linking
 from wicked.at.tests.wickedtestcase import WickedSite
 from wicked.fieldevent import meta 
 from Products.Five import zcml
@@ -18,25 +18,12 @@ test_klasses = (test_cache.TestLinkCache,
                 test_linking.TestDocCreation,
                 test_linking.TestWikiLinking,
                 test_linking.TestLinkNormalization,
-                test_linking.TestRemoteLinking,
-                #test_rendering.TestWickedRendering, # this one is useless
-                #test_scope.TestWickedScope, # this one is special
-                test_wickeddoc.TestWickedDoc)
+                test_linking.TestRemoteLinking)
 
 ptc.setupPloneSite()
 
 # this manhandles the zcml a bit
     
-class AllAT(wtc.WickedSite):
-    
-    @classmethod
-    def setUp(cls):
-        #zcml.load_config('all-at.zcml', package=here)
-        print "< ------------ skip ------------- >"
-
-    @classmethod
-    def tearDown(cls):
-        raise NotImplementedError
 
 from registration import basic_type_regs
 
@@ -86,12 +73,7 @@ def make_wicked_suite(klasses, layer, content_type="Document", field="text"):
         
 def test_suite():
     # this is overkill but proves the configs work
-    suites = [make_wicked_suite(test_klasses, layer) \
-              for layer in (#AllAT,
-                            SelectiveATCT,
-                            #DocumentOnly
-                            )]
-    
+    suites = make_wicked_suite(test_klasses, SelectiveATCT) 
     return unittest.TestSuite(suites)
     
     
