@@ -2,31 +2,30 @@
   <span tal:condition="view/howmany" tal:omit-tag="">
     <span tal:condition="not:view/multiple" tal:omit-tag=''> 
       <span tal:define="link view/singlelink" tal:omit-tag=''>
-	<span class="wickedResolved"
-	      tal:attributes="id string:${view/section}-${link/uid}">
-	  <a tal:attributes="href link/url">
+        <span class="wickedResolved"
+              tal:attributes="id string:${view/section}-${link/uid}">
+          <a tal:attributes="href link/url">
             <img tal:condition="link/icon"
                  tal:attributes="src link/icon" />
-	    <span class="chunk" tal:content="view/chunk" />
-	  </a>
-	</span>
+              <span class="chunk" tal:content="view/chunk" /></a>
+        </span>
       </span>
     </span>
     <span tal:condition="view/multiple" tal:omit-tag="">  
       <span tal:define="link view/singlelink" tal:omit-tag=""> 
-	<span metal:use-macro="here/wicked_link/macros/linkmenu"> 
-	  the first link
-	</span>
+        <span metal:use-macro="here/wicked_link/macros/linkmenu"> 
+        The first link
+        </span>
       </span>
     </span>
   </span>
   <span tal:condition="not: view/howmany" tal:omit-tag=''>
     <span tal:attributes="id string:${view/section}-${view/count}" 
-	  class="wickedUnresolved">
+          class="wickedUnresolved">
       <span class="chunk" tal:content="view/chunk" >A CHUNK</span>
       <a class="wickedAdd"
-	 tal:attributes="href string:$here_url/@@wickedadd?Title=${view/chunk}&section=${view/section}"
-	 tal:define="here_url here/absolute_url">+</a>
+         tal:attributes="href string:$here_url/@@wickedadd?Title=${view/chunk}&section=${view/section}"
+         tal:define="here_url here/absolute_url">+</a>
     </span>
   </span>
 </tal:wicked_link>
