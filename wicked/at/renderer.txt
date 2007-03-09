@@ -32,16 +32,16 @@ rolling.
     >>> renderer.section='fieldname'
     >>> from wicked.testing.xml import xstrip
     >>> print  xstrip(renderer())
-    <span class="wicked_resolved" id="fieldname-uid"><a href="http://nohost/apath"><img src="anicon.ico"><span class="chunk">Chunk</span></a></span>
+    <span class="wickedResolved" id="fieldname-uid"><a href="http://nohost/apath"><img src="anicon.ico"><span class="chunk">Chunk</span></a></span>
     ...
 
     >>> renderer.load([], 'Chunk 2')
     >>> print xstrip(renderer())
-    <span class="wicked_unresolved" id="fieldname-1"><span class="chunk">Chunk 2</span><a class="wickedadd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk%202&amp;section=fieldname">+</a></span>...
+    <span class="wickedUnresolved" id="fieldname-1"><span class="chunk">Chunk 2</span><a class="wickedAdd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk%202&amp;section=fieldname">+</a></span>...
 
 Test counter::
 
     >>> renderer.load([], 'Chunk 3')
     >>> print xstrip(renderer())
-    <span class="wicked_unresolved" id="fieldname-2"><span class="chunk">Chunk 3</span><a class="wickedadd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk%203&amp;section=fieldname">+</a></span>...
+    <span class="wickedUnresolved" id="fieldname-2"><span class="chunk">Chunk 3</span><a class="wickedAdd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk%203&amp;section=fieldname">+</a></span>...
 
