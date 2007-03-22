@@ -1,7 +1,7 @@
 import os
 from cStringIO import StringIO
 from Testing import ZopeTestCase
-from Testing.ZopeTestCase import PortalTestCase
+from Testing.ZopeTestCase import PortalTestCase, installProduct
 from Products.CMFCore.utils  import getToolByName
 from Products.PloneTestCase import ptc
 from Products.PloneTestCase.layer import PloneSite 
@@ -11,6 +11,7 @@ from wicked.testing.xml import xstrip as strip
 from wicked.normalize import titleToNormalizedId
 from wicked.registration import BasePloneWickedRegistration 
 from zope.interface import Interface
+from Products.Five import zcml
 
 
 ptc.setupPloneSite(products=['wicked.atcontent'])
@@ -30,6 +31,8 @@ class WickedSite(PloneSite):
         app = ZopeTestCase.app()
         plone = app.plone
         reg = BasePloneWickedRegistration(plone)
+        import wicked.atcontent
+        zcml.load_config("configure.zcml", package=wicked.atcontent)
         reg.handle()
         txn.commit()
         ZopeTestCase.close(app)
@@ -56,12 +59,10 @@ class WickedTestCase(ptc.PloneTestCase):
     
     def afterSetUp(self):
         # add some pages
-        self.page1 = makeContent(self.folder,
-                                 titleToNormalizedId(TITLE1),
-                                 self.wicked_type, title=TITLE1)
-        self.page2 = makeContent(self.folder,
-                                 titleToNormalizedId(TITLE2),
-                                 self.wicked_type, title=TITLE2)
+        id1 = titleToNormalizedId(TITLE1)
+        id2 = titleToNormalizedId(TITLE2)
+        self.page1 = makeContent(self.folder,id1,self.wicked_type,title=TITLE1)
+        self.page2 = makeContent(self.folder,id2,self.wicked_type, title=TITLE2)
 
     strip = staticmethod(strip)
  
