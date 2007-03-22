@@ -18,6 +18,7 @@ from wicked import utils
 from wicked.fieldevent.interfaces import EndFiltrationException
 from wicked.fieldevent.interfaces import ITxtFilterList, IFieldRenderEvent
 from wicked.fieldevent.interfaces import IFieldValueSetter, IFieldStorageEvent
+from wicked.fieldevent.interfaces import IFieldEvent
 from zope.component.interfaces import ComponentLookupError
 from wicked.fieldevent.txtfilter import TxtFilter
 from zope.component import getMultiAdapter, adapts, adapter
@@ -37,6 +38,7 @@ class WickedFilter(TxtFilter):
 
     pattern = pattern
     query_iface = IWickedQuery
+    _encoding = 'UTF8'
 
     def __init__(self, field, instance, event):
         super(WickedFilter, self).__init__(field, instance, event)
@@ -57,12 +59,21 @@ class WickedFilter(TxtFilter):
     @utils.memoize
     def normalize(self, value):
         return self._normalize(value)
+
+    @utils.memoizedproperty
+    def encoding(self):
+        """AT hack"""
+        try:
+            encoding = self.context.getCharset()
+        except AttributeError:
+            encoding = self._encoding
+        return encoding
     
     def _filterCore(self, chunk, **kwargs):
         normalled = self.normalize(chunk)
         links=self.getLinks(chunk, normalled)
         self.renderer.load(links, chunk)
-        return self.renderer()
+        return self.renderer().encode(self.encoding)
 
     @property
     def filtered_text(self):
@@ -105,7 +116,7 @@ class WickedFilter(TxtFilter):
     
     @utils.memoizedproperty
     def renderer(self):
-        # @@ better way to get request?
+        # @@ better way to get request? maybe a txtfilter should be a view?
         renderer = getMultiAdapter((self.context, self.context.REQUEST), Interface, 'link_renderer')
         renderer.section = self.section
         # hook for zope2 aq wrapper
@@ -144,8 +155,8 @@ def wicked_listener(field, instance, event):
     not using txtfilters"""
     
     if event.kwargs.get('raw', False):
-        return # no processing (probably should be caught even earlier)
-    
+        return 
+
     wicked = getMultiAdapter((field, instance, event), IWickedFilter)
     try:
         wicked()
