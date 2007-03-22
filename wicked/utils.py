@@ -145,7 +145,6 @@ def getMatch(chunk, brains, normalled=None):
     normalled_chunk = normalled
     if not normalled_chunk:
         normalled_chunk = normalize(chunk)
-    normalled_chunk = intern(normalled_chunk)
     if not isinstance(brains, list):
         # make a copy to AdvancedQuery sequencing issues
         brains = [x for x in brains]
@@ -153,9 +152,9 @@ def getMatch(chunk, brains, normalled=None):
     # inspect single return case
 
     if len(brains) == 1 and \
-           (intern(brains[0].getId) is normalled_chunk \
-            or intern(brains[0].getId.strip()) is intern(chunk.strip()) \
-            or intern(normalize(brains[0].Title)) is normalled_chunk):
+           (brains[0].getId == normalled_chunk \
+            or brains[0].getId.strip() == chunk.strip() \
+            or normalize(brains[0].Title) == normalled_chunk):
         return brains[0]
 
     # first, match id
@@ -172,44 +171,10 @@ def getMatch(chunk, brains, normalled=None):
 
     # second, match Title
     brains=[brain for brain in brains \
-            if intern(normalize(brain.Title)) is normalled_chunk]
+            if normalize(brain.Title) == normalled_chunk]
     
     return brains and brains[0] or None
 
-def configure(self, **attrs):
-    """
-    For runtime configuration of filter.
-    
-    @param attrs: dict of 0-N key value pairs that
-    will be set on the filter for the duration of
-    its existence
-    >>> from testing.general import portal_url, dummy, pdo
-    >>> troll = dummy(dict(_configure_exclude=dict(fo=True)))
-    >>> configure(troll, **dict(fi='fie', fo='fum'))
-    {'fo': 'fum'}
-    
-    >>> getattr(troll, 'fi', 'No fie?!!')
-    'fie'
-    
-    When no term are exclude, configure should
-    set and remove all kwargs passed in
-    
-    >>> configure(troll, **dict(englishman='yum'))
-    {}
-    
-    >>> getattr(troll, 'englishman')
-    'yum'
-    
-    Make sure a dict gets returned even if
-    kwargs are empty
-    
-    >>> configure(troll, **dict())
-    {}
-    """
-    [(setattr(self, key, attrs[key]), attrs.__delitem__(key)) \
-     for key in attrs.keys() \
-     if not self._configure_exclude.has_key(key)]
-    return attrs and attrs
 
 
 def counter():
