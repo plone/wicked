@@ -31,7 +31,7 @@ class Filter(object):
 
 portal_tools = dict()
 def getToolByName(context, toolname, default):
-    return portal_tool.get(toolname, default)
+    return portal_tools.get(toolname, default)
 
 def backlinkTools():
     import Products.CMFCore.utils

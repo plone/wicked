@@ -40,7 +40,7 @@ def at_handle_target_moved(obj, event):
     path = '/'.join(obj.getPhysicalPath())
     for target in refs:
         for field in ISchema(target).fields():
-            wicked = utils.getWicked(field, ref)
+            wicked = utils.getWicked(field, target)
             uid = IUID(obj)
             data = dict(path=path,
                         icon=obj.getIcon(),

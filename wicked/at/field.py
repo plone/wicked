@@ -49,6 +49,7 @@ def baseunit_to_string(value, field):
 @adapter(FileUpload, IAmWickedField)
 def fileupload_to_string(value, field):
     """a file was uploaded, get the (possibly transformed) value"""
+    # XXX no `instance` defined
     return field.get(instance, skip_filters=True)
 
 

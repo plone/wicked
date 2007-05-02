@@ -175,6 +175,7 @@ class UtilityCacheManager(BaseCacheManager):
 
     @memoizedproperty
     def cache_store(self):
+        # XXX There is no IWickedCacheStore
         return getUtility(IWickedCacheStore)
 
     def name(): 

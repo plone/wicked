@@ -7,7 +7,7 @@ from wicked.fieldevent.interfaces import IFieldValue
 from wicked.fieldevent.interfaces import IFieldValueSetter
 import itertools
 import zope.component.zcml
-import zope.configuration.fields as fields
+from zope.configuration import fields
 import zope.interface
 import zope.schema
 import wicked.fieldevent
@@ -26,8 +26,8 @@ class NewLineTokens(fields.Tokens):
             for s in u.split('\\n'):
                 try:
                     v = vt.fromUnicode(s)
-                except schema.ValidationError, v:
-                    raise InvalidToken("%s in %s" % (v, u))
+                except zope.schema.ValidationError, v:
+                    raise fields.InvalidToken("%s in %s" % (v, u))
                 else:
                     values.append(v)
         else:

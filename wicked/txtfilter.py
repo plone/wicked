@@ -122,7 +122,7 @@ class WickedFilter(TxtFilter):
         # hook for zope2 aq wrapper
         if hasattr(renderer, '__of__'):
             return renderer.__of__(self.context)
-        return render
+        return renderer
 
     def __call__(self):
         if self.event.kwargs.get('raw', False):

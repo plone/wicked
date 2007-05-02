@@ -224,7 +224,3 @@ def test_suite():
     optionflags = doctest.REPORT_ONLY_FIRST_FAILURE | doctest.ELLIPSIS
     return doctest.DocTestSuite('wicked.utils',
                                 optionflags=optionflags)
-
-if __name__=="__main__":
-    unittest.TextTestRunner().run(test_suite())
-

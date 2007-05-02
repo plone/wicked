@@ -87,8 +87,3 @@ def test_suite():
                                  package='wicked',
                                  optionflags=doctest.REPORT_ONLY_FIRST_FAILURE | doctest.ELLIPSIS)
     return suite
-
-
-
-if __name__=="__main__":
-    unittest.TextTestRunner().run(test_suite())
