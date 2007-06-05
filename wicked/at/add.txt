@@ -17,10 +17,8 @@ Let's set up a fixture::
 
 This is a test to check the basic setup(addmenu is TBA ;) )::
 
-    >>> manage_addFiveTraversableFolder(self.folder, 'testfo', title='T Fo!')
+    >>> id = self.folder.invokeFactory('Folder', 'testfo')
     >>> testfo = self.folder.testfo
-    >>> mark(testfo, IAmWicked)
-    >>> mark(testfo, IAttributeAnnotatable)
     >>> view=testfo.restrictedTraverse('@@wickedaddmenu')
     >>> view()
     1
@@ -29,26 +27,32 @@ Now let's test the adding feature. This is roughly the same as the
 pythonscript, but now the creation of a wiki page will set an entry
 in the cache of the original document::
 
-    >>> testfo.portal_type = 'Document'
-    >>> testfo.isReferenceable=True
-    >>> mark(self.folder, IAmWicked)
-    >>> mark(self.folder, IAttributeAnnotatable)
-    >>> title = 'Test Doc'
-    >>> self.folder.REQUEST.set('Title', title)
-    >>> self.folder.REQUEST.set('portal_type', 'Document')
+    >>> id = testfo.invokeFactory('Document', id='first-doc', title='First doc')
+    >>> self.folder.REQUEST.set('Title', 'Second doc')
     >>> self.folder.REQUEST.set('section', 'text')
-    >>> view=testfo.restrictedTraverse('@@wickedadd')
+    >>> view=testfo['first-doc'].restrictedTraverse('@@wickedadd')
+    >>> 'second-doc' in self.folder.contentIds()
+    False
     >>> retadd = view()
+    >>> 'second-doc' in testfo.contentIds()
+    True
+    >>> testfo['second-doc'].portal_type
+    'Document'
+    >>> testfo.REQUEST.RESPONSE.headers['status']
+    '302 Moved Temporarily'
 
-@@ check response for redirect?
+Let's try this through the publisher:
 
-This is not working properly in the test, but works in the browser::
+    >>> from Testing.ZopeTestCase import user_name
+    >>> from Testing.ZopeTestCase import user_password
 
-    >>> from urllib import quote
     >>> print http(r'''
-    ... GET /plone/Members/test_user_1_/@@wickedadd?Title=%s HTTP/1.1
-    ... ''' %quote(title))
+    ... GET /plone/Members/test_user_1_/testfo/first-doc/@@wickedadd?Title=%s&section=text HTTP/1.1
+    ... Authorization: Basic %s:%s
+    ... ''' % ('Spam', user_name, user_password))
     HTTP/1.1 302 Moved Temporarily...
 
-    
-
+    >>> 'spam' in testfo.contentIds()
+    True
+    >>> testfo['spam'].portal_type
+    'Document'

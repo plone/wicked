@@ -62,23 +62,28 @@ class BasicFiveLink(BasicLink, BrowserView):
     __init__=BasicLink.__init__
 
 
+
+
+
+
 def test_suite():
     import unittest
     from zope.testing import doctest
-    optionflags = doctest.REPORT_ONLY_FIRST_FAILURE | doctest.ELLIPSIS
+    optionflags = doctest.ELLIPSIS
     from Products.PloneTestCase.layer import PloneSite, ZCMLLayer
+    from wicked.plone.tests import ZCMLLayer as PloneWickedZCMLLayer
     from Testing.ZopeTestCase import ZopeDocFileSuite, FunctionalDocFileSuite
     from Products.PloneTestCase import ptc
     ptc.setupPloneSite()
     renderer = ZopeDocFileSuite('renderer.txt',
                                 package='wicked.at',
                                 optionflags=optionflags)
-    setattr(renderer, 'layer', ZCMLLayer)
+    renderer.layer = ZCMLLayer
     add = FunctionalDocFileSuite('add.txt',
                            package='wicked.at',
-                           test_class=ptc.FunctionalTestCase,                                   
+                           test_class=ptc.FunctionalTestCase,
                            optionflags=optionflags)
-                 
+    add.layer = PloneWickedZCMLLayer
     return unittest.TestSuite((add, renderer))
 
 

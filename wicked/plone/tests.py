@@ -1,13 +1,14 @@
 # we want to test each configuration to make sure what we think is
 # happening does.
 import unittest
+from Products.Five import zcml
+from Products.Five import fiveconfigure
 from Products.PloneTestCase import ptc, five
 from Products.PloneTestCase.layer import ZCML, PloneSite
 from wicked.at.tests import wickedtestcase as wtc
 from wicked.at.tests import test_cache, test_linking
 from wicked.at.tests.wickedtestcase import WickedSite
 from wicked.fieldevent import meta 
-from Products.Five import zcml
 import wicked.plone as here
 from Products.PloneTestCase.layer import PloneSite 
 
@@ -27,6 +28,12 @@ ptc.setupPloneSite()
 
 from registration import basic_type_regs
 
+class ZCMLLayer(PloneSite):
+    @classmethod
+    def setUp(cls):
+        fiveconfigure.debug_mode = True
+        zcml.load_config('all-at.zcml', here)
+        fiveconfigure.debug_mode = False
 
 class SelectiveATCT(PloneSite):
 
