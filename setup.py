@@ -24,7 +24,9 @@ setup(name='wicked',
       namespace_packages=['wicked'],
       include_package_data=True,
       zip_safe=False,
-      install_requires=[],
+      install_requires=[
+          'setuptools',
+      ],
       entry_points="""
       # -*- Entry points: -*-
       [wicked.base_registration]
