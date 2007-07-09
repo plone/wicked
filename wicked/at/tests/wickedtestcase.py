@@ -12,7 +12,8 @@ from wicked.normalize import titleToNormalizedId
 from wicked.registration import BasePloneWickedRegistration 
 from zope.interface import Interface
 from Products.Five import zcml
-
+from App.Product import initializeProduct
+from App.ProductContext import ProductContext
 
 ptc.setupPloneSite(products=['wicked.atcontent'])
 
@@ -24,6 +25,19 @@ USELXML = False
 import transaction as txn
 #from collective.testing.debug import autopsy
 
+def init_product(module_, app, init_func=None):
+    product = initializeProduct(module_,
+                                module_.__name__,
+                                module_.__path__[0],
+                                app)
+    
+    product.package_name = module_.__name__
+    
+    if init_func is not None:
+        newContext = ProductContext(product, app, module_)
+        init_func(newContext)
+
+
 class WickedSite(PloneSite):
 
     @classmethod
@@ -32,6 +46,8 @@ class WickedSite(PloneSite):
         plone = app.plone
         reg = BasePloneWickedRegistration(plone)
         import wicked.atcontent
+        from wicked.atcontent.zope2 import initialize
+        init_product(wicked.atcontent, app, initialize)
         zcml.load_config("configure.zcml", package=wicked.atcontent)
         reg.handle()
         txn.commit()
@@ -58,10 +74,15 @@ class WickedTestCase(ptc.PloneTestCase):
         setter(text, **kw)
     
     def afterSetUp(self):
+        #self.loginAsPortalOwner()
         # add some pages
         id1 = titleToNormalizedId(TITLE1)
         id2 = titleToNormalizedId(TITLE2)
-        self.page1 = makeContent(self.folder,id1,self.wicked_type,title=TITLE1)
+        try:
+            self.page1 = makeContent(self.folder,id1,self.wicked_type,title=TITLE1)
+        except :
+            import sys, pdb
+            pdb.post_mortem(sys.exc_info()[2])
         self.page2 = makeContent(self.folder,id2,self.wicked_type, title=TITLE2)
 
     strip = staticmethod(strip)
