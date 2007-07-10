@@ -1,28 +1,21 @@
+from wicked import utils
 from wicked.at.seeker import IWickedQuery, AdvQueryMatchingSeeker
 from wicked.cache import ICacheManager, ContentCacheManager
-from wicked.txtfilter import WickedFilter, IWickedFilter
-from wicked.txtfilter import IAmWickedField, IFieldEvent
-from wicked.txtfilter import BrackettedWickedFilter, BacklinkRegistrationProxy
-from wicked import utils
 from wicked.fieldevent.interfaces import IFieldRenderEvent, IFieldStorageEvent
 from wicked.fieldevent.interfaces import IFieldValueSetter
 from wicked.interfaces import IAmWicked
 from wicked.interfaces import IAmWickedField
-from wicked.interfaces import IWickedFilter
 from wicked.interfaces import IWickedEvent
-
+from wicked.interfaces import IWickedFilter
 from wicked.txtfilter import BrackettedWickedFilter
+from wicked.txtfilter import BacklinkRegistrationProxy
+from wicked.txtfilter import IAmWickedField, IFieldEvent
+from wicked.txtfilter import WickedFilter, IWickedFilter
 from wicked.txtfilter import WickedFilter, wicked_listener
 from zope.app.schema.vocabulary import IVocabularyFactory
 from zope.component import getSiteManager
 from zope.interface import implements
 from zope.schema.vocabulary import SimpleVocabulary
-
-try:
-    import pkg_resources
-    get_points = pkg_resources.iter_entry_points
-except ImportError:
-    get_points = lambda :[]
 
 
 class BaseWickedRegistration(object):
@@ -84,7 +77,7 @@ class BasePloneWickedRegistration(BaseWickedRegistration):
     """Basic wicked behavior for Plone. Registers a fieldevent
     subscriber and the wicked filter."""
     backlink_handler = BacklinkRegistrationProxy
-
+    #txtfilter = EasyWickedFilter
 
 class BasePloneMediaWickedRegistration(BasePloneWickedRegistration):
     """Same as basic but with square bracket style linking"""
@@ -135,11 +128,12 @@ class BaseConfigurationOptionsFactory(object):
     implements(IVocabularyFactory)
 
     def __call__(self, context):
-        entry_points = get_points("wicked.base_registration")
-        items = [(bc.name, bc.load().title) for bc in entry_points]
-        items.sort()
-        items.insert(0, ('off', 'Off'))
-        return SimpleVocabulary.fromItems(items)
+##         entry_points = get_points("wicked.base_registration")
+##         items = [(bc.name, bc.load().title) for bc in entry_points]
+##         items.sort()
+##         items.insert(0, ('off', 'Off'))
+##         return SimpleVocabulary.fromItems(items)
+        pass
 
 class CacheConfigurationOptionsFactory(object):
     implements(IVocabularyFactory)
