@@ -35,6 +35,21 @@
      />
 
   <!-- views -->
+  <!-- portal factory add view -->
+  <!-- 
+  <browser:pages
+     for="Products.ATContentTypes.interface.IATContentType"
+     class="wicked.at.link.ATPortalFactoryAdd"
+     permission="zope.Public"
+     >
+
+    <browser:page
+       name="wickedadd"
+       attribute="add_content"
+       />
+
+  </browser:pages>
+  -->
 
   <browser:pages
      for="Products.ATContentTypes.interface.IATContentType"
@@ -52,7 +67,8 @@
 	attribute="addMenu"
 	/>
   </browser:pages>
-   
+
+
   <browser:page
      for="Products.ATContentTypes.interface.IATContentType"
      name="link_renderer"
