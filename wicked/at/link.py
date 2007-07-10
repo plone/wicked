@@ -20,6 +20,8 @@ from wicked.utils import getWicked
 from wicked.link import WickedAdd, BasicLink
 from wicked.interfaces import IWickedContentAddedEvent
 from Products.Archetypes.interfaces import IBaseObject
+from Products.CMFPlone.utils import transaction_note
+from Products.CMFCore.utils import getToolByName
 
 _marker=object()
 
@@ -33,15 +35,34 @@ class ATWickedAdd(WickedAdd, BrowserView):
             type_name = self.context.portal_type
         title = self.request.get('Title', title)
         section = self.request.get('section', section)
+        newcontent = self._create_content(title, type_name)
+        self.notify_content_added(newcontent, title, section)
+
+    def _create_content(self, title, type_name):
         assert title, 'Must have a title to create content' 
         newcontentid = normalize(title)
-
         container = self.aq_parent.aq_parent
-        container.invokeFactory(type_name, id=newcontentid,
-                                   title=title)
+        newcontentid = container.invokeFactory(type_name, id=newcontentid,
+                                               title=title)
+        return getattr(self.context, newcontentid)
 
-        newcontent = getattr(self.context, newcontentid)
-        self.notify_content_added(newcontent, title, section)
+
+class ATPortalFactoryAdd(ATWickedAdd):
+
+    def _create_content(self, title, type_name):
+        assert title, 'Must have a title to create content' 
+        id_=self.context.generateUniqueId(type_name)
+        
+        new_content = self.context.restrictedTraverse('portal_factory/%s/%s' % (type_name, id_))
+
+        transaction_note('Initiated creation of %s with id %s in %s' % \
+                         (new_content.getTypeInfo().getId(),
+                          id_,
+                          self.context.absolute_url()))
+        new_content.setTitle(title)
+        newcontentid = normalize(title)
+        new_content.setId(newcontentid)
+        return new_content
 
 # channel on AT
 @adapter(IBaseObject, IWickedContentAddedEvent)
@@ -49,9 +70,11 @@ def handle_at_newcontent(context, event):
     field = context.Schema()[event.section]
     wicked = getWicked(field, context, event)
     wicked.manageLink(context, event.title)
-    portal_status_message='"%s" has been created' % event.title
+    portal_status_message=quote('"%s" has been created' % event.title)
     url = event.newcontent.absolute_url()
-    restr = "%s/edit?portal_status_message=%s" %(url, quote(portal_status_message))
+    restr = "%s/edit?title=%s&portal_status_message=%s" %(url,
+                                                          quote(event.title),
+                                                          portal_status_message)
     event.request.RESPONSE.redirect(restr)
 
     
@@ -60,9 +83,6 @@ class BasicFiveLink(BasicLink, BrowserView):
     Five prepared link implementation
     """
     __init__=BasicLink.__init__
-
-
-
 
 
 
