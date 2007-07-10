@@ -43,10 +43,28 @@ class TxtFilter(object):
         self.field = field
         self.event = event
 
+    @utils.memoize
+    def findall(self, value):
+        for pattern in self.patterns:
+            val = pattern.findall(value)
+            if len(val):
+                return val
+        return val
+        
+    @utils.memoizedproperty
+    def patterns(self):
+        if not isinstance(self.pattern, list):
+            return [self.pattern]
+        return self.pattern
+
     @utils.memoizedproperty
     def chunks(self):
         """Simple text replacement via co-op with the modules"""
-        return self.pattern.split(self.event.value)
+        for pattern in self.patterns:
+            val=pattern.split(self.event.value)
+            if len(val)>1:
+                return val
+        return val
 
     @utils.memoizedproperty
     def dynamic(self):
