@@ -28,7 +28,16 @@ import sre
 
 _marker = object()
 
-pattern = sre.compile(r'\(\(([\w\W]+?)\)\)') # matches ((Some Text To link 123))
+pattern1 = sre.compile(r'\(\(([\w\W]+?)\)\)') # matches ((Some Text To link 123))
+pattern2 = sre.compile(r'\[\[([\w\W]+?)\]\]') # matches [[Some Text To link 123]]
+
+def removeParens(wikilink):
+    wikilink.replace('((', '')
+    wikilink.replace('))', '')
+    wikilink.replace('[[', '')
+    wikilink.replace(']]', '')
+    return wikilink
+
 
 class WickedFilter(TxtFilter):
     implements(IWickedFilter)
@@ -36,7 +45,7 @@ class WickedFilter(TxtFilter):
 
     name = 'Wicked Filter'
 
-    pattern = pattern
+    pattern = [pattern1, pattern2]
     query_iface = IWickedQuery
     _encoding = 'UTF8'
 
@@ -129,16 +138,16 @@ class WickedFilter(TxtFilter):
             raise EndFiltrationException('Kwargs flag for raw return')
         super(WickedFilter, self).__call__()
 
-    def removeParens(wikilink):
-        wikilink.replace('((', '')
-        wikilink.replace('))', '')
-        return wikilink
+##     def removeParens(wikilink):
+##         wikilink.replace('((', '')
+##         wikilink.replace('))', '')
+##         return wikilink
     removeParens=staticmethod(removeParens)
 
 
 class BrackettedWickedFilter(WickedFilter):
     """media wiki style bracket matching"""
-    pattern=sre.compile(r'\[\[([\w\W]+?)\]\]') # matches [[Some Text To link 123]]
+    pattern=pattern2
     def removeParens(wikilink):
         wikilink.replace('[[', '')
         wikilink.replace(']]', '')
@@ -188,7 +197,7 @@ def backlink_handler(field, event):
         pass
 
 
-    found = wicked.pattern.findall(value_str)
+    found = wicked.findall(value_str)
 
     if not len(found):
         return
