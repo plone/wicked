@@ -24,7 +24,7 @@ class Base(WickedTestCase):
     def demoCreate(self, **kw):
         self.login('test_user_1_')
         addview = self.page1.restrictedTraverse('@@wickedadd')
-        addview.add_content(title=self.title, section=self.wicked_field, type_name='IronicWiki')
+        addview.add_content(title=self.title, section=self.wicked_field, type_name=self.wicked_type)
 
     def moveContent(self, obj, target):
         cps = obj.aq_parent.manage_copyObjects([obj.getId()])
@@ -219,7 +219,7 @@ class TestLinkNormalization(Base):
         simulates browser interaction
         """
         addview = page.restrictedTraverse('@@wickedadd')
-        addview.add_content(title=title, section=self.wicked_field, type_name='IronicWiki')
+        addview.add_content(title=title, section=self.wicked_field, type_name=self.wicked_type)
         self.set_text(page, "((%s))" %title ) #wha?
         return getattr(self.folder, titleToNormalizedId(title))
 
