@@ -74,7 +74,6 @@ def make_wicked_suite(klasses, layer, content_type="Document", field="text"):
         newklass = type(newname, bases, newdict)
         new = unittest.makeSuite(newklass)
         suite.addTest(new)
-        
     return suite
 
         
