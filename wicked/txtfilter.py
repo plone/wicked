@@ -24,12 +24,12 @@ from wicked.fieldevent.txtfilter import TxtFilter
 from zope.component import getMultiAdapter, adapts, adapter
 from zope.interface import implements, implementer, Interface
 
-import sre
+import re
 
 _marker = object()
 
-pattern1 = sre.compile(r'\(\(([\w\W]+?)\)\)') # matches ((Some Text To link 123))
-pattern2 = sre.compile(r'\[\[([\w\W]+?)\]\]') # matches [[Some Text To link 123]]
+pattern1 = re.compile(r'\(\(([\w\W]+?)\)\)') # matches ((Some Text To link 123))
+pattern2 = re.compile(r'\[\[([\w\W]+?)\]\]') # matches [[Some Text To link 123]]
 
 def removeParens(wikilink):
     wikilink.replace('((', '')
