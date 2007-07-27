@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 import sys, os
 
-version = '1.1.3'
+version = '1.1.5'
 
 setup(name='wicked',
       version=version,
-      description="wicked is a compact syntax for doing wiki-like content linking and creation",
+      description="wicked is a compact syntax for doing wiki-like content linking and creation in zope and plone",
       long_description="""\
 """,
       classifiers=[
