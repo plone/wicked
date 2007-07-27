@@ -78,7 +78,6 @@ def make_wicked_suite(klasses, layer, content_type="Document", field="text"):
 
         
 def test_suite():
-    # this is overkill but proves the configs work
     suites = make_wicked_suite(test_klasses, SelectiveATCT) 
     return unittest.TestSuite(suites)
     
