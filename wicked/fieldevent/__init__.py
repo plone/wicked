@@ -6,11 +6,18 @@ from zope.component import subscribers, getMultiAdapter, handle
 from zope.component import adapter, adapts
 from zope.interface import implementer, implements
 
+import logging
+logger = logging.getLogger('wicked.fieldevent')
+
 @adapter(IFieldEvent)
 def notifyFieldEvent(event):
     field = event.field
     if IFieldRenderEvent.providedBy(event):
         event.value = getMultiAdapter((field, event), IFieldValue)
+        
+    if event.kwargs.get('raw', False) or getattr(event, 'raw', False):
+        # bail out
+        return 
 
     handle(event.field, event.instance, event)
     
