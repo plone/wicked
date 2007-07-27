@@ -22,7 +22,7 @@ from wicked.fieldevent.interfaces import IFieldEvent
 from zope.component.interfaces import ComponentLookupError
 from wicked.fieldevent.txtfilter import TxtFilter
 from zope.component import getMultiAdapter, adapts, adapter
-from zope.interface import implements, implementer, Interface
+from zope.interface import implements, implementer, Interface, alsoProvides
 
 import re
 
@@ -38,20 +38,20 @@ def removeParens(wikilink):
     wikilink.replace(']]', '')
     return wikilink
 
-
 class WickedFilter(TxtFilter):
     implements(IWickedFilter)
     adapts(IAmWickedField, IAmWicked, IFieldEvent)
 
     name = 'Wicked Filter'
 
-    pattern = [pattern1, pattern2]
+    #pattern = [pattern1, pattern2]
     query_iface = IWickedQuery
     _encoding = 'UTF8'
 
     def __init__(self, field, instance, event):
         super(WickedFilter, self).__init__(field, instance, event)
         self.section = field.__name__
+        self.pattern = None
 
     @utils.memoizedproperty
     def scope(self):
@@ -159,19 +159,56 @@ NAME = WickedFilter.name
 
 ## event handlers ##
 
-def wicked_listener(field, instance, event):
-    """standalone wicked filter (ie not as a txtfilter). Optimal if
-    not using txtfilters"""
-    
-    if event.kwargs.get('raw', False):
-        return 
+class WickedListener(object):
 
-    wicked = getMultiAdapter((field, instance, event), IWickedFilter)
-    try:
-        wicked()
-    except EndFiltrationException:
-        pass
+    def __init__(self, pattern):
+        self.pattern = pattern
+        
+    def render(self, field, instance, event):
+        """standalone wicked filter (ie not as a txtfilter). Optimal if
+        not using txtfilters"""
 
+        if event.kwargs.get('raw', False):
+            return 
+
+        wicked = getMultiAdapter((field, instance, event), IWickedFilter)
+        wicked.pattern = self.pattern
+        try:
+            wicked()
+        except EndFiltrationException:
+            pass
+
+    def store(self, field, event):
+        try:
+            wicked = utils.getWicked(field, event.instance, event)
+        except ComponentLookupError:
+            # no adapter registered for this type currently
+            # @@ This might be handle better by redispatch
+            return
+        
+        wicked.pattern = self.pattern
+        if not event.value:
+            return
+
+        value = event.value
+        value_str = value
+
+        try:
+            # this block handle conversions for file uploads and
+            # atapi.BaseUnit or any other not quite plain text "value objects"
+            value_str = getMultiAdapter((value, field), IValueToString)
+        except ComponentLookupError:
+            pass
+
+        found = wicked.findall(value_str)
+
+        if not len(found):
+            return
+
+        new_links = [wicked.removeParens(link) for link in found]
+        wicked.manageLinks(new_links)
+
+from zope.interface import classImplements
 
 @implementer(IFieldValueSetter)
 @adapter(IAmWickedField, IFieldStorageEvent)
@@ -205,13 +242,31 @@ def backlink_handler(field, event):
     new_links = [wicked.removeParens(link) for link in found]
     wicked.manageLinks(new_links)
 
+pattern1_listeners = WickedListener(pattern1)
+pattern2_listeners = WickedListener(pattern2)
 
-class BacklinkRegistrationProxy(object):
-    """cuz you can't pickle functions with decorators"""
+## hack around fact that functions can not be pickled ##
+
+class wicked_listener(object):
+    __init__=staticmethod(pattern1_listeners.render)
+
+class bracketted_wicked_listener(object):
+    __init__=staticmethod(pattern2_listeners.render)
+    
+class backlink(object):
     implements(IFieldValueSetter)
     adapts(IAmWickedField, IFieldStorageEvent)
     
-    __init__ = staticmethod(backlink_handler)
+    __init__ = staticmethod(pattern1_listeners.store)
+
+BacklinkRegistrationProxy = backlink
+
+class brackettedbacklink(object):
+    implements(IFieldValueSetter)
+    adapts(IAmWickedField, IFieldStorageEvent)
+    
+    __init__ = staticmethod(pattern2_listeners.store)    
+
 
 ## toy example code ##
     
