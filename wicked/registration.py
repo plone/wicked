@@ -8,15 +8,17 @@ from wicked.interfaces import IAmWickedField
 from wicked.interfaces import IWickedEvent
 from wicked.interfaces import IWickedFilter
 from wicked.txtfilter import BrackettedWickedFilter
-from wicked.txtfilter import BacklinkRegistrationProxy
+from wicked.txtfilter import backlink, brackettedbacklink
 from wicked.txtfilter import IAmWickedField, IFieldEvent
 from wicked.txtfilter import WickedFilter, IWickedFilter
-from wicked.txtfilter import WickedFilter, wicked_listener
+from wicked.txtfilter import WickedFilter, wicked_listener, bracketted_wicked_listener
 from zope.app.schema.vocabulary import IVocabularyFactory
 from zope.component import getSiteManager
 from zope.interface import implements
 from zope.schema.vocabulary import SimpleVocabulary
 
+import logging
+logger = logging.getLogger('wicked.registration')
 
 class BaseWickedRegistration(object):
     """abstract base: add a docstring to display a description on the
@@ -54,8 +56,10 @@ class BaseWickedRegistration(object):
             handle_sub_adapter_reg = self.sm.unregisterSubscriptionAdapter
         
         self.handle_txtfilter(handle_adapter_reg)
-        handle_subscriber_reg(self.subscriber[0], required=self.required)
-        handle_sub_adapter_reg(self.backlink_handler)
+        for subscriber in self.subscriber:
+            handle_subscriber_reg(subscriber, required=self.required)
+        for bh in self.backlink_handler:
+            handle_sub_adapter_reg(bh)
         return (handle_adapter_reg, handle_subscriber_reg, handle_sub_adapter_reg)
 
     def handle_txtfilter(self, handle, event=None, txtfilter=None, unregister=False):
@@ -76,7 +80,8 @@ class BaseWickedRegistration(object):
 class BasePloneWickedRegistration(BaseWickedRegistration):
     """Basic wicked behavior for Plone. Registers a fieldevent
     subscriber and the wicked filter."""
-    backlink_handler = BacklinkRegistrationProxy
+    subscriber = (wicked_listener, bracketted_wicked_listener)
+    backlink_handler = (backlink, brackettedbacklink)
     #txtfilter = EasyWickedFilter
 
 class BasePloneMediaWickedRegistration(BasePloneWickedRegistration):
@@ -94,20 +99,24 @@ class SelectiveRegistration(BaseWickedRegistration):
     seeker = AdvQueryMatchingSeeker
     seeker_provides = IWickedQuery
     other_events = (IWickedEvent, IFieldStorageEvent)
-    backlink_handler = BacklinkRegistrationProxy
-
+    backlink_handler = (backlink, brackettedbacklink)
+    subscriber = (wicked_listener, bracketted_wicked_listener)
+    
     @property
     def cache_required(self):
         return (self.txtfilter_provides, self.content)
     
     def handle(self, unregister=False):
-        handle_adapter_reg, handle_subscriber_reg, handle_sub_adapter_reg = super(SelectiveRegistration, self).handle(unregister=unregister)
+        handle_adapter_reg, handle_subscriber_reg, handle_sub_adapter_reg = super(SelectiveRegistration,
+                                       self).handle(unregister=unregister)
         self.handle_cache(handle_adapter_reg)
         self.handle_seeker(handle_adapter_reg)
         
         for event in self.other_events:
             self.handle_txtfilter(handle_adapter_reg, event=event)
-        return (handle_adapter_reg, handle_subscriber_reg)
+        return (handle_adapter_reg,
+                handle_subscriber_reg,
+                handle_sub_adapter_reg)
 
     def handle_cache(self, handle):
         handle(self.cache,
@@ -118,7 +127,6 @@ class SelectiveRegistration(BaseWickedRegistration):
         handle(self.seeker,
                required=(self.content,),
                provided=self.seeker_provides)
-    
 
 ## vocabulary
 
