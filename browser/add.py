@@ -54,7 +54,7 @@ class WickedAdd(BrowserView):
         newcontent = getattr(self.context, newcontentid)
         wicked = getFilter(self.context)
         wicked.section=section
-        wicked.manageLink(newcontent, title)
+        wicked.manageLink(newcontent, newcontentid)
         
         portal_status_message='"%s" has been created' % title
         url = newcontent.absolute_url()
