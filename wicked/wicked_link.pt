@@ -25,7 +25,7 @@
          title="Click to add a new page"
      tal:attributes="href string:$here_url/@@wickedadd?Title=${view/chunk}&section=${view/section}"
      tal:define="here_url here/absolute_url">
-      <span tal:replace="view/chunk" >A CHUNK</span><sup>+</sup></a>
+      <span tal:replace="view/chunk" >A CHUNK</span><sup>[+]</sup></a>
     </span>
   </span>
 </tal:wicked_link>
