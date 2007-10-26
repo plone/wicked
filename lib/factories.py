@@ -20,7 +20,10 @@ from interfaces import IContentCacheManager, IWickedQuery, IATBacklinkManager
 from normalize import titleToNormalizedId as normalize
 from relation import Backlink
 from utils import memoizedproperty, memoize, match, packBrain
-from zope.app.annotation.interfaces import IAnnotations, IAnnotatable
+try:
+    from zope.app.annotation.interfaces import IAnnotations, IAnnotatable
+except ImportError:
+    from zope.annotation.interfaces import IAnnotations, IAnnotatable
 from zope.interface import implements
 from Missing import Value as MissingValue
 
