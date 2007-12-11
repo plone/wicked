@@ -53,7 +53,7 @@ Test counter::
 
     >>> renderer.load([], 'Chunk 3')
     >>> print xstrip(renderer())
-    <span class="wicked_unresolved" id="fieldname-2"><span class="chunk">Chunk 3</span><a class="wickedadd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk%203&amp;section=fieldname">+</a></span>...
+    <span class="wicked_unresolved" id="fieldname-1"><a class="wickedadd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk%202&amp;section=fieldname"><span class="chunk">Chunk 2</span>+</a></span>
 
 Cleanup::
 
