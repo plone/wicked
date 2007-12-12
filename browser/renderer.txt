@@ -54,12 +54,12 @@ rolling.
     <span class="wicked_unresolved" id="fieldname-1"><a class="wickedadd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk%202&amp;section=fieldname"><span class="chunk">Chunk 2</span>+</a></span>
     ...
 
-    >>> renderer.load([], u'laboratoire de géomatique')
+    >>> renderer.load([], u'laboratoire de g\u00E9omatique')
 
 for some reason, the ampersand is being escaped too::
 
     >>> xstrip(renderer()) 
-    '<span class="wicked_unresolved" id="fieldname-2"><a class="wickedadd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=laboratoire%20de%20g%C3%83%C2%A9omatique&amp;section=fieldname"><span class="chunk">laboratoire de g\xc3\x83\xc2\xa9omatique</span>+</a></span>\n'
+    '<span class="wicked_unresolved" id="fieldname-2"><a class="wickedadd" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=laboratoire%20de%20g%C3%A9omatique&amp;section=fieldname"><span class="chunk">laboratoire de g\xc3\xa9omatique</span>+</a></span>\n'
 
 Test counter::
 
