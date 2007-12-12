@@ -18,11 +18,14 @@ xslt = """
 
 #import libxml2, libxslt
 xsltfile = os.path.join(os.path.dirname(__file__), 'strip.xsl')
- 	
+
 #use stylesheet as global
-import libxml2, libxslt
-styledoc=libxml2.parseFile(xsltfile)
-style=libxslt.parseStylesheetDoc(styledoc)
+try:
+    import libxml2, libxslt
+    styledoc=libxml2.parseFile(xsltfile)
+    style=libxslt.parseStylesheetDoc(styledoc)
+except ImportError:
+    pass
 
 def libstrip(text):
     """
@@ -65,7 +68,7 @@ def lxmlstrip(text):
     val = str(result)
     return val
 
-xstrip = libstrip
+xstrip = lxmlstrip
 
 import unittest
 from zope.testing import doctest
