@@ -54,7 +54,8 @@ def titleToNormalizedId(title=""):
         base = m.groups()[0]
         ext = m.groups()[1]
     parts = pattern2.split(base)
-        
+
+    # speed these up by precompiling
     slug = re.sub(r"[\W\-]+","-",base) # replace non-alphanumeric characters with dashes
     slug = re.sub(r"^\-+","",slug)     # trim leading dashes
     slug = re.sub(r"\-+$","",slug)     # trim trailing dashes
@@ -94,7 +95,6 @@ class NormTestCase(unittest.TestCase):
         return test_norming
     
 NormTestCase = NormTestCase.populate()
-
 
 if __name__ == "__main__":
     unittest.main()
