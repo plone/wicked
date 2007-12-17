@@ -44,7 +44,7 @@ in the cache of the original document::
     >>> print retadd
     http://nohost/plone/Members/test_user_1_/test-doc/edit?portal_status_message=%22Test%20Doc%22%20has%20been%20created
 
-    >>> title = u'Test G\u00e9omatique'
+    >>> title = u'Test G\u00e9omatique'.encode("utf-8")
     >>> self.folder.REQUEST.set('Title', title)
     >>> self.folder.REQUEST.set('portal_type', 'Document')
     >>> view=testfo.restrictedTraverse('@@wickedadd')
@@ -52,7 +52,7 @@ in the cache of the original document::
     >>> print retadd
     http://nohost/plone/Members/test_user_1_/test-geomatique/edit?portal_status_message=%22Test%20G%C3%A9omatique%22%20has%20been%20created
 
-    >>> title = u'\u3322'
+    >>> title = u'\u3322'.encode("utf-8")
     >>> self.folder.REQUEST.set('Title', title)
     >>> self.folder.REQUEST.set('portal_type', 'Document')
     >>> view=testfo.restrictedTraverse('@@wickedadd')
