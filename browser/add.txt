@@ -52,13 +52,19 @@ in the cache of the original document::
     >>> print retadd
     http://nohost/plone/Members/test_user_1_/test-geomatique/edit?portal_status_message=%22Test%20G%C3%A9omatique%22%20has%20been%20created
 
-This is not working properly in the test, but works in the browser::
+Test via HTTP::
 
     >>> from urllib import quote
     >>> print http(r'''
     ... GET /plone/Members/test_user_1_/@@wickedadd?Title=%s HTTP/1.1
     ... ''' %quote(title.encode('utf-8')))
-    HTTP/1.1 302 Moved Temporarily...
+    HTTP/1.1 302 Moved Temporarily...Location: ...omatique/edit
 
-    
+And test Asian characters via HTTP::
 
+    title = u"\u3322"
+    >>> from urllib import quote
+    >>> print http(r'''
+    ... GET /plone/Members/test_user_1_/@@wickedadd?Title=%s HTTP/1.1
+    ... ''' %quote(title.encode('utf-8')))
+    HTTP/1.1 302 Moved Temporarily...Location: $3322/edit
