@@ -102,7 +102,4 @@ class WickedFilter(WickedBase):
         renderer.section = self.section
         return renderer.__of__(self.context)
     
-if __name__=="__main__":
-    from testing.filtercore import dummy, fakecacheiface, fakefilter
-    import doctest
-    doctest.testmod()
+
