@@ -13,6 +13,7 @@ __authors__ = 'Anders Pearson <anders@columbia.edu>'
 __docformat__ = 'restructuredtext'
 
 import re
+import unittest
 from unaccent import unaccented_map
 
 mapping = {138: 's', 140: 'OE', 142: 'z', 154: 's', 156: 'oe', 158: 'z', 159: 'Y', 
@@ -62,7 +63,8 @@ def titleToNormalizedId(title=""):
     return slug
 
 
-tests = [
+class NormTestCase(unittest.TestCase):
+    tests = [
     (u"This is a normal title.", "this-is-a-normal-title"),
     (u"Short sentence. Big thoughts.", "short-sentence-big-thoughts"),
     (u"Some298374NUMBER", "some298374number"),
@@ -76,17 +78,27 @@ tests = [
      u'7265837-thai'), 
     ]
 
-if __name__ == "__main__":
-    import profile
+    @classmethod
+    def populate(cls):
+        count = 0
+        for ori, cor in cls.tests:
+            count += 1
+            setattr(cls, "test_%s" %count,  cls.make_test(ori, cor))
+        return cls
+    
+    @classmethod        
+    def make_test(cls, original, correct):
+        def test_norming(self):
+            sanitized = titleToNormalizedId(original)
+            self.assertEqual(sanitized, correct)
+        return test_norming
+    
+NormTestCase = NormTestCase.populate()
 
-    for original,correct in tests:
-        sanitized = titleToNormalizedId(original)
-        print "*********"
-        print original.encode('utf-8')
-        if sanitized == correct:
-            print sanitized
-        else: 
-            print "Expected: ", correct
-            print "Got:      ", sanitized
+
+if __name__ == "__main__":
+    unittest.main()
+
+
 
 
