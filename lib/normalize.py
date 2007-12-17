@@ -13,6 +13,7 @@ __authors__ = 'Anders Pearson <anders@columbia.edu>'
 __docformat__ = 'restructuredtext'
 
 import re
+from unaccent import unaccented_map
 
 mapping = {138: 's', 140: 'OE', 142: 'z', 154: 's', 156: 'oe', 158: 'z', 159: 'Y', 
 192: 'A', 193: 'A', 194: 'A', 195: 'A', 196: 'A', 197: 'a', 198: 'E', 199: 'C', 
@@ -37,10 +38,14 @@ def normalizeISO(text=""):
 
 pattern1 = re.compile(r"^([^\.]+)\.(\w{,4})$")
 pattern2 = re.compile(r'r"([\W\-]+)"')
+map = unaccented_map()
+import types
 def titleToNormalizedId(title=""):
     title = title.lower()
     title = title.strip()
-    title = normalizeISO(title)
+    #title = normalizeISO(title)
+    if title and isinstance(title, types.UnicodeType):
+        title = title.translate(map).encode("ascii", 'backslashreplace')
     base = title
     ext = ""
     m = pattern1.match(title)
@@ -49,30 +54,39 @@ def titleToNormalizedId(title=""):
         ext = m.groups()[1]
     parts = pattern2.split(base)
         
-    slug = re.sub(r"[\W\-]+","-",base)
-    slug = re.sub(r"^\-+","",slug)
-    slug = re.sub(r"\-+$","",slug)
+    slug = re.sub(r"[\W\-]+","-",base) # replace non-alphanumeric characters with dashes
+    slug = re.sub(r"^\-+","",slug)     # trim leading dashes
+    slug = re.sub(r"\-+$","",slug)     # trim trailing dashes
     if ext != "":
         slug = slug + "." + ext
     return slug
 
 
 tests = [
-(u"This is a normal title.", "this-is-a-normal-title"),
-(u"Short sentence. Big thoughts.", "short-sentence-big-thoughts"),
-(u"Some298374NUMBER", "some298374number"),
-(u'Eksempel \xe6\xf8\xe5 norsk \xc6\xd8\xc5', u'eksempel-aoa-norsk-aoa'), 
-(u'\u9ad8\u8054\u5408 Chinese', u'2837821-chinese'), 
-(u'\u30a2\u30ec\u30af\u30b5\u30f3\u30c0\u30fc\u3000\u30ea\u30df Japanese', u'23987643-japanese'), 
-(u'\uc774\ubbf8\uc9f1 Korean', u'987342-korean'), 
-(u'\u0e2d\u0e40\u0e25\u0e47\u0e01\u0e0b\u0e32\u0e19\u0e40\u0e14\u0e2d\u0e23\u0e4c \u0e25\u0e35\u0e21 Thai', u'7265837-thai'), 
-(u'About folder.gif', u'about-folder.gif')]
+    (u"This is a normal title.", "this-is-a-normal-title"),
+    (u"Short sentence. Big thoughts.", "short-sentence-big-thoughts"),
+    (u"Some298374NUMBER", "some298374number"),
+    (u'About folder.gif', u'about-folder.gif'),
+    (u"laboratoire de g\xe9omatique", "laboratoire-de-geomatique"),
+    (u'Eksempel \xe6\xf8\xe5 norsk \xc6\xd8\xc5', u'eksempel-aeoea-norsk-aeoea'), 
+    (u'\u9ad8\u8054\u5408 Chinese', u'2837821-chinese'), 
+    (u'\u30a2\u30ec\u30af\u30b5\u30f3\u30c0\u30fc\u3000\u30ea\u30df Japanese', u'23987643-japanese'), 
+    (u'\uc774\ubbf8\uc9f1 Korean', u'987342-korean'), 
+    (u'\u0e2d\u0e40\u0e25\u0e47\u0e01\u0e0b\u0e32\u0e19\u0e40\u0e14\u0e2d\u0e23\u0e4c \u0e25\u0e35\u0e21 Thai',
+     u'7265837-thai'), 
+    ]
 
 if __name__ == "__main__":
     import profile
 
     for original,correct in tests:
         sanitized = titleToNormalizedId(original)
-        print sanitized
+        print "*********"
+        print original.encode('utf-8')
+        if sanitized == correct:
+            print sanitized
+        else: 
+            print "Expected: ", correct
+            print "Got:      ", sanitized
 
 
