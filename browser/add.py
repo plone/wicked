@@ -40,7 +40,6 @@ class WickedAdd(BrowserView):
         title = self.request.get('Title', title)
         section = self.request.get('section', section)
         assert title, 'Must have a title to create content'
-        title = title.decode('utf-8')
 
         newcontentid = normalize(title)
         #print "%s %s" %(title.encode('utf-8'), newcontentid)
