@@ -28,7 +28,7 @@ def test_suite():
     return unittest.TestSuite((
             FunctionalDocFileSuite('add.txt',
                                    package='Products.wicked.browser',
-                                   test_class=ATCTFunctionalSiteTestCase,                                   
+                                   test_class=ATCTFunctionalSiteTestCase,
                                    optionflags=optionflags)
             ,),)
 
