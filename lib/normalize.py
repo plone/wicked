@@ -38,7 +38,12 @@ def normalizeISO(text=""):
 
 
 pattern1 = re.compile(r"^([^\.]+)\.(\w{,4})$")
-pattern2 = re.compile(r'r"([\W\-]+)"')
+#pattern2 = re.compile(r'r"([\W\-]+)"')
+pattern2 = re.compile(r'([\W\-]+)')
+#non_alpha = re.compile(r'[\W\-]+')
+non_alpha = re.compile(r'[^a-zA-Z0-9~]+')
+u_esc = re.compile(r'\\u')
+
 map = unaccented_map()
 import types
 def titleToNormalizedId(title=""):
@@ -56,9 +61,11 @@ def titleToNormalizedId(title=""):
     parts = pattern2.split(base)
 
     # speed these up by precompiling
-    slug = re.sub(r"[\W\-]+","-",base) # replace non-alphanumeric characters with dashes
-    slug = re.sub(r"^\-+","",slug)     # trim leading dashes
-    slug = re.sub(r"\-+$","",slug)     # trim trailing dashes
+    slug = base
+    slug = slug.replace('\u', '~')
+    slug = non_alpha.sub("-", slug) # replace non-alphanumeric characters with dashes
+    #slug = re.sub(r"^~+","", slug)     # trim leading dashes
+    slug = re.sub(r"\-+$","", slug)     # trim trailing dashes
     if ext != "":
         slug = slug + "." + ext
     return slug
