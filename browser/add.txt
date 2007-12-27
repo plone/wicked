@@ -44,13 +44,19 @@ in the cache of the original document::
     >>> print retadd
     http://nohost/plone/Members/test_user_1_/test-doc/edit?portal_status_message=%22Test%20Doc%22%20has%20been%20created
 
-This is not working properly in the test, but works in the browser::
+    >>> title = u'Test G\u00e9omatique'.encode("utf-8")
+    >>> self.folder.REQUEST.set('Title', title)
+    >>> self.folder.REQUEST.set('portal_type', 'Document')
+    >>> view=testfo.restrictedTraverse('@@wickedadd')
+    >>> retadd = view()
+    >>> print retadd
+    http://nohost/plone/Members/test_user_1_/test-geomatique/edit?portal_status_message=%22Test%20G%C3%A9omatique%22%20has%20been%20created
 
-    >>> from urllib import quote
-    >>> print http(r'''
-    ... GET /plone/Members/test_user_1_/@@wickedadd?Title=%s HTTP/1.1
-    ... ''' %quote(title))
-    HTTP/1.1 302 Moved Temporarily...
-
-    
+    >>> title = u'\u3322'.encode("utf-8")
+    >>> self.folder.REQUEST.set('Title', title)
+    >>> self.folder.REQUEST.set('portal_type', 'Document')
+    >>> view=testfo.restrictedTraverse('@@wickedadd')
+    >>> retadd = view()
+    >>> print retadd
+    http://nohost/plone/Members/test_user_1_/%7E3322/edit?portal_status_message=%22%E3%8C%A2%22%20has%20been%20created
 

@@ -39,8 +39,12 @@ class WickedAdd(BrowserView):
             type_name = self.context.portal_type
         title = self.request.get('Title', title)
         section = self.request.get('section', section)
-        assert title, 'Must have a title to create content' 
+        assert title, 'Must have a title to create content'
+
+        title = title.decode("utf-8")
+
         newcontentid = normalize(title)
+        #print "%s %s" %(title.encode('utf-8'), newcontentid)
         
         # put the new object at the same level as the context
         # XXX the property trick for context doesn't work, we still
@@ -58,7 +62,7 @@ class WickedAdd(BrowserView):
         
         portal_status_message='"%s" has been created' % title
         url = newcontent.absolute_url()
-        restr = "%s/edit?portal_status_message=%s" %(url, quote(portal_status_message))
+        restr = "%s/edit?portal_status_message=%s" %(url, quote(portal_status_message.encode('utf-8')))
         return self.request.RESPONSE.redirect(restr)
 
     def addMenu(self):

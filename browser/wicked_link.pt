@@ -23,7 +23,7 @@
     <span tal:attributes="id string:${view/section}-${view/count}" 
 	  class="wicked_unresolved">
       <a class="wickedadd"
-	 tal:attributes="href string:$here_url/@@wickedadd?Title=${view/chunk}&section=${view/section}"
+	 tal:attributes="href string:${here_url}/@@wickedadd?Title=${view/chunk}&section=${view/section}"
 	 tal:define="here_url here/absolute_url"><span class="chunk" tal:content="view/chunk" >A CHUNK</span>+</a>
     </span>
   </span>
