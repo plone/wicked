@@ -18,6 +18,8 @@ CHAR_REPLACEMENT = {
     0xf0: u"d",  # LATIN SMALL LETTER ETH
     0xf8: u"oe", # LATIN SMALL LETTER O WITH STROKE
     0xfe: u"th", # LATIN SMALL LETTER THORN
+    0x26: u"and", # &
+    0x40: u"at",  # @
     }
 
 ##
