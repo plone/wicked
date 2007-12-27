@@ -80,7 +80,7 @@ def getMatch(chunk, brains, normalled=None):
     the first absolute match is the one returned.  Matches on id
     take priority over matches on title
 
-    all strings are normalized and interned for comparison matches.
+    all strings are normalized for comparison matches.
 
     >>> from testing.general import pdo
     >>> mkbrain = lambda i: pdo(getId='-'.join([str(x) for x in i]), Title='%s %s' %i, created=i[1])
@@ -123,25 +123,28 @@ def getMatch(chunk, brains, normalled=None):
     0
 
     Test title to chunk match
+    
+    >>> title = brains[3]['Title'] = 'A unique title'
+    >>> from pprint import pprint
+    >>> pprint(getMatch(title, brains))
+    {'created': 3, 'getId': 'a-0', 'Title': 'A unique title'}
 
-    >>> brains[3].Title='A unique title'
-    >>> getMatch(brains[3].Title, brains).Title
+    >>> getMatch(title, brains).Title
     'A unique title'
     """
     normalled_chunk = normalled
     if not normalled_chunk:
         normalled_chunk = normalize(chunk)
-    normalled_chunk = intern(normalled_chunk)
-    if not isinstance(brains, list) or not isinstance(brains, tuple):
+    if not isinstance(brains, list) and not isinstance(brains, tuple):
         # make a copy to AdvancedQuery sequencing issues
         brains = list(brains)
 
     # inspect single return case
 
     if len(brains) == 1 and \
-           (intern(brains[0].getId) is normalled_chunk \
-            or intern(brains[0].getId.strip()) is intern(chunk.strip()) \
-            or intern(normalize(brains[0].Title)) is normalled_chunk):
+           (brains[0].getId == normalled_chunk \
+            or brains[0].getId.strip() == chunk.strip() \
+            or normalize(brains[0].Title) == normalled_chunk):
         return brains[0]
 
     # first, match id
@@ -158,7 +161,7 @@ def getMatch(chunk, brains, normalled=None):
 
     # second, match Title
     brains=[brain for brain in brains \
-            if intern(normalize(brain.Title)) is normalled_chunk]
+            if normalize(brain.Title) == normalled_chunk]
     
     return brains and brains[0] or None
 
