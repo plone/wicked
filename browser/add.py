@@ -24,12 +24,8 @@ _marker=object()
 class WickedAdd(BrowserView):
 
     def __init__(self, context, request):
-        self._context = (context,)
+        self.context = context
         self.request = request
-        
-    @property
-    def context(self):
-        return self._context[0]
 
     def addContent(self, title=None, section=None, type_name=_marker):
         # make it possible to pass in container
