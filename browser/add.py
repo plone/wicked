@@ -9,6 +9,7 @@
 #   - and contributors
 #
 ##########################################################
+from Acquisition import aq_parent, aq_inner
 from urllib import quote
 from zope.interface import Interface
 from Products.Five import BrowserView
@@ -43,9 +44,7 @@ class WickedAdd(BrowserView):
         #print "%s %s" %(title.encode('utf-8'), newcontentid)
         
         # put the new object at the same level as the context
-        # XXX the property trick for context doesn't work, we still
-        #     get the object wrapped in the view
-        parent = self._context[0].aq_parent
+        parent = aq_parent(aq_inner(self.context))
         parent.invokeFactory(type_name, id=newcontentid,
                              title=title)
 
