@@ -23,12 +23,8 @@ class BasicLink(object):
     counter=counter()
     
     def __init__(self, context, request):
-        self._context = (context,)
+        self.context = context
         self.request = request
-        
-    @property
-    def context(self):
-        return self._context[0]
 
     @memoizedproperty
     def howmany(self):
