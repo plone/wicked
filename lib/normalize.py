@@ -41,8 +41,9 @@ def titleToNormalizedId(title="", umap=unaccented_map()):
 
     slug = base
     slug = slug.replace('~', '-')
-    slug = slug.replace('\u', '~')
-    slug = slug.replace('\\x', '$')
+    slug = slug.replace('\\u', '~')
+    slug = slug.replace('\\U', '~U')
+    slug = slug.replace('\\x', '~x')
 
     # replace non-alphanumeric characters with dashes
     slug = non_alpha.sub("-", slug)
