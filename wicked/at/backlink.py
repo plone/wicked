@@ -1,14 +1,14 @@
 from Missing import Value as MissingValue
 from Products.Archetypes.interfaces import IReferenceable
 from Products.CMFCore.utils import getToolByName
-from wicked.interfaces import IWickedFilter, IAmWicked, IWickedTarget
+from wicked.interfaces import IWickedFilter, IWickedTarget
 from wicked.at import config
 from wicked.interfaces import IATBacklinkManager, IUID
 from wicked.normalize import titleToNormalizedId as normalize
 from relation import Backlink
 from zope.interface import alsoProvides as mark
 from zope.interface import implements
-from wicked.utils import memoizedproperty, memoize, match, packBrain, cleanUID
+from wicked.utils import packBrain, cleanUID
 from zope.component import adapts
 
 
@@ -93,7 +93,7 @@ class ATBacklinkManager(object):
                     icon=obj.getIcon(),
                     uid=objuid)
         
-        self.cm.set((intern(normalled), objuid), [data])  
+        self.cm.set((intern(str(normalled)), objuid), [data])  
 
     def removeLinks(self, exclude=tuple()):
         oldlinks = self.getLinks()
