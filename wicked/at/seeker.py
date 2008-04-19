@@ -46,7 +46,11 @@ class AdvQueryMatchingSeeker(object):
         if not self.scope is _marker:
             # XXX let's move this out of attr storage
             # on the content to at least an annotation
-            scope = getattr(self.context, self.scope, self.scope)
+            try:
+                scope = getattr(self.context, self.scope, self.scope)
+            except TypeError:
+                # scope may not be a string
+                scope = self.scope
             if callable(scope):
                 scope = scope()
             if scope:
