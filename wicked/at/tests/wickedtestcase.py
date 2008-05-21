@@ -44,12 +44,16 @@ class WickedSite(PloneSite):
     def setUp(cls):
         app = ZopeTestCase.app()
         plone = app.plone
+        # fake a <five:registerPackage> tag
         reg = BasePloneWickedRegistration(plone)
         import wicked.atcontent
         from wicked.atcontent.zope2 import initialize
         init_product(wicked.atcontent, app, initialize)
         zcml.load_config("configure.zcml", package=wicked.atcontent)
         reg.handle()
+        # install the product
+        qi = plone.portal_quickinstaller
+        qi.installProduct('wicked.atcontent')
         txn.commit()
         ZopeTestCase.close(app)
 
@@ -78,11 +82,7 @@ class WickedTestCase(ptc.PloneTestCase):
         # add some pages
         id1 = titleToNormalizedId(TITLE1)
         id2 = titleToNormalizedId(TITLE2)
-        try:
-            self.page1 = makeContent(self.folder,id1,self.wicked_type,title=TITLE1)
-        except :
-            import sys, pdb
-            pdb.post_mortem(sys.exc_info()[2])
+        self.page1 = makeContent(self.folder,id1,self.wicked_type,title=TITLE1)
         self.page2 = makeContent(self.folder,id2,self.wicked_type, title=TITLE2)
 
     strip = staticmethod(strip)
