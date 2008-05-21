@@ -9,16 +9,13 @@ _marker=object()
 class WickedAdd(object):
 
     def __init__(self, context, request):
+        self.context = context
         self._context = (context,)
         self.request = request
 
     def notify_content_added(self, newcontent, title, section):
         notify(WickedContentAddedEvent(self.context, newcontent, title, section, self.request))
         
-    @property
-    def context(self):
-        return self._context[0]
-
     def add_content(self, title=None, section=None, type_name=_marker):
         raise NotImplementedError
 
@@ -33,13 +30,10 @@ class BasicLink(object):
     section = _marker
     
     def __init__(self, context, request):
+        self.context = context
         self._context = (context,)
         self.request = request
         self.counter=utils.counter()
-        
-    @property
-    def context(self):
-        return self._context[0]
 
     @utils.memoizedproperty
     def howmany(self):
