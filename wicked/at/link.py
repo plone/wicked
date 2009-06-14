@@ -69,7 +69,7 @@ class ATPortalFactoryAdd(ATWickedAdd):
 def handle_at_newcontent(context, event):
     field = context.Schema()[event.section]
     wicked = getWicked(field, context, event)
-    wicked.manageLink(context, event.title)
+    wicked.manageLink(event.newcontent, event.title)
     portal_status_message=quote('"%s" has been created' % event.title)
     url = event.newcontent.absolute_url()
     restr = "%s/edit?title=%s&portal_status_message=%s" %(url,

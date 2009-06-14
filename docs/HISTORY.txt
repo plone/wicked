@@ -2,8 +2,15 @@ Changelog for wicked
 
     (name of developer listed in brackets)
 
-wicked - 1.0.1 Unreleased
+wicked - 1.1.6 svn unreleased
 
-    - Initial package structure.
-      [zopeskel]
+    - When creating a new content object (to which the wiki link already exists)
+      add the backlink to the new object, not to the context which can be
+      the object that contains the link in case @@wickedadd is used.
+      Fixes http://dev.plone.org/plone/ticket/8731
+      [csenger]
 
+wicked - 1.1.6 svn unreleased
+
+    - super-massive black hole. Developed by Whit Morriss and contributors.
+      Details are unknown until 1.1.6 svn unreleased

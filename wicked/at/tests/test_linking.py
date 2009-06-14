@@ -41,6 +41,21 @@ class TestWikiLinking(Base):
     def test_backlink(self):
         assert self.page1 in self.page2.getRefs(relationship=BACKLINK_RELATIONSHIP)
 
+    def test_backlink_after_wickedadd(self):
+        '''
+        Test that the backlink is set if the link is added first
+        and the content is created afterwards with the @@wickedadd link
+        '''
+        TITLE = 'lowertitle'
+        self.login('test_user_1_')
+        self.set_text(self.page1, '((%s))' % TITLE)
+        addview = self.page1.restrictedTraverse('@@wickedadd')
+        addview.add_content(title=TITLE,
+                            section=self.wicked_field,
+                            type_name=self.wicked_type)
+        newcontent = self.folder[TITLE]
+        assert self.page1 in newcontent.getRefs(relationship=BACKLINK_RELATIONSHIP)
+
     def testforlink(self):
         self.failUnlessWickedLink(self.page1, self.page2)
 
