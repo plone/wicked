@@ -2,7 +2,7 @@ Changelog for wicked
 
     (name of developer listed in brackets)
 
-wicked - 1.1.6 svn unreleased
+wicked - 1.1.6 - 2009-06-20
 
     - When creating a new content object (to which the wiki link already exists)
       add the backlink to the new object, not to the context which can be
