@@ -1,21 +1,11 @@
-import os
-from cStringIO import StringIO
 from Testing import ZopeTestCase
-from Testing.ZopeTestCase import PortalTestCase, installProduct
-from Products.CMFCore.utils  import getToolByName
+from Testing.ZopeTestCase import installPackage
 from Products.PloneTestCase import ptc
-from Products.PloneTestCase.layer import PloneSite 
-from wicked.atcontent.Extensions.Install import install as installWicked
-import wicked.at.config as config
+from Products.PloneTestCase.layer import onsetup, PloneSite 
 from wicked.testing.xml import xstrip as strip
 from wicked.normalize import titleToNormalizedId
 from wicked.registration import BasePloneWickedRegistration 
-from zope.interface import Interface
 from Products.Five import zcml
-from App.Product import initializeProduct
-from App.ProductContext import ProductContext
-
-ptc.setupPloneSite(products=['wicked.atcontent'])
 
 TITLE1 = "Cop Shop"
 TITLE2 = 'DMV Computer has died'
@@ -25,18 +15,14 @@ USELXML = False
 import transaction as txn
 #from collective.testing.debug import autopsy
 
-def init_product(module_, app, init_func=None):
-    product = initializeProduct(module_,
-                                module_.__name__,
-                                module_.__path__[0],
-                                app)
-    
-    product.package_name = module_.__name__
-    
-    if init_func is not None:
-        newContext = ProductContext(product, app, module_)
-        init_func(newContext)
+@onsetup
+def register_package():
+    import wicked.atcontent
+    zcml.load_config("configure.zcml", package=wicked.atcontent)
+    installPackage('wicked.atcontent')
 
+register_package()
+ptc.setupPloneSite(products=['wicked.atcontent'])
 
 class WickedSite(PloneSite):
 
@@ -44,12 +30,7 @@ class WickedSite(PloneSite):
     def setUp(cls):
         app = ZopeTestCase.app()
         plone = app.plone
-        # fake a <five:registerPackage> tag
         reg = BasePloneWickedRegistration(plone)
-        import wicked.atcontent
-        from wicked.atcontent.zope2 import initialize
-        init_product(wicked.atcontent, app, initialize)
-        zcml.load_config("configure.zcml", package=wicked.atcontent)
         reg.handle()
         # install the product
         qi = plone.portal_quickinstaller

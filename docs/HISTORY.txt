@@ -2,6 +2,13 @@ Changelog for wicked
 
     (name of developer listed in brackets)
 
+wicked - 1.1.8 - unreleased
+
+    - Adjusted test setup to make sure that wicked.atcontent is registered as
+      a package before App.FactoryDispatcher's _product_packages gets
+      memoized by Plone 4's monkey patch optimization.
+      [davisagli]
+
 wicked - 1.1.7 - 2009-06-20
 
     - When creating a new content object (to which the wiki link already exists)
