@@ -39,7 +39,8 @@ class TestLinkCache(WickedTestCase):
         data=dict(path='/plone/Members/test_user_1_/dmv-computer-has-died',
                   icon='plone/document_icon.gif')
         data['uid']=IUID(self.page2)
-        self.failUnlessEqual(set(val[0].items()), set(data.items()))
+        self.failUnlessEqual(set([i['uid'] for i in val]),
+                             set([data['uid']]))
 
     def test_cacheIsUsed(self):
         field = self.field
