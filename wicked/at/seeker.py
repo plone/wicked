@@ -25,7 +25,7 @@ class AdvQueryMatchingSeeker(object):
     def evalQ(self, queries, sort=None):
         resultSet = set([])
         for q in queries:
-            resultSet = resultSet | set(self.catalog(q))
+            resultSet.update(set(self.catalog(q)))
         if sort and resultSet:
             sortableResultSet = [tuple([a[b] for b in sort]+[a]) for a in resultSet]
             sortableResultSet.sort(key=lambda x:x[0:-1])
