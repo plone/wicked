@@ -1,10 +1,8 @@
-from Products.AdvancedQuery import Eq, Generic
 from Products.CMFCore.utils import getToolByName
 from wicked.interfaces import IWickedQuery, IAmWicked
 from wicked.utils import memoizedproperty, memoize, match, packBrain, cleanUID
 from zope.interface import implements
 from zope.component import adapts
-
 
 _marker = object()
 class AdvQueryMatchingSeeker(object):
@@ -23,7 +21,17 @@ class AdvQueryMatchingSeeker(object):
         self.context = context
         self.catalog = getToolByName(context, 'portal_catalog')
         self.path = '/'.join(context.aq_inner.aq_parent.getPhysicalPath())    
-        self.evalQ = self.catalog.evalAdvancedQuery
+
+    def evalQ(self, queries, sort=None):
+        resultSet = set([])
+        for q in queries:
+            resultSet = resultSet | set(self.catalog(q))
+        if sort and resultSet:
+            sortableResultSet = [tuple([a[b] for b in sort]+[a]) for a in resultSet]
+            sortableResultSet.sort(key=lambda x:x[0:-1])
+            return [a[-1] for a in sortableResultSet]
+        else:
+            return [a for a in resultSet]
 
     def configure(self, chunk, normalled, scope):
         self.chunk = chunk
@@ -37,12 +45,12 @@ class AdvQueryMatchingSeeker(object):
             return self.evalQ(query)
 
     def queryUIDs(self, uids):
-        return self._query(Generic('UID', uids), sort=None)
+        return self._query([{'UID': uids}], sort=None)
 
     @property
     def scopedQuery(self):
         chunk, title = self.chunk, self.title
-        query = (Eq('getId', chunk) | Eq('Title', title))
+        query = [{'getId': chunk}, {'Title': title}]
         if not self.scope is _marker:
             # XXX let's move this out of attr storage
             # on the content to at least an annotation
@@ -54,7 +62,7 @@ class AdvQueryMatchingSeeker(object):
             if callable(scope):
                 scope = scope()
             if scope:
-                query = Generic('path', scope) & query
+                [a.update(path=scope) for a in query]
         return query
 
     @property
@@ -62,8 +70,9 @@ class AdvQueryMatchingSeeker(object):
         chunk, normalled = self.chunk, self.normalled
         getId = chunk
         self.title = title = '"%s"' % chunk
-        query = Generic('path', {'query': self.path, 'depth': -1}) \
-                & (Eq('getId', chunk) | Eq('Title', title) | Eq('getId', normalled))
+        query = [{'path': {'query': self.path, 'depth': -1}, 'getId': chunk},
+                 {'path': {'query': self.path, 'depth': -1}, 'Title': title},
+                 {'path': {'query': self.path, 'depth': -1}, 'getId': normalled}]
         return query
 
     @property
@@ -81,7 +90,7 @@ class AdvQueryMatchingSeeker(object):
         if curr is _marker:
             curr = query
         else:
-            curr |= query
+            curr.extend(query)
         setattr(self, name, curr)
         return curr
 
