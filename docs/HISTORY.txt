@@ -4,6 +4,10 @@ Changelog for wicked
 
 wicked - 1.1.8 - unreleased
 
+    - Adjusted wicked.at.seeker.AdvQueryMatchingSeeker to no longer use
+      AdvancedQuery. Fixes http://dev.plone.org/plone/ticket/9398
+      [esteele]
+      
     - Adjusted test setup to make sure that wicked.atcontent is registered as
       a package before App.FactoryDispatcher's _product_packages gets
       memoized by Plone 4's monkey patch optimization.
