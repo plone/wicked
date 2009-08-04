@@ -36,7 +36,6 @@ def getToolByName(context, toolname, default):
 def backlinkTools():
     import Products.CMFCore.utils
     Products.CMFCore.utils.getToolByName = getToolByName
-    from Products import AdvancedQuery
     from Products.CMFCore.CatalogTool import CatalogTool
     from Products.Archetypes.ReferenceEngine import ReferenceCatalog, UIDCatalog
     return dict(portal_workflow=None,
