@@ -83,25 +83,6 @@
      class="wicked.at.link.BasicFiveLink"
      />
 
-   <!-- for backlinking / content creation. normally registered to
-	IAmWicked, but here constrained to atcontent types -->
-
-   <adapter 
-      factory="wicked.txtfilter.WickedFilter"
-      provides="wicked.interfaces.IWickedFilter"
-      for="wicked.interfaces.IAmWickedField
-	   Products.ATContentTypes.interface.IATContentType
-	   wicked.interfaces.IWickedEvent" 
-      />
-
-   <adapter
-      factory="wicked.txtfilter.WickedFilter" 
-      provides="wicked.interfaces.IWickedFilter"
-      for="wicked.interfaces.IAmWickedField
-           Products.ATContentTypes.interface.IATContentType
-	   wicked.fieldevent.interfaces.IFieldStorageEvent"
-      />
-
    <!-- subscriber 
       factory="wicked.txtfilter.backlink_handler"
       provides="wicked.fieldevent.IFieldValueSetter" /-->
