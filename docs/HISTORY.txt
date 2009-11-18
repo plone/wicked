@@ -4,8 +4,8 @@ Changelog for wicked
 (name of developer listed in brackets)
 
 
-1.1.8 (unreleased)
-------------------
+1.1.8alpha1 (2009-11-18)
+------------------------
 
 - Don't register WickedFilter for IATContent. All necessary
   registratons are done for more specific Interfaces per content type
