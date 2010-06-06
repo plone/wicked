@@ -12,9 +12,10 @@ from wicked.txtfilter import backlink, brackettedbacklink
 from wicked.txtfilter import IAmWickedField, IFieldEvent
 from wicked.txtfilter import WickedFilter, IWickedFilter
 from wicked.txtfilter import WickedFilter, wicked_listener, bracketted_wicked_listener
-from zope.app.schema.vocabulary import IVocabularyFactory
+
 from zope.component import getSiteManager
 from zope.interface import implements
+from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleVocabulary
 
 import logging

@@ -4,6 +4,9 @@ Changelog
 1.1.8b1 (unreleased)
 --------------------
 
+- Avoid any usage of zope.app packages.
+  [hannosch]
+
 - Updated package metadata.
   [hannosch]
 

@@ -23,6 +23,10 @@ setup(name='wicked',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'zope.container',
+          'zope.lifecycleevent',
+          'zope.schema',
+          'zope.traversing',
       ],
       entry_points="""
       [wicked.base_registration]

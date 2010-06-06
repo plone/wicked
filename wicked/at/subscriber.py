@@ -9,10 +9,14 @@
 #   - and contributors
 #
 ##########################################################
-from wicked import config, utils
-from zope.app.container.interfaces import IObjectRemovedEvent, IObjectAddedEvent
-from wicked.interfaces import IAmWicked, IAmWickedField, IUID
+
+from zope.container.interfaces import IObjectAddedEvent
+from zope.container.interfaces import IObjectRemovedEvent
+
 from Products.Archetypes.interfaces import ISchema
+
+from wicked import config, utils
+from wicked.interfaces import IAmWicked, IAmWickedField, IUID
 
 # @@ these a very at specific
 
