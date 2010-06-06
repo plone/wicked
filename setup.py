@@ -1,24 +1,21 @@
 from setuptools import setup, find_packages
-import sys, os
 
-version = '1.1.8alpha1'
+version = '1.1.8b1'
 
 setup(name='wicked',
       version=version,
       description="wicked is a compact syntax for doing wiki-like content linking and creation in zope and plone",
-      long_description="""\
-""",
+      long_description=open("README.txt").read() + "\n" +
+                       open("CHANGES.txt").read(),
       classifiers=[
         "Framework :: Zope2",
-        "Framework :: Zope3",
         "Framework :: Plone",
         "Programming Language :: Python",
-        "Topic :: Software Development :: Libraries :: Python Modules",
         ],
-      keywords='wiki anti-wiki zope3 zope2 plone',
+      keywords='wiki anti-wiki zope2 plone',
       author='whit',
       author_email='wicked@lists.openplans.org',
-      url='http://openplans.org/projects/wicked',
+      url='http://pypi.python.org/pypi/wicked',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
       namespace_packages=['wicked'],
@@ -28,10 +25,8 @@ setup(name='wicked',
           'setuptools',
       ],
       entry_points="""
-      # -*- Entry points: -*-
       [wicked.base_registration]
       basic_plone_registration = wicked.registration:BasePloneWickedRegistration
       bracketted_plone_registration = wicked.registration:BasePloneMediaWickedRegistration
-      #[wicked.cache_manager]
       """,
       )

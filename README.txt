@@ -1,7 +1,7 @@
-wicked Package Readme
-=========================
+wicked
+======
 
 Overview
 --------
 
-wicked is a compact syntax for doing wiki-like content linking and creation
+wicked is a compact syntax for doing wiki-like content linking and creation.

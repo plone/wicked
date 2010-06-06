@@ -1,8 +1,11 @@
-Changelog for wicked
-====================
+Changelog
+=========
 
-(name of developer listed in brackets)
+1.1.8b1 (unreleased)
+--------------------
 
+- Updated package metadata.
+  [hannosch]
 
 1.1.8alpha1 (2009-11-18)
 ------------------------
@@ -14,16 +17,15 @@ Changelog for wicked
   like ICacheManager, leads to ComponentLookupErrors.
   Fixes http://dev.plone.org/plone/ticket/9597
   [csenger]
-      
+
 - Adjusted wicked.at.seeker.AdvQueryMatchingSeeker to no longer use
   AdvancedQuery. Fixes http://dev.plone.org/plone/ticket/9398
   [esteele]
-      
+
 - Adjusted test setup to make sure that wicked.atcontent is registered as
   a package before App.FactoryDispatcher's _product_packages gets
   memoized by Plone 4's monkey patch optimization.
   [davisagli]
-
 
 1.1.7 - 2009-06-20
 ------------------
@@ -33,7 +35,6 @@ Changelog for wicked
   the object that contains the link in case @@wickedadd is used.
   Fixes http://dev.plone.org/plone/ticket/8731
   [csenger]
-
 
 1.1.6
 -----
