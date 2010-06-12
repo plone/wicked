@@ -1,21 +1,22 @@
 <configure
    xmlns="http://namespaces.zope.org/zope"
-   xmlns:five="http://namespaces.zope.org/five"
    xmlns:wicked="http://namespaces.openplans.org/wicked">
 
   <include package="wicked.at" />
 
   <wicked:decorate-at-field
      fieldclass="Products.Archetypes.Field.TextField"
-     />  
+     />
 
-  <five:implements class="Products.Archetypes.Field.TextField"
-		   interface="wicked.at.interfaces.IAmATWickedField" />
+  <class class="Products.Archetypes.Field.TextField">
+      <implements interface="wicked.at.interfaces.IAmATWickedField" />
+  </class>
 
-  <five:implements class="Products.Archetypes.Referenceable.Referenceable"
-		   interface="wicked.interfaces.IAmWicked" />
+  <class class="Products.Archetypes.Referenceable.Referenceable">
+      <implements interface="wicked.interfaces.IAmWicked" />
+  </class>
 
-  <subscriber 
+  <subscriber
      factory="wicked.txtfilter.backlink_handler"
      provides="wicked.fieldevent.IFieldValueSetter" />
 

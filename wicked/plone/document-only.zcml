@@ -1,6 +1,5 @@
 <configure
    xmlns="http://namespaces.zope.org/zope"
-   xmlns:five="http://namespaces.zope.org/five"
    xmlns:wicked="http://namespaces.openplans.org/wicked">
 
   <include package="wicked.at" />
@@ -11,8 +10,9 @@
 
   <!-- ATDocument -->
 
-  <five:implements class="Products.ATContentTypes.content.document.ATDocument"
-		   interface="wicked.interfaces.IAmWicked" />
+  <class class="Products.ATContentTypes.content.document.ATDocument">
+      <implements interface="wicked.interfaces.IAmWicked" />
+  </class>
 
   <wicked:atschema-fields-implement
      atclass="Products.ATContentTypes.content.document.ATDocument"

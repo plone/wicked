@@ -4,6 +4,9 @@ Changelog
 1.1.8b1 (unreleased)
 --------------------
 
+- Avoid using the deprecated five:implements directive.
+  [hannosch]
+
 - Avoid any usage of zope.app packages.
   [hannosch]
 
