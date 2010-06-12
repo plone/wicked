@@ -38,8 +38,8 @@ in the cache of the original document::
     True
     >>> testfo['second-doc'].portal_type
     'Document'
-    >>> testfo.REQUEST.RESPONSE.headers['status']
-    '302 Moved Temporarily'
+    >>> testfo.REQUEST.RESPONSE.getStatus()
+    302
 
 Let's try this through the publisher:
 
