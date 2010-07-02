@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '1.1.8b1'
+version = '1.1.8'
 
 setup(name='wicked',
       version=version,

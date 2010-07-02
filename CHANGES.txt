@@ -1,8 +1,8 @@
 Changelog
 =========
 
-1.1.8b1 (unreleased)
---------------------
+1.1.8 (2010-07-02)
+------------------
 
 - Avoid using the deprecated five:implements directive.
   [hannosch]
