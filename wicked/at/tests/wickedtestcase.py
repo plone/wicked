@@ -10,8 +10,6 @@ from Products.Five import zcml
 TITLE1 = "Cop Shop"
 TITLE2 = 'DMV Computer has died'
 
-USELXML = False
-
 import transaction as txn
 #from collective.testing.debug import autopsy
 
