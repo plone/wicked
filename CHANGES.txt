@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.1.9 (unreleased)
+1.1.9 (2010-09-09)
 ------------------
 
 - Avoid the undeclared libxml2/lxml test dependency with a simplistic regex.
