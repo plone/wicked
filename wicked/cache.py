@@ -13,15 +13,15 @@ from persistent import Persistent
 from persistent.mapping import PersistentMapping
 from BTrees.OOBTree import OOBTree
 from wicked.interfaces import ICacheManager, IAmWicked, IWickedFilter
-from wicked.interfaces import IUID
-from zope.annotation.interfaces import IAnnotations, IAnnotatable
+from zope.annotation.interfaces import IAnnotations
 from zope.interface import implements
-from zope.component import adapts, getUtility
-from utils import memoizedproperty, memoize, clearbefore
+from zope.component import adapts
+from utils import memoizedproperty, clearbefore
 
 _marker = object()
 
 # @@ need sys-module alias
+
 
 class CacheStore(Persistent):
     """
@@ -31,7 +31,6 @@ class CacheStore(Persistent):
     """
     def __init__(self, id_):
         self.id = id_
-        super(CacheStore, self).__init__(self)
         self.field={}
         self._cache = OOBTree()
 
@@ -108,9 +107,7 @@ class Cache(PersistentMapping):
         """
         trickle up deletion
         """
-        uid = self.getRaw(key)
         self.parent.remove(key)
-        
         super(Cache, self).__delitem__(key)
 
 # @@ migrate to new name        
@@ -169,22 +166,6 @@ class BaseCacheManager(object):
 
     def reset(self, uid, value):
         self.cache_store.set(uid, value)
-
-
-class UtilityCacheManager(BaseCacheManager):
-
-    @memoizedproperty
-    def cache_store(self):
-        # XXX There is no IWickedCacheStore
-        return getUtility(IWickedCacheStore)
-
-    def name(): 
-        def _pset(self, name, value):
-            self._name=(name, IUID(self.context))
-        def _pget(self, name):
-            return self._name
-        return locals()
-    name = property(name())
 
 
 class ContentCacheManager(BaseCacheManager):
