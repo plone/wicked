@@ -21,10 +21,10 @@ Here is some structured text data:
 """
 
 class TestWickedRendering(WickedTestCase):
-    # an untest? 
+    # an untest?
     wicked_type = 'IronicWiki'
     wicked_field = 'body'
-    
+
     def test_stxRendering(self):
         self.set_text(self.page1, stx_body, mimetype='text/structured')
         self.failUnless('<ul>' in self.page1.getBody())

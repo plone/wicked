@@ -8,11 +8,11 @@
 
   <wicked:decorate-at-field
      fieldclass="Products.Archetypes.Field.TextField"
-     />  
+     />
 
   <!-- ATDocument -->
 
-  <wicked:atschema-fields-implement 
+  <wicked:atschema-fields-implement
      atclass="Products.ATContentTypes.content.document.ATDocument"
      fields="text"
      implements="wicked.at.interfaces.IAmATWickedField"
@@ -20,7 +20,7 @@
 
   <!-- ATEvent -->
 
-  <wicked:atschema-fields-implement 
+  <wicked:atschema-fields-implement
      atclass="Products.ATContentTypes.content.event.ATEvent"
      fields="text"
      implements="wicked.at.interfaces.IAmATWickedField"
@@ -28,7 +28,7 @@
 
   <!-- ATNewsItem -->
 
-  <wicked:atschema-fields-implement 
+  <wicked:atschema-fields-implement
      atclass="Products.ATContentTypes.content.newsitem.ATNewsItem"
      fields="text"
      implements="wicked.at.interfaces.IAmATWickedField"
@@ -36,7 +36,7 @@
 
   <!-- views -->
   <!-- portal factory add view -->
-  <!-- 
+  <!--
   <browser:pages
      for="Products.ATContentTypes.interface.IATContentType"
      class="wicked.at.link.ATPortalFactoryAdd"
@@ -61,7 +61,7 @@
        name="wickedadd"
        attribute="add_content"
        />
-     
+
      <browser:page
 	name="wickedaddmenu"
 	attribute="addMenu"
@@ -83,7 +83,7 @@
      class="wicked.at.link.BasicFiveLink"
      />
 
-   <!-- subscriber 
+   <!-- subscriber
       factory="wicked.txtfilter.backlink_handler"
       provides="wicked.fieldevent.IFieldValueSetter" /-->
 

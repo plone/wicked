@@ -16,12 +16,12 @@ class ATBacklinkManager(object):
     #@@ needs refactoring
     implements(IATBacklinkManager)
     adapts(IWickedFilter, IReferenceable)
-    
+
     relation = config.BACKLINK_RELATIONSHIP
     refKlass = Backlink
 
     packBrain = staticmethod(packBrain)
-    
+
     def __init__(self, wfilter, context):
         self.wfilter = wfilter
         self.context = context
@@ -43,7 +43,7 @@ class ATBacklinkManager(object):
             ## XXX non-orthogonal
             return self.resolver.queryUIDs(uids)
         return []
-    
+
     def _preplinks(self, links=dict()):
         return links and dict([(normalize(link), link) for link in links]) \
                      or dict()
@@ -51,7 +51,7 @@ class ATBacklinkManager(object):
     def manageLinks(self, new_links):
         # this has been heavily optimized
         # @@ but asyncing backlinking would help
-                
+
         scope=self.wfilter.scope
         dups = set(self.removeLinks(new_links))
 
@@ -63,7 +63,7 @@ class ATBacklinkManager(object):
             self.resolver.aggregate(link, normalled, scope)
 
         for link, normalled in zip(new_links, norm):
-            match = self.getMatch(link, resolver.agg_brains, normalled=normalled)            
+            match = self.getMatch(link, resolver.agg_brains, normalled=normalled)
             if not match:
                 match = self.getMatch(link, resolver.agg_scoped_brains, normalled=normalled)
             if not match:
@@ -92,18 +92,18 @@ class ATBacklinkManager(object):
         data = dict(path=path,
                     icon=obj.getIcon(),
                     uid=objuid)
-        
-        self.cm.set((intern(str(normalled)), objuid), [data])  
+
+        self.cm.set((intern(str(normalled)), objuid), [data])
 
     def removeLinks(self, exclude=tuple()):
         oldlinks = self.getLinks()
         if not oldlinks:
             return set()
-        
-        exclude = self._preplinks(exclude)        
+
+        exclude = self._preplinks(exclude)
         dups = set([brain for brain in oldlinks if \
                     self.match(brain, exclude.get)])
-        
+
         [self.remove(brain) for brain in set(oldlinks) - dups]
         return [self.cleanUID(b) for b in dups]
 
@@ -118,7 +118,7 @@ class ATBacklinkManager(object):
                        getlink(normalize(brain.Title), None))
         if link:
             return True
-                
+
     def remove(self, brain):
         #XXX needs test
         objs = self.refcat._resolveBrains(\

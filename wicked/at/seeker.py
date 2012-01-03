@@ -7,7 +7,7 @@ from zope.component import adapts
 _marker = object()
 class AdvQueryMatchingSeeker(object):
     """
-    An advanced query specific 
+    An advanced query specific
     CMFish catalog query handler
     """
     implements(IWickedQuery)
@@ -16,11 +16,11 @@ class AdvQueryMatchingSeeker(object):
     chunk = _marker
     normalled = _marker
     scope = _marker
-    
+
     def __init__(self, context):
         self.context = context
         self.catalog = getToolByName(context, 'portal_catalog')
-        self.path = '/'.join(context.aq_inner.aq_parent.getPhysicalPath())    
+        self.path = '/'.join(context.aq_inner.aq_parent.getPhysicalPath())
 
     def evalQ(self, queries, sort=None):
         resultSet = set([])
@@ -103,14 +103,14 @@ class AdvQueryMatchingSeeker(object):
         return self._aggquery('_squery', self.scopedQuery)
 
     # memo prevents dups
-    @memoize 
+    @memoize
     def aggregate(self, link, normalled, scope):
         """
         builds aggregated queries for scoped and basic
         """
         self.configure(link, normalled, scope)
-        self.bquery 
-        self.squery 
+        self.bquery
+        self.squery
 
     @memoizedproperty
     def agg_brains(self):

@@ -31,7 +31,7 @@ class BaseWickedRegistration(object):
     txtfilter = WickedFilter
     txtfilter_provides = IWickedFilter
     subscriber = (wicked_listener,)
-    
+
     def __init__(self, context, **kw):
         self.site = context
         for key, item in kw.items():
@@ -45,7 +45,7 @@ class BaseWickedRegistration(object):
     @property
     def required(self):
         return (self.field, self.content, self.event)
-    
+
     def handle(self, unregister=False):
         # @@ add logging
         handle_adapter_reg = self.sm.registerAdapter
@@ -55,7 +55,7 @@ class BaseWickedRegistration(object):
             handle_adapter_reg = self.sm.unregisterAdapter
             handle_subscriber_reg = self.sm.unregisterHandler
             handle_sub_adapter_reg = self.sm.unregisterSubscriptionAdapter
-        
+
         self.handle_txtfilter(handle_adapter_reg)
         for subscriber in self.subscriber:
             handle_subscriber_reg(subscriber, required=self.required)
@@ -102,17 +102,17 @@ class SelectiveRegistration(BaseWickedRegistration):
     other_events = (IWickedEvent, IFieldStorageEvent)
     backlink_handler = (backlink, brackettedbacklink)
     subscriber = (wicked_listener, bracketted_wicked_listener)
-    
+
     @property
     def cache_required(self):
         return (self.txtfilter_provides, self.content)
-    
+
     def handle(self, unregister=False):
         handle_adapter_reg, handle_subscriber_reg, handle_sub_adapter_reg = super(SelectiveRegistration,
                                        self).handle(unregister=unregister)
         self.handle_cache(handle_adapter_reg)
         self.handle_seeker(handle_adapter_reg)
-        
+
         for event in self.other_events:
             self.handle_txtfilter(handle_adapter_reg, event=event)
         return (handle_adapter_reg,

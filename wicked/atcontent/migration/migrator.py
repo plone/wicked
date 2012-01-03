@@ -9,7 +9,7 @@ if CMFItemMigrator != None:
     class WickedDocMigrator(CMFItemMigrator):
         walker = CatalogWalker
         map = {'getText': 'setText'}
-        
+
         src_portal_type = 'Document'
         src_meta_type = 'ATDocument'
         dst_portal_type = 'WickedDoc'

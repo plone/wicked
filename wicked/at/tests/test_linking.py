@@ -11,7 +11,7 @@ from Products.CMFCore.utils import getToolByName
 class Base(WickedTestCase):
     wicked_type = 'IronicWiki'
     wicked_field = 'body'
-    
+
     def replaceCreatedIndex(self):
         """ replace the 'created' index w/ a field index b/c we need
         better than 1 minute resolution for our testing """
@@ -20,7 +20,7 @@ class Base(WickedTestCase):
         cat.manage_addIndex('created', 'FieldIndex',
                             extra={'indexed_attrs':'created'})
         cat.manage_reindexIndex(ids=['created'])
-    
+
     def demoCreate(self, **kw):
         self.login('test_user_1_')
         addview = self.page1.restrictedTraverse('@@wickedadd')
@@ -33,7 +33,7 @@ class Base(WickedTestCase):
 
 
 class TestWikiLinking(Base):
-    
+
     def afterSetUp(self):
         super(TestWikiLinking, self).afterSetUp()
         self.set_text(self.page1, '((%s))' % TITLE2)
@@ -62,9 +62,9 @@ class TestWikiLinking(Base):
     def testformultiplelinks(self):
         self.set_text(self.page1, '((DMV Computer has died))  ((Make another link))')
         self.failUnlessAddLink(self.page1)
-                        
+
         self.failUnlessWickedLink(self.page1, self.page2)
-        
+
     def testInexactTitleNotMatch(self):
         w1 = makeContent(self.folder, 'w1', self.wicked_type,
                          title='W1 Title With Extra')
@@ -160,11 +160,11 @@ class TestWikiLinking(Base):
         for id in args:
             folders.append(makeContent(self.folder, id, 'Folder'))
         return tuple(folders)
-            
+
     def testDupRemoteTitleMatchesOldest(self):
         self.replaceCreatedIndex()
         title = 'Duplicate Title'
-        
+
         f2, f3, f4 = self.makeFolders('f2', 'f3', 'f4')
 
         w1 = makeContent(f2, 'w1', self.wicked_type,
@@ -188,7 +188,7 @@ class TestWikiLinking(Base):
         f2, f3 = self.makeFolders('f2', 'f3')
         w1 = makeContent(f2, 'w1', self.wicked_type,
                          title=title)
-        
+
         # check implicit resolution
         # this is a pre-test
         # should set cache
@@ -199,18 +199,18 @@ class TestWikiLinking(Base):
         self.moveContent(w1, f3)
 
         w1.setTitle('new title to make sure we do not accidentally resolve')
-        
+
         # check link did not change
         self.failUnlessWickedLink(self.page1, w1)
 
 class TestDocCreation(Base):
-    
+
     def afterSetUp(self):
         WickedTestCase.afterSetUp(self)
         self.title = 'Create a New Document'
         self.demoCreate()
         self.set_text(self.page1, '((%s))' %self.title)
-        
+
     def testDocAdded(self):
         self.failUnless(getattr(self.folder,
                                 titleToNormalizedId(self.title), None))
@@ -219,13 +219,13 @@ class TestDocCreation(Base):
         newdoc = getattr(self.folder, titleToNormalizedId(self.title))
         backlinks = newdoc.getRefs(relationship=BACKLINK_RELATIONSHIP)
         self.failUnless(self.page1 in backlinks)
-        
+
 class TestLinkNormalization(Base):
     title = 'the monkey flies at dawn'
 
     def afterSetUp(self):
         super(TestLinkNormalization, self).afterSetUp()
-        title1 = self.title 
+        title1 = self.title
         self.login('test_user_1_')
         self.newpage = self.clickCreate(self.page1, self.title)
 
@@ -262,13 +262,13 @@ class TestLinkNormalization(Base):
 ##         self.failIfWickedLink(self.page1, self.newpage)
 ##         self.failUnlessWickedLink(self.page1, self.page2)
 
-        
+
     def test_create_titlechange(self):
         # add content from link
         # test link
         # change title
         # test link
-        title1 = self.title 
+        title1 = self.title
 
         # if this fails, wicked is not working period
         self.failUnlessWickedLink(self.page1, self.newpage)
@@ -277,7 +277,7 @@ class TestLinkNormalization(Base):
         self.failUnlessWickedLink(self.page1, self.newpage)
 
 class TestRemoteLinking(Base):
-    
+
     def afterSetUp(self):
         super(TestRemoteLinking, self).afterSetUp()
         self.set_text(self.page1, '((%s))' % TITLE2)
@@ -327,7 +327,7 @@ class TestRemoteLinking(Base):
         self.set_text(w3, "((%s))" % w1.id)
         self.failUnlessWickedLink(w3, w1)
         self.failIfWickedLink(w3, w2)
-        
+
 
 def test_suite():
     from wicked.at.link import test_suite as btests

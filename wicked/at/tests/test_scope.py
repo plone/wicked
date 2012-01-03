@@ -35,17 +35,17 @@ def scopeTester(field, context):
 
 
 class Scoped(WickedSite):
-    
+
     @classmethod
     def setUp(cls):
         alsoProvides(IronicWiki.schema['body'], IScopedField)
         # @@ maybe make this local?
         provideAdapter(scopeTester)
-        
+
     @classmethod
     def tearDown(cls):
         # clear out markers
-        noLongerProvides(IronicWiki.schema['body'], IScopedField)        
+        noLongerProvides(IronicWiki.schema['body'], IScopedField)
 
 
 class TestWickedScope(WickedTestCase):
@@ -64,7 +64,7 @@ class TestWickedScope(WickedTestCase):
         f2 = makeContent(self.folder, 'f2', 'Folder')
         w1 = makeContent(f2, 'w1', 'IronicWiki',
                           title='W1 Title')
-        
+
         self.set_text(w1, "((%s))" % self.page1.Title())
         self.failUnlessWickedLink(w1, self.page1)
 
@@ -75,7 +75,7 @@ class TestWickedScope(WickedTestCase):
                           title='W1 Title')
         self.set_text(w1, "((%s))" % self.page1.Title())
         self.failIfWickedLink(w1, self.page1)
-        
+
 
 def test_suite():
     suite = unittest.TestSuite()

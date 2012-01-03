@@ -10,32 +10,32 @@
 #
 ##########################################################
 from general import dummy
-from wicked.factories import ContentCacheManager     
+from wicked.factories import ContentCacheManager
 
 def fakecacheiface(cached):
     def call(*args):
         return args[0]
     def set(*args):
         return "<link cached>"
-    methods = dict(__call__=call, set=set) 
+    methods = dict(__call__=call, set=set)
     cacheman=type('dummy',
                   (dict,), methods)()
     cacheman.update(cached)
     return cacheman
 
 class query(object):
-    
+
     brains = ['We are brains!']
-    
+
     def scopedSearch(self):
         if self.chunk != 'dud':
             return self.brains
-        
+
     def configure(self, chunk, normalized, scope):
         self.chunk = chunk
         self.normalized = normalized
         self.scope = scope
-        
+
     def search(self):
         if self.chunk != 'dud' and self.chunk != 'scoped':
             return self.brains
@@ -43,7 +43,7 @@ class query(object):
 def argchug(rets):
     def function(*args, **kwargs):
         return rets
-    
+
 def fakefilter():
     def conf(*args, **kw):
         self = list(args).pop()

@@ -17,7 +17,7 @@ def linkcache(func):
     def cache(wfilter, chunk, normalized):
         # cache depends on query and match
         # this could use some untangling
-        # generic function? 
+        # generic function?
         value = wfilter.cache.get(normalized)
         if not value:
             value = func(wfilter, chunk, normalized)
@@ -77,7 +77,7 @@ def packBrain(brain):
     # index is updated for an object, substitute the record id
 
     uid = cleanUID(brain)
-    
+
     return dict(path=brain.getPath(),
                 icon=brain.getIcon,
                 uid=uid,
@@ -89,7 +89,7 @@ def getMatch(chunk, brains, normalled=None):
     Given a set of query results and the wicked link text, return
     the single brain that represents the correct object to link to, or
     None.
-    
+
     Assumes that brains are already ordered oldest to newest, so
     the first absolute match is the one returned.  Matches on id
     take priority over matches on title
@@ -113,7 +113,7 @@ def getMatch(chunk, brains, normalled=None):
 
     >>> getMatch('', brains[:1], 'a-0').getId
     'a-0'
-    
+
     >>> getMatch(brains[0].getId, brains[:1], 'blah').getId
     'a-0'
 
@@ -129,7 +129,7 @@ def getMatch(chunk, brains, normalled=None):
     >>> brains =   brains + [newbrain]
     >>> getMatch('', brains, 'a-0').created
     0
-    
+
     >>> getMatch(brains[0].getId, brains).created
     0
 
@@ -172,7 +172,7 @@ def getMatch(chunk, brains, normalled=None):
     # second, match Title
     brains=[brain for brain in brains \
             if normalize(brain.Title) == normalled_chunk]
-    
+
     return brains and brains[0] or None
 
 
@@ -216,7 +216,7 @@ _m = Memoizer()
 memoize = _m.memoize
 memoizedproperty = _m.memoizedproperty
 clearbefore = _m.clearbefore
-    
+
 
 def test_suite():
     import unittest

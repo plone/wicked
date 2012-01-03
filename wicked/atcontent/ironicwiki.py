@@ -25,7 +25,7 @@ from Products.CMFCore.utils import getToolByName
 from wicked.at.field import WikiField
 from wicked.atcontent import zope2
 from wicked.interfaces import IAmWicked
-from zope.annotation.interfaces import IAttributeAnnotatable 
+from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.interface import implements
 
 
@@ -44,7 +44,7 @@ class IronicWiki(atapi.BaseContent):
                                               'text/html',
                                               'text/plain',
                                               'text/plain-pre'),
-               
+
                    widget=atapi.RichWidget( description = "The body text of the document.",
                                             description_msgid = "help_body_text",
                                             label = "Body text",

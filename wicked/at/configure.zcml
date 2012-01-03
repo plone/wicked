@@ -6,7 +6,7 @@
 
    <include package="wicked" />
 
-   <five:registerPackage package="wicked.at" 
+   <five:registerPackage package="wicked.at"
        initialize="wicked.at.zope2.initialize" />
 
    <adapter factory=".zope2.at_uid"/>
@@ -18,7 +18,7 @@
    <class class=".field.WikiField">
       <implements interface="wicked.at.interfaces.IAmATWickedField" />
    </class>
- 
+
    <adapter factory="wicked.at.backlink.ATBacklinkManager"
        permission="zope2.Public" />
 

@@ -4,7 +4,7 @@
 
     <include package="wicked.at" />
 
-    <five:registerPackage package="wicked.atcontent" 
+    <five:registerPackage package="wicked.atcontent"
                           initialize="wicked.atcontent.zope2.initialize" />
 
 </configure>

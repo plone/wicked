@@ -32,7 +32,7 @@ class IFieldEvent(Interface):
 
 class IFieldRenderEvent(IFieldEvent):
     """ an container to fetch a value for a field """
-    
+
 class IFieldStorageEvent(IFieldEvent):
     """ an container to store a value for a field """
 
@@ -59,12 +59,12 @@ class ITxtFilterList(IReadSequence):
 
 class FieldEvent(object):
     implements(IFieldEvent)
-    value=None    
+    value=None
     def __init__(self, field_, instance, **kwargs):
         self.field = field_
         self.instance = instance
         self.kwargs = kwargs
-    
+
 class FieldStorageEvent(FieldEvent):
     implements(IFieldStorageEvent)
     def __init__(self, field_, instance, value, **kwargs):

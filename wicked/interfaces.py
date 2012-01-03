@@ -44,7 +44,7 @@ class IWickedBacklink(Interface):
     @@ is this used?
     """
 
-    
+
 class IWickedFilter(Interface):
     """
     Wicked resolving filter
@@ -68,18 +68,18 @@ class IBacklinkManager(Interface):
         in dups (this allow chaining with removelinks, which
         returns duplicate links)
         """
-        
+
     def getLinks():
         """
         returns all current backlinks
         """
-        
+
     def set(brain, link):
         """
         creates a backlink(a smart pointer pointing for the links target)
         and caches link
         """
-        
+
     def remove(brain):
         """
         does the actual backlink removal and cache unsetting
@@ -89,13 +89,13 @@ class IBacklinkManager(Interface):
         """
         iterates over a list of brain representing existing backlink
         and executes backlink deletion if not included in exclude
-        
+
         @exclude: list of strings 'links' not to erase
         """
 
 class IATBacklinkManager(IBacklinkManager):
     """
-    A manager for Archetypes reference (aka smart pointer) based backlinka 
+    A manager for Archetypes reference (aka smart pointer) based backlinka
     """
     relation = Attribute( """
     Name of Archetype relationship. Used to retrieve
@@ -122,12 +122,12 @@ class ICacheManager(Interface):
         """
         @rendered wicked link
         """
-        
+
     def set(key, text):
         """
         sets text to cache
         """
-        
+
     def unset(key):
         """
         invalidates cache key
@@ -138,20 +138,20 @@ class ICacheManager(Interface):
         create and / or
         @return the  master store
         """
-        
+
     def _get_cache():
         """
         @return actual datastructure
         for getting and setting
         """
-        
+
 class IWickedQuery(Interface):
     """
     object for handling and returning
     dataobjects for wicked prep
     for the macro parser
     """
-    
+
     chunk = Attribute('unaltered string from inside ((wicked link))')
     normalized = Attribute('normalled chunk')
     scope = Attribute('scoping parameter for "scoped" searches')
@@ -163,7 +163,7 @@ class IWickedQuery(Interface):
 
         @return: list of dataobjects
         """
-        
+
     def search(chunk, normalized, best_match):
         """
         @param best_match : attempt to make
@@ -171,18 +171,18 @@ class IWickedQuery(Interface):
 
         @return : list of dataobjects
         """
-        
+
     def configure(chunk, normalized, scope):
         """
         configure set instance attributes
-        
-        @param chunk : instance attr 
+
+        @param chunk : instance attr
         @param normalized : instance attr
         @param scope : instance attr
 
         @return : None
         """
-        
+
 class IWickedLink(Interface):
     """renderer for wicked links"""
 
@@ -190,13 +190,13 @@ class IWickedLink(Interface):
         """
         context
         """
-        
+
     def howmany():
         """
         @return integer
         how many links
         """
-        
+
     def multiple():
         """
         @return boolean
@@ -248,6 +248,6 @@ class IWickedContentAddedEvent(Interface):
 
 class WickedContentAddedEvent(WickedEvent):
     implements(IWickedContentAddedEvent)
-    
+
     def __init__(self, context, newcontent, title, section, request=None):
         self.__dict__.update(locals())

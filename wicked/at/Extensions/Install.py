@@ -7,7 +7,7 @@ def configureWysiwyg(portal, out):
     props = getToolByName(portal, 'portal_properties')
     if not hasattr(props, 'site_properties'): # not plone
         return
-    
+
     editors = props.site_properties.getProperty('available_editors')
     if "Kupu" in editors:
         # move it up in the list
@@ -45,11 +45,11 @@ def install(self):
     if not 'UID' in pc.schema():
         pc.addColumn('UID')
         reindex = True
-        
+
     if not 'UID' in pc.indexes():
         pc.addIndex('UID', 'FieldIndex')
         reindex = True
-        
+
     pc.manage_reindexIndex('UID')
     print >> out, "Successfully installed %s." % config.PROJECTNAME
     return out.getvalue()

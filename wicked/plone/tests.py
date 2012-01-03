@@ -8,9 +8,9 @@ from Products.PloneTestCase.layer import ZCML, PloneSite
 from wicked.at.tests import wickedtestcase as wtc
 from wicked.at.tests import test_cache, test_linking
 from wicked.at.tests.wickedtestcase import WickedSite
-from wicked.fieldevent import meta 
+from wicked.fieldevent import meta
 import wicked.plone as here
-from Products.PloneTestCase.layer import PloneSite 
+from Products.PloneTestCase.layer import PloneSite
 
 from Testing import ZopeTestCase
 
@@ -24,7 +24,7 @@ test_klasses = (test_cache.TestLinkCache,
 ptc.setupPloneSite()
 
 # this manhandles the zcml a bit
-    
+
 
 from registration import basic_type_regs
 
@@ -76,9 +76,9 @@ def make_wicked_suite(klasses, layer, content_type="Document", field="text"):
         suite.addTest(new)
     return suite
 
-        
+
 def test_suite():
-    suites = make_wicked_suite(test_klasses, SelectiveATCT) 
+    suites = make_wicked_suite(test_klasses, SelectiveATCT)
     return unittest.TestSuite(suites)
-    
-    
+
+

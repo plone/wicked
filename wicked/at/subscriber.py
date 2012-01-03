@@ -39,7 +39,7 @@ def at_handle_target_moved(obj, event):
     #@@ add more tests
     if IObjectRemovedEvent.providedBy(event):
         return
-    
+
     refs=obj.getRefs(relationship=config.BACKLINK_RELATIONSHIP)
     path = '/'.join(obj.getPhysicalPath())
     for target in refs:
@@ -52,4 +52,4 @@ def at_handle_target_moved(obj, event):
                         uid=uid)
                 wicked.cache.reset(uid, [data])
 
-    
+

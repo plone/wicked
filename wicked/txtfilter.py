@@ -10,7 +10,7 @@
 #   - and contributors
 #
 ##########################################################
-from interfaces import IAmWickedField, IAmWicked, IFieldEvent 
+from interfaces import IAmWickedField, IAmWicked, IFieldEvent
 from interfaces import ICacheManager, IValueToString, IScope
 from interfaces import IWickedFilter, IWickedQuery, IBacklinkManager
 from normalize import titleToNormalizedId as normalize
@@ -77,7 +77,7 @@ class WickedFilter(TxtFilter):
         except AttributeError:
             encoding = self._encoding
         return encoding
-    
+
     def _filterCore(self, chunk, **kwargs):
         normalled = self.normalize(chunk)
         links=self.getLinks(chunk, normalled)
@@ -88,7 +88,7 @@ class WickedFilter(TxtFilter):
     def filtered_text(self):
         """syntax preprocessing"""
         return super(WickedFilter, self).filtered_text
-    
+
     @utils. memoize
     @utils.linkcache
     def getLinks(self, chunk, normalled):
@@ -106,7 +106,7 @@ class WickedFilter(TxtFilter):
         """
         return self.query_iface(self.context)
 
-    @utils.memoizedproperty    
+    @utils.memoizedproperty
     def backlinker(self):
         return getMultiAdapter((self, self.context), IBacklinkManager)
 
@@ -115,14 +115,14 @@ class WickedFilter(TxtFilter):
 
     def unlink(self, uid):
         self.backlinker.unlink(uid)
-        
+
     def manageLinks(self, links):
         self.backlinker.manageLinks(links)
-        
+
     @utils.memoizedproperty
     def cache(self):
         return getMultiAdapter((self, self.context), ICacheManager)
-    
+
     @utils.memoizedproperty
     def renderer(self):
         # @@ better way to get request? maybe a txtfilter should be a view?
@@ -163,13 +163,13 @@ class WickedListener(object):
 
     def __init__(self, pattern):
         self.pattern = pattern
-        
+
     def render(self, field, instance, event):
         """standalone wicked filter (ie not as a txtfilter). Optimal if
         not using txtfilters"""
 
         if event.kwargs.get('raw', False):
-            return 
+            return
 
         wicked = getMultiAdapter((field, instance, event), IWickedFilter)
         wicked.pattern = self.pattern
@@ -185,7 +185,7 @@ class WickedListener(object):
             # no adapter registered for this type currently
             # @@ This might be handle better by redispatch
             return
-        
+
         wicked.pattern = self.pattern
         if not event.value:
             return
@@ -219,7 +219,7 @@ def backlink_handler(field, event):
         # no adapter registered for this type currently
         # @@ This might be handle better by redispatch
         return
-        
+
     if not event.value:
         return
 
@@ -252,11 +252,11 @@ class wicked_listener(object):
 
 class bracketted_wicked_listener(object):
     __init__=staticmethod(pattern2_listeners.render)
-    
+
 class backlink(object):
     implements(IFieldValueSetter)
     adapts(IAmWickedField, IFieldStorageEvent)
-    
+
     __init__ = staticmethod(pattern1_listeners.store)
 
 BacklinkRegistrationProxy = backlink
@@ -264,12 +264,12 @@ BacklinkRegistrationProxy = backlink
 class brackettedbacklink(object):
     implements(IFieldValueSetter)
     adapts(IAmWickedField, IFieldStorageEvent)
-    
-    __init__ = staticmethod(pattern2_listeners.store)    
+
+    __init__ = staticmethod(pattern2_listeners.store)
 
 
 ## toy example code ##
-    
+
 @adapter(IAmWickedField, IAmWicked, IFieldRenderEvent)
 @implementer(ITxtFilterList)
 def filter_list(field, context, event):

@@ -24,7 +24,7 @@ from Products.CMFCore.utils import getToolByName
 from wicked.at.field import WikiField
 from wicked.atcontent import zope2
 from wicked.interfaces import IAmWicked
-from zope.annotation.interfaces import IAttributeAnnotatable 
+from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.interface import implements
 
 try:
@@ -37,7 +37,7 @@ try:
 except ImportError: # ATCT 0.2
     from Products.ATContentTypes.config import ATDOCUMENT_CONTENT_TYPE
 
-     
+
 class WickedDoc(ATDocument):
     """ A page in the portal; supports wiki linking. """
     implements(IAmWicked, IAttributeAnnotatable)

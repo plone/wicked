@@ -5,7 +5,7 @@ def dummy(kdict, name='dummy', iface=ITestObject, bases=(object,)):
     """ factory for dummies """
     obj = type(name, bases, kdict)()
     mark(obj, iface)
-    return obj 
+    return obj
 
 def getToolByName(context, tool_name):
     """
@@ -18,7 +18,7 @@ portal_path = "/path_to/portal"
 class portal_url(object):
     def __init__(self, portal_path=portal_path):
         self.portal_path=portal_path
-        
+
     def getPortalPath(self):
         return self.portal_path
 
@@ -39,7 +39,7 @@ class pdo(dict):
 
     def getPath(self):
         return portal_path + "/%s" %self.getId
-    
+
     def getObject(self):
         self.UID = lambda : self.UID
         return self

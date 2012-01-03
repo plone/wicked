@@ -15,7 +15,7 @@ class WickedAdd(object):
 
     def notify_content_added(self, newcontent, title, section):
         notify(WickedContentAddedEvent(self.context, newcontent, title, section, self.request))
-        
+
     def add_content(self, title=None, section=None, type_name=_marker):
         raise NotImplementedError
 
@@ -28,7 +28,7 @@ _marker=object()
 class BasicLink(object):
     implements(IWickedLink)
     section = _marker
-    
+
     def __init__(self, context, request):
         self.context = context
         self._context = (context,)

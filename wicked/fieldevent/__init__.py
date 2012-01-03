@@ -16,10 +16,10 @@ def notifyFieldEvent(event):
         event.value = getMultiAdapter((field, event), IFieldValue)
         if event.kwargs.get('raw', False) or getattr(event, 'raw', False):
             # bail out
-            return 
+            return
 
     handle(event.field, event.instance, event)
-    
+
     if IFieldStorageEvent.providedBy(event):
         for ignore in subscribers((field, event), IFieldValueSetter):
             pass
@@ -53,14 +53,14 @@ def test_suite():
     from zope.component import provideAdapter, provideHandler
     from zope.component import provideSubscriptionAdapter
     from zope.testing.cleanup import cleanUp
-    
+
     def setUp(tc):
         # clean slate!
         cleanUp()
 
         # init event system
         from zope.component import event
-        
+
         # register components
         provideHandler(notifyFieldEvent)
         provideAdapter(at_field_retrieval)
@@ -68,10 +68,10 @@ def test_suite():
 
     def tearDown(tc):
         cleanUp()
-        
+
     globs=globals()
     globs.update(locals())
-    
+
     optflags = doctest.REPORT_ONLY_FIRST_FAILURE | doctest.ELLIPSIS
     rm = doctest.DocFileTest("README.txt",
                              package="wicked.fieldevent",
@@ -79,5 +79,5 @@ def test_suite():
                              setUp=setUp,
                              tearDown=tearDown,
                              optionflags=optflags)
-    
+
     return unittest.TestSuite((rm,))

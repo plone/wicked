@@ -26,7 +26,7 @@ _marker = object()
 class CacheStore(Persistent):
     """
     basic persistent cache object
-    
+
     see cache.txt
     """
     def __init__(self, id_):
@@ -54,7 +54,7 @@ class CacheStore(Persistent):
             subcache = self.field[key]
             self._p_changed
         return subcache
-        
+
     def remove(self, key):
         val = self._cache.get(key)
         if val:
@@ -65,7 +65,7 @@ class CacheStore(Persistent):
                     if uid==key:
                         del fcache[slug]
 
-           
+
 class Cache(PersistentMapping):
 
     def __init__(self, id_=None, parent=None):
@@ -91,7 +91,7 @@ class Cache(PersistentMapping):
         self.parent.set(uid, value)
         self._p_changed
         return value
-        
+
     def __getitem__(self, key):
         retval = self.parentGet(key)
         if retval: return retval
@@ -110,14 +110,14 @@ class Cache(PersistentMapping):
         self.parent.remove(key)
         super(Cache, self).__delitem__(key)
 
-# @@ migrate to new name        
+# @@ migrate to new name
 CACHE_KEY = 'Products.wicked.lib.factories.ContentCacheManager'
 
 class BaseCacheManager(object):
     """abstract base"""
     implements(ICacheManager)
     adapts(IWickedFilter, IAmWicked)
-    
+
     def __init__(self, wicked, context):
         self.context = context
         self.name = wicked.section
@@ -139,14 +139,14 @@ class BaseCacheManager(object):
     @memoizedproperty
     def cache(self):
         return self._get_cache()
-    
+
     def get(self, key, default=None):
         return self.cache.get(key, default)
-        
+
     def set(self, key, value):
         self.cache.set(key, value)
         return value
-        
+
     def unset(self, key, use_uid=False):
         val = None
         if use_uid:
@@ -160,7 +160,7 @@ class BaseCacheManager(object):
             del self.cache[key]
 
         return val
-    
+
     def remove(self, uid):
         self.cache_store.remove(uid)
 

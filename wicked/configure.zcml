@@ -12,14 +12,14 @@
        providers -->
   <!-- include file="txtfilter-example.zcml" / -->
 
-  <adapter 
+  <adapter
      factory="wicked.cache.ContentCacheManager"
      permission="zope2.Public"
      />
 
    <!-- for backlinking / content creation -->
    <adapter
-      factory=".txtfilter.WickedFilter" 
+      factory=".txtfilter.WickedFilter"
       provides="wicked.interfaces.IWickedFilter"
       for="wicked.interfaces.IAmWickedField
 	   wicked.interfaces.IAmWicked
@@ -27,7 +27,7 @@
       />
 
    <adapter
-      factory=".txtfilter.WickedFilter" 
+      factory=".txtfilter.WickedFilter"
       provides="wicked.interfaces.IWickedFilter"
       for="wicked.interfaces.IAmWickedField
 	   wicked.interfaces.IAmWicked
@@ -35,12 +35,12 @@
       />
 
    <!-- redispatch needed for wicked content creation events -->
-   <subscriber 
-      handler="wicked.link.redispatch" 
+   <subscriber
+      handler="wicked.link.redispatch"
       />
 
    <!-- handles backlinking  -->
-   <!-- subscriber 
+   <!-- subscriber
       factory="wicked.txtfilter.backlink_handler"
       provides="wicked.fieldevent.IFieldValueSetter" / -->
 

@@ -39,7 +39,7 @@ class ATWickedAdd(WickedAdd, BrowserView):
         self.notify_content_added(newcontent, title, section)
 
     def _create_content(self, title, type_name):
-        assert title, 'Must have a title to create content' 
+        assert title, 'Must have a title to create content'
         newcontentid = normalize(title)
         container = self.aq_parent.aq_parent
         newcontentid = container.invokeFactory(type_name, id=newcontentid,
@@ -50,9 +50,9 @@ class ATWickedAdd(WickedAdd, BrowserView):
 class ATPortalFactoryAdd(ATWickedAdd):
 
     def _create_content(self, title, type_name):
-        assert title, 'Must have a title to create content' 
+        assert title, 'Must have a title to create content'
         id_=self.context.generateUniqueId(type_name)
-        
+
         new_content = self.context.restrictedTraverse('portal_factory/%s/%s' % (type_name, id_))
 
         transaction_note('Initiated creation of %s with id %s in %s' % \
@@ -77,7 +77,7 @@ def handle_at_newcontent(context, event):
                                                           portal_status_message)
     event.request.RESPONSE.redirect(restr)
 
-    
+
 class BasicFiveLink(BasicLink, BrowserView):
     """
     Five prepared link implementation

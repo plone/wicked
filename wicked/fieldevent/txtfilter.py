@@ -8,10 +8,10 @@ from interfaces import ITxtFilter
 
 def txtfilter_output(field, instance, event):
     """a run once subscriber to process text in a pipeline"""
-    
+
     if getattr(event, '_txtfiltered_', False):
         return
-    
+
     filter_names = queryMultiAdapter((field, instance, event), ITxtFilterList)
     if not filter_names:
         return
@@ -26,7 +26,7 @@ def txtfilter_output(field, instance, event):
                 txtfilter()
         except EndFiltrationException, e:
             break
-        
+
     event._txtfiltered_=True
 
 
@@ -34,10 +34,10 @@ class TxtFilter(object):
     """Abstract Base for Filtration
     """
     implements(ITxtFilter)
-    
+
     name = None    # required
     pattern = None
-    
+
     def __init__(self, field, context, event):
         self.context = context
         self.field = field
@@ -50,7 +50,7 @@ class TxtFilter(object):
             if len(val):
                 return val
         return val
-        
+
     @utils.memoizedproperty
     def patterns(self):
         if not isinstance(self.pattern, list):
@@ -79,10 +79,10 @@ class TxtFilter(object):
     def filtered_text(self):
         """join the two lists (knowing that len(text) == subs+1)"""
         return ''.join(ijoin(self.chunks[::2], self.filtered_chunks))
-    
+
     def __call__(self):
         if len(self.chunks) == 1: # fastpath
-            return 
+            return
 
         # set value reference (accessing filtered_text does the work)
         self.event.value = self.filtered_text

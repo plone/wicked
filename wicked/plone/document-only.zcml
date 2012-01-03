@@ -6,7 +6,7 @@
 
   <wicked:decorate-at-field
      fieldclass="Products.Archetypes.Field.TextField"
-     />  
+     />
 
   <!-- ATDocument -->
 

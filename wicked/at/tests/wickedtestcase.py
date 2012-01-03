@@ -1,10 +1,10 @@
 from Testing import ZopeTestCase
 from Testing.ZopeTestCase import installPackage
 from Products.PloneTestCase import ptc
-from Products.PloneTestCase.layer import onsetup, PloneSite 
+from Products.PloneTestCase.layer import onsetup, PloneSite
 from wicked.testing.xml import xstrip as strip
 from wicked.normalize import titleToNormalizedId
-from wicked.registration import BasePloneWickedRegistration 
+from wicked.registration import BasePloneWickedRegistration
 from Products.Five import zcml
 
 TITLE1 = "Cop Shop"
@@ -55,7 +55,7 @@ class WickedTestCase(ptc.PloneTestCase):
     def set_text(self, content, text, **kw):
         setter = getattr(content, self.setter)
         setter(text, **kw)
-    
+
     def afterSetUp(self):
         #self.loginAsPortalOwner()
         # add some pages
@@ -65,7 +65,7 @@ class WickedTestCase(ptc.PloneTestCase):
         self.page2 = makeContent(self.folder,id2,self.wicked_type, title=TITLE2)
 
     strip = staticmethod(strip)
- 
+
     def getRenderedWickedField(self, doc):
         fieldname = self.wicked_field
         text = doc.getField(fieldname).get(doc)

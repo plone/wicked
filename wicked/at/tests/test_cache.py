@@ -29,7 +29,7 @@ class TestLinkCache(WickedTestCase):
         self.filter = utils.getWicked(field, self.page1)
         self.wicked_ccm = self.filter.cache
         self.wicked_ccm.name=field.getName()
-        
+
     def test_linkGetsCached(self):
         field = self.field
         wicked_ccm = self.wicked_ccm
@@ -50,7 +50,7 @@ class TestLinkCache(WickedTestCase):
         value = self.getRenderedWickedField(self.page1)
         self.failUnless(MARKER['path'] in value)
         self.failIfWickedLink(self.page1, self.page2)
-        
+
 
 def test_suite():
     suite = unittest.TestSuite()

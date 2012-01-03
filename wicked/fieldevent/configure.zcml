@@ -7,7 +7,7 @@
 
   <adapter factory="wicked.fieldevent.at_field_retrieval"  />
 
-  <subscriber factory="wicked.fieldevent.at_field_storage" 
+  <subscriber factory="wicked.fieldevent.at_field_storage"
 	      provides=".interfaces.IFieldValueSetter" />
 
 </configure>

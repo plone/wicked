@@ -17,7 +17,7 @@ class Filter(object):
     dummy
     """
     implements(Interface)
-    
+
     def __init__(self, context):
         self.context = context
 
@@ -26,7 +26,7 @@ class Filter(object):
 
     def filter(self, *args, **kwargs):
         pass
-    
+
     section='body'
 
 portal_tools = dict()
@@ -50,18 +50,18 @@ from general import pdo
 
 ## class pRefCat(dict):
 ##     def _queryFor(self, **kw):
-##         self.get(kw['tid']) 
+##         self.get(kw['tid'])
 
 ##     def addReference(self, obj, target, *args, **kwargs):
 ##         attrs= dict(targetUID=target.UID())
 
 ##         if not self.has_key(self[obj.UID()]):
 ##             self[obj.UID()] = []
-            
+
 ##         self[obj.UID()].append(pdo(attrs))
 
 ##     def _resolveBrains(self, suid, tuid, *args):
 ##         return [x for x in self.get(suid) if x.targetUID==tuid].pop()
-    
+
 ##    def _deleteReference(self, obj):
 ##         del self[obj.UID()]

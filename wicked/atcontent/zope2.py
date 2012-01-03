@@ -11,7 +11,7 @@ def initialize(context):
     from Products.CMFCore import utils as cmf_utils
     #app = context._ProductContext__app
     #patch_listDefaultTypeInformation(app)
-    
+
     from ironicwiki import IronicWiki
     try:
         from wickeddoc import WickedDoc
@@ -30,7 +30,7 @@ def initialize(context):
 
         # Assign default roles
         setDefaultRoles(permission, ('Manager', 'Owner'))
-    
+
     allTypes = zip(content_types, constructors)
     for atype, constructor in allTypes:
         kind = "%s: %s" % (PROJECTNAME, atype.archetype_name)
