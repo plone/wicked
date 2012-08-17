@@ -31,16 +31,16 @@ rolling.
     >>> renderer.load([link], 'Chunk')
     >>> renderer.section='fieldname'
     >>> from wicked.testing.xml import xstrip
-    >>> print  xstrip(renderer())
+    >>> print xstrip(renderer())
     <span id="fieldname-uid"><a class="link-wiki" href="http://nohost/apath">...Chunk</a></span>...
 
 
     >>> renderer.load([], 'Chunk 2')
     >>> print xstrip(renderer())
-    <span class="" id="fieldname-1"><a class="link-wiki-add" title="Click to add a new page" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk 2&amp;section=fieldname">...Chunk 2<sup>[+]</sup></a></span>...
+    <span...class="" id="fieldname-1"><a class="link-wiki-add" title="Click to add a new page" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk 2&amp;section=fieldname">...Chunk 2<sup>[+]</sup></a></span>...
 
 Test counter::
 
     >>> renderer.load([], 'Chunk 3')
     >>> print xstrip(renderer())
-    <span class="" id="fieldname-2"><a class="link-wiki-add" title="Click to add a new page" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk 3&amp;section=fieldname">...Chunk 3<sup>[+]</sup></a></span>...
+    <span...class="" id="fieldname-2"><a class="link-wiki-add" title="Click to add a new page" href="http://nohost/test_folder_1_/testfo/@@wickedadd?Title=Chunk 3&amp;section=fieldname">...Chunk 3<sup>[+]</sup></a></span>...

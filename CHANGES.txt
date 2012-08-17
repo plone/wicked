@@ -4,6 +4,8 @@ Changelog
 1.1.10 (unreleased)
 -------------------
 
+- Fix minor white space test failures in combination with chameleon.
+  [maurits]
 
 1.1.9 (2010-09-09)
 ------------------
