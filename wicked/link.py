@@ -65,7 +65,18 @@ class BasicLink(object):
     @utils.clearbefore
     def load(self, links, chunk):
         self._links = links
-        self.chunk = chunk
+        if(chunk.lower().startswith('file:')):
+            parts = chunk[5:].strip().split('|')
+            self.type = 'Image'
+        elif(chunk.lower().startswith('download:')):
+            parts = chunk[9:].strip().split('|')
+            self.type = 'File'
+        else:
+            parts = chunk.strip().split('|')
+            self.type = 'Document'
+        
+        self.title = parts[0].strip()
+        self.chunk = parts[-1].strip()
 
 
 @adapter(IWickedEvent)
