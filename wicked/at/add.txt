@@ -46,10 +46,18 @@ Let's try this through the publisher:
     >>> from Testing.ZopeTestCase import user_name
     >>> from Testing.ZopeTestCase import user_password
 
+    >>> self.login(user_name)
+
+    >>> def getAuth():
+    ...     try:
+    ...         from plone.protect import authenticator
+    ...         return authenticator.createToken()
+    ...     except:
+    ...         return ''
     >>> print http(r'''
-    ... GET /plone/Members/test_user_1_/testfo/first-doc/@@wickedadd?Title=%s&section=text HTTP/1.1
+    ... GET /plone/Members/test_user_1_/testfo/first-doc/@@wickedadd?Title=%s&section=text&_authenticator=%s HTTP/1.1
     ... Authorization: Basic %s:%s
-    ... ''' % ('Spam', user_name, user_password))
+    ... ''' % ('Spam', getAuth(), user_name, user_password))
     HTTP/1.1 302 Moved Temporarily...
 
     >>> 'spam' in testfo.contentIds()
