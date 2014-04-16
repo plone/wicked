@@ -19,7 +19,7 @@ def linkcache(func):
         # this could use some untangling
         # generic function?
         value = wfilter.cache.get(normalized)
-        if not value:
+        if not value or '/'.join(wfilter.context.getPhysicalPath()) != wfilter.cache.cache_store.id:
             value = func(wfilter, chunk, normalized)
             if value:
                 uid = value[0]['uid']
