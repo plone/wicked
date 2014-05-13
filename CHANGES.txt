@@ -4,7 +4,8 @@ Changelog
 1.1.12 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Invalidate cache when object has been moved or copied.
+  [domruf]
 
 
 1.1.11 (2014-04-15)
