@@ -67,7 +67,13 @@ class WickedFilter(TxtFilter):
     # optimization
     @utils.memoize
     def normalize(self, value):
-        return self._normalize(value)
+        if(value.lower().startswith('file:')):
+            parts = value[5:].strip().split('|')
+        elif(value.lower().startswith('download:')):
+            parts = value[9:].strip().split('|')
+        else:
+            parts = value.strip().split('|')
+        return self._normalize(parts[0].strip())
 
     @utils.memoizedproperty
     def encoding(self):
