@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.1.12 (unreleased)
+1.1.12 (2014-10-13)
 -------------------
 
 - Invalidate cache when object has been moved or copied.
